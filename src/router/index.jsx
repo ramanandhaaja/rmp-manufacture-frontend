@@ -3,6 +3,7 @@ import RNDPages from "../pages/RNDPages";
 import TestPage from "../pages/TestPage";
 import VendorManagement from "../pages/vendorManagement/index";
 import AddVendorPage from "../pages/vendorManagement/AddVendorPage";
+import DetailVendorPage from "../pages/vendorManagement/DetailVendorPage";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/vendor-management/add-vendor",
     element: <AddVendorPage />,
+  },
+  {
+    path: "/vendor-management/detail-vendor",
+    element: <DetailVendorPage />,
   },
 ]);
 
