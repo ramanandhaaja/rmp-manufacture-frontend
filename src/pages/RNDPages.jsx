@@ -1,8 +1,9 @@
 import PermintaanRnD from "../components/R&D/PermintaanR&D.jsx";
-import SearchAndFilter from "../components/SearchAndFilter.jsx";
+import SearchAndActionBtn from "../components/SearchAndActionBtn.jsx";
 import Tabs from "../components/Tabs.jsx";
 import Layout from "../components/layout/Layout.jsx";
 import { useState } from "react";
+import PageTitle from "../components/PageTitle.jsx";
 
 const tabData = [
   { name: "permintaan", label: "List Permintaan" },
@@ -14,17 +15,14 @@ const RNDPages = () => {
 
   return (
     <Layout>
-      <div className="border-b border-gray-200 mb-4">
-        <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
-          Permintaan Pengembangan Produk
-        </h1>
-      </div>
+      <PageTitle title={"Permintaan Pengembangan Produk "} />
+
       <Tabs
         tabData={tabData}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
-      <SearchAndFilter />
+      <SearchAndActionBtn />
       <PermintaanRnD />
     </Layout>
   );

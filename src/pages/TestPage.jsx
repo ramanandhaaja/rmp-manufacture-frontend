@@ -1,5 +1,6 @@
 import LayoutRightSpace from "../components/layout/LayoutRightSpace";
 import Timeline from "../components/Timeline";
+import PageTitle from "../components/PageTitle";
 
 const Content = () => {
   return <div> content</div>;
@@ -8,11 +9,8 @@ const Content = () => {
 const TestPage = () => {
   return (
     <LayoutRightSpace content={<Content />}>
-      <div className="border-b border-gray-200 mb-4">
-        <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
-          Log Test
-        </h1>
-      </div>
+      <PageTitle title={"Test page"} />
+
       <Timeline />
     </LayoutRightSpace>
   );

@@ -1,6 +1,12 @@
-import { Filter } from "lucide-react";
+import { Filter, Upload, Download, Plus } from "lucide-react";
 
-const SearchAndFilter = ({ buttonTitle }) => {
+const SearchAndActionBtn = ({
+  buttonTitle,
+  buttonClassName,
+  showBtnImport = false,
+  showAddBtn = false,
+  onClickAddBtn,
+}) => {
   return (
     <div className="flex justify-between mb-6">
       <div className="relative flex gap-2">
@@ -31,14 +37,31 @@ const SearchAndFilter = ({ buttonTitle }) => {
         </button>
       </div>
       <div className="flex gap-3">
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700">
+        <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2">
           Export
+          <Upload size={16} />
         </button>
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700">
-          Import
-        </button>
+        {showBtnImport && (
+          <>
+            <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2">
+              Import
+              <Download size={16} />
+            </button>
+          </>
+        )}
+        {showAddBtn && (
+          <button
+            onClick={onClickAddBtn}
+            className={`px-4 py-2  rounded-lg text-gray-700 flex items-center gap-2 ${
+              buttonClassName || ""
+            } `}
+          >
+            {buttonTitle}
+            <Plus size={16} />
+          </button>
+        )}
       </div>
     </div>
   );
 };
-export default SearchAndFilter;
+export default SearchAndActionBtn;
