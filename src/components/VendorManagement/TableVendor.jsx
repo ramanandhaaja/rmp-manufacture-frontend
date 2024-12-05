@@ -76,32 +76,40 @@ const VendorTable = () => {
     },
   ];
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto text-sm">
       <table className="w-full">
         <thead>
           <tr className="bg-gray-50">
-            <th className="py-3 px-4 text-left text-indigo-900">ID</th>
-            <th className="py-3 px-4 text-left text-indigo-900">Nama Vendor</th>
-            <th className="py-3 px-4 text-left text-indigo-900">Kategori</th>
-            <th className="py-3 px-4 text-left text-indigo-900">PIC</th>
-            <th className="py-3 px-4 text-left text-indigo-900">Kontak PIC</th>
-            <th className="py-3 px-4 text-left text-indigo-900">Email PIC</th>
-            <th className="py-3 px-4 text-left text-indigo-900">
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">ID</th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">
+              Nama Vendor
+            </th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">
+              Kategori
+            </th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">PIC</th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">
+              Kontak PIC
+            </th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">
+              Email PIC
+            </th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">
               Status Approval
             </th>
-            <th className="py-3 px-4 text-left text-indigo-900"></th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 bg-white">
           {vendors.map((vendor) => (
             <tr key={vendor.id} className="hover:bg-gray-50">
-              <td className="py-6 px-4">{vendor.id}</td>
-              <td className="py-6 px-4">{vendor.namaVendor}</td>
-              <td className="py-6 px-4">{vendor.kategori}</td>
-              <td className="py-6 px-4">{vendor.pic}</td>
-              <td className="py-6 px-4">{vendor.kontakPIC}</td>
-              <td className="py-6 px-4">{vendor.emailPIC}</td>
-              <td className="py-6 px-4 ">
+              <td className="py-6 px-4 text-sm">{vendor.id}</td>
+              <td className="py-6 px-4 text-sm">{vendor.namaVendor}</td>
+              <td className="py-6 px-4 text-sm">{vendor.kategori}</td>
+              <td className="py-6 px-4 text-sm">{vendor.pic}</td>
+              <td className="py-6 px-4 text-sm">{vendor.kontakPIC}</td>
+              <td className="py-6 px-4 text-sm">{vendor.emailPIC}</td>
+              <td className="py-6 px-4 text-sm ">
                 <span
                   className={`px-2 py-1 rounded-full text-xs
                   ${
@@ -168,7 +176,7 @@ const VendorTable = () => {
           ))}
         </tbody>
       </table>
-      <div className="mt-4">
+      <div className="mt-4 text-sm">
         <PaginationBtn
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}

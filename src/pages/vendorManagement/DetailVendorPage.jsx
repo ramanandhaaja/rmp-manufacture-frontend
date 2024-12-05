@@ -32,9 +32,15 @@ const DetailVendorPage = () => {
 
   return (
     <LayoutRightSpace>
-      <PageTitle title={"PT Gunung Sindur"} />
+      <div className="flex gap-2 ">
+        <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
+          PT Gunung Sindur
+        </h1>
+        <div className="bg-gray-200 text-gray-700 h-8 px-3 py-1 rounded-lg text-sm">
+          Menunggu Persetujuan
+        </div>
+      </div>
 
-      {/* Tabs */}
       <div className="p-6">
         <Tabs
           tabData={tabData}
@@ -50,37 +56,37 @@ const DetailVendorPage = () => {
               <div className="grid grid-cols-1 gap-2">
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">ID</p>
-                  <p>{vendorData.id}</p>
+                  <p className="text-sm">{vendorData.id}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Nama Vendor</p>
-                  <p>{vendorData.namaVendor}</p>
+                  <p className="text-sm">{vendorData.namaVendor}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Kategori</p>
-                  <p>{vendorData.kategori}</p>
+                  <p className="text-sm">{vendorData.kategori}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">PIC</p>
-                  <p>{vendorData.pic}</p>
+                  <p className="text-sm">{vendorData.pic}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Kontak PIC</p>
-                  <p>{vendorData.kontakPIC}</p>
+                  <p className="text-sm">{vendorData.kontakPIC}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Email PIC</p>
-                  <p>{vendorData.emailPIC}</p>
+                  <p className="text-sm">{vendorData.emailPIC}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Alamat</p>
-                  <p>{vendorData.alamat}</p>
+                  <p className="text-sm">{vendorData.alamat}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">
                     Tipe Barang Vendor
                   </p>
-                  <p>{vendorData.tipeBarangVendor}</p>
+                  <p className="text-sm">{vendorData.tipeBarangVendor}</p>
                 </div>
               </div>
             </div>

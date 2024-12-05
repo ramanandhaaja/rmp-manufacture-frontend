@@ -69,7 +69,7 @@ const Timeline = () => {
 
             {/* Content on the right */}
             <div className="flex-1 pl-4">
-              <div className="mt-1 text-base font-semibold">{step.title}</div>
+              <div className="mt-1 text-sm font-semibold">{step.title}</div>
               <div className="text-sm text-gray-500">{step.description}</div>
             </div>
           </div>
