@@ -5,37 +5,37 @@ import { format } from "date-fns";
 const steps = [
   {
     date: "2024-05-19",
-    title: "Selesai",
+    title: "PO [PO0001] ATK Kantor - Bermasalah",
     description: "Lorem Ipsum",
     completed: true,
   },
   {
     date: "2024-04-14",
-    title: "Permintaan",
+    title: "PO [PO0002] ATK Kantor - Bermasalah",
     description: "Lorem Ipsum",
     completed: false,
   },
   {
     date: "2024-04-14",
-    title: "PO Terbuat",
+    title: "PO [PO0003] ATK Kantor - Baik",
     description: "Lorem Ipsum",
     completed: false,
   },
   {
     date: "2024-04-14",
-    title: "Disetujui",
+    title: "PO [PO0004] ATK Kantor - Baik",
     description: "Lorem Ipsum",
     completed: false,
   },
   {
     date: "2024-04-13",
-    title: "Direvisi",
+    title: "PO [PO0005] ATK Kantor - Baik",
     description: "Lorem Ipsum",
     completed: false,
   },
   {
     date: "2024-04-12",
-    title: "Menunggu Persetujuan",
+    title: "PO [PO0006] ATK Kantor - Baik",
     description: "Lorem Ipsum",
     completed: false,
   },
@@ -43,7 +43,7 @@ const steps = [
 
 const Timeline = () => {
   return (
-    <div className="relative">
+    <div className="relative right-[40%]">
       {steps.map((step, index) => (
         <div key={index} className="mb-8 flex items-start">
           {/* Vertical line */}

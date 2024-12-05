@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { MoreVertical } from "lucide-react";
 import PaginationBtn from "../PaginationBtn";
+import PopupMenu from "../PopUpMenu";
+import { useNavigate } from "react-router-dom";
 
 const VendorTable = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -117,9 +120,49 @@ const VendorTable = () => {
                 </span>
               </td>
               <td className="py-3 px-4">
-                <button className="p-1 hover:bg-gray-100 rounded-full">
-                  <MoreVertical className="h-5 w-5 text-gray-500" />
-                </button>
+                {vendor.statusApproval == "Menunggu Persetujuan" ? (
+                  <PopupMenu
+                    items={[
+                      {
+                        label: "Edit",
+                        onClick: () => {
+                          console.log("Edit vendor:", vendor.id);
+                        },
+                      },
+                      {
+                        label: "Hapus",
+                        onClick: () => {
+                          console.log("Delete vendor:", vendor.id);
+                        },
+                      },
+                      {
+                        label: "Lihat Detail",
+                        onClick: () => {
+                          navigate("/vendor-management/detail-vendor");
+                        },
+                      },
+                    ]}
+                  >
+                    <button className="p-1 hover:bg-gray-100 rounded-full">
+                      <MoreVertical className="h-5 w-5 text-gray-500" />
+                    </button>
+                  </PopupMenu>
+                ) : (
+                  <PopupMenu
+                    items={[
+                      {
+                        label: "Lihat Detail",
+                        onClick: () => {
+                          navigate("/vendor-management/detail-vendor");
+                        },
+                      },
+                    ]}
+                  >
+                    <button className="p-1 hover:bg-gray-100 rounded-full">
+                      <MoreVertical className="h-5 w-5 text-gray-500" />
+                    </button>
+                  </PopupMenu>
+                )}
               </td>
             </tr>
           ))}
