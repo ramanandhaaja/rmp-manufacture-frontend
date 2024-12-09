@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     element: <AddVendorPage />,
   },
   {
-    path: "/vendor-management/detail-vendor",
+    path: "/vendor-management/detail-vendor/:id",
     element: <DetailVendorPage />,
   },
   {

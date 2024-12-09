@@ -1,23 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Tabs from "../../components/Tabs";
-import PageTitle from "../../components/PageTitle";
-import { Layout } from "lucide-react";
+
 import LayoutRightSpace from "../../components/layout/LayoutRightSpace";
 import Timeline from "../../components/Timeline";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchVendorById } from "../../store/vendorManagement/vendorSlice";
+import { useParams } from "react-router-dom";
 
 const DetailVendorPage = () => {
   const [activeTab, setActiveTab] = useState("detail");
-
-  const vendorData = {
-    id: "6266754",
-    namaVendor: "PT Gunung Sindur",
-    kategori: "Non Material",
-    pic: "Rika Nurlistiani",
-    kontakPIC: "+62 823 4567 8901",
-    emailPIC: "cedemara@gmail.com",
-    alamat: "Jl Perjuangan no 88 Jakarta Barat",
-    tipeBarangVendor: "ATK, Elektronik, Perangkat Komputer",
-  };
+  const dispatch = useDispatch();
+  const { vendorDetails, status, error } = useSelector(
+    (state) => state.vendorList
+  );
+  const { id } = useParams();
 
   const documents = [
     { id: 1, name: "Document 1", filename: "dokumen_kelengkapan.pdf" },
@@ -29,6 +25,10 @@ const DetailVendorPage = () => {
     { name: "detail", label: "Detail Vendor" },
     { name: "history", label: "Riwayat Vendor" },
   ];
+  useEffect(() => {
+    dispatch(fetchVendorById(id));
+  }, [dispatch, id]);
+  console.log(vendorDetails);
 
   return (
     <LayoutRightSpace>
@@ -56,37 +56,39 @@ const DetailVendorPage = () => {
               <div className="grid grid-cols-1 gap-2">
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">ID</p>
-                  <p className="text-sm">{vendorData.id}</p>
+                  <p className="text-sm">{vendorDetails.id}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Nama Vendor</p>
-                  <p className="text-sm">{vendorData.namaVendor}</p>
+                  <p className="text-sm">{vendorDetails.name}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">
                     Tipe Barang Vendor
                   </p>
-                  <p className="text-sm">{vendorData.kategori}</p>
+                  <p className="text-sm">{vendorDetails.vendor_type}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">PIC</p>
-                  <p className="text-sm">{vendorData.pic}</p>
+                  <p className="text-sm">{vendorDetails.pic_name}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Kontak PIC</p>
-                  <p className="text-sm">{vendorData.kontakPIC}</p>
+                  <p className="text-sm">{vendorDetails.pic_phone}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Email PIC</p>
-                  <p className="text-sm">{vendorData.emailPIC}</p>
+                  <p className="text-sm">{vendorDetails.pic_email}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Alamat</p>
-                  <p className="text-sm">{vendorData.alamat}</p>
+                  <p className="text-sm">{vendorDetails.address}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-500 w-32">Kategori Barang</p>
-                  <p className="text-sm">{vendorData.tipeBarangVendor}</p>
+                  <p className="text-sm">
+                    {vendorDetails.goods_category?.join(", ")}
+                  </p>
                 </div>
               </div>
             </div>
@@ -95,7 +97,7 @@ const DetailVendorPage = () => {
             <div>
               <h2 className="text-lg font-medium mb-4">Dokumen Pendukung</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {documents.map((doc) => (
+                {vendorDetails.documents?.map((doc, index) => (
                   <div
                     key={doc.id}
                     className="border rounded-lg p-4 text-center"
@@ -115,14 +117,14 @@ const DetailVendorPage = () => {
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
-                      <p className="font-medium">{doc.name}</p>
+                      <p className="font-medium">Document{index + 1}</p>
                       <p className="text-sm text-gray-500 mb-3">
-                        {doc.filename}
+                        {doc.file_name}
                       </p>
                       <button
                         className="flex items-center px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                         onClick={() =>
-                          console.log(`Downloading ${doc.filename}`)
+                          console.log(`Downloading ${doc.file_name}`)
                         }
                       >
                         <svg

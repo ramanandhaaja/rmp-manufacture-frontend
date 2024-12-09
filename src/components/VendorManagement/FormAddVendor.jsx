@@ -1,36 +1,50 @@
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { kategoriBarangOptions } from "../../const/vendorManagement/index";
+import {
+  createVendor,
+  fetchVendorById,
+} from "../../store/vendorManagement/vendorSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { forwardRef, useImperativeHandle } from "react";
+import { fetchTipeBarang } from "../../store/vendorManagement/tipeBarangSlice";
 
-const FormAddVendor = () => {
+const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
+  const dispatch = useDispatch();
+
+  const { data } = useSelector((state) => state.tipeBarang);
+  const [documentInputs, setDocumentInputs] = useState([]);
+
   const {
     register,
     handleSubmit,
     control,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      vendorName: "",
-      vendorTypes: [],
-      kategoriBarang: [],
-      pic: "",
-      picContact: "",
-      picEmail: "",
+      name: "",
+      goods_category: [],
+      vendor_type: [],
+      pic_name: "",
+      pic_phone: "",
+      pic_email: "",
       address: "",
       documents: [],
     },
   });
 
-  const [documentInputs, setDocumentInputs] = useState([{ id: 1 }]);
+  useEffect(() => {
+    dispatch(fetchTipeBarang({ page: 1, perPage: 10 }));
+  }, [dispatch]);
 
-  const vendorTypeOptions = [
-    { value: "type1", label: "Tipe Barang" },
-    { value: "type2", label: "Tipe Barang" },
-    { value: "type3", label: "Tipe Barang" },
-    { value: "type4", label: "Tipe Barang" },
-  ];
+  const vendorTypeOptions =
+    data?.data?.map((item) => ({
+      value: item.name,
+      label: item.name,
+    })) || [];
 
   const handleFileChange = (e, index) => {
     const file = e.target.files[0];
@@ -40,6 +54,11 @@ const FormAddVendor = () => {
         alert("File size should not exceed 20MB");
         return;
       }
+      setDocumentInputs((prevInputs) => {
+        const newInputs = [...prevInputs];
+        newInputs[index] = { ...newInputs[index], file: file };
+        return newInputs;
+      });
 
       const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
       if (!allowedTypes.includes(file.type)) {
@@ -55,12 +74,13 @@ const FormAddVendor = () => {
     }
   };
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
+  useImperativeHandle(ref, () => ({
+    submit: () => handleSubmit(onSubmit)(),
+    getFormValues: () => getValues(),
+  }));
   return (
     <div className="bg-white rounded-lg p-4 pt-6 md:p-6 lg:p-6 xl:p-6">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form>
         <div className="space-y-6">
           {/* Vendor Name */}
           <div>
@@ -71,14 +91,12 @@ const FormAddVendor = () => {
               type="text"
               placeholder="Value"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              {...register("vendorName", {
+              {...register("name", {
                 required: "Nama Vendor is required",
               })}
             />
-            {errors.vendorName && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.vendorName.message}
-              </p>
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
             )}
           </div>
 
@@ -88,7 +106,7 @@ const FormAddVendor = () => {
               Kategori Barang
             </label>
             <Controller
-              name="kategoriBarang"
+              name="goods_category"
               control={control}
               rules={{ required: "Please select at least one type" }}
               render={({ field }) => (
@@ -101,9 +119,9 @@ const FormAddVendor = () => {
                 />
               )}
             />
-            {errors.vendorTypes && (
+            {errors.goods_category && (
               <p className="mt-1 text-sm text-red-600">
-                {errors.vendorTypes.message}
+                {errors.goods_category.message}
               </p>
             )}
           </div>
@@ -113,7 +131,7 @@ const FormAddVendor = () => {
               Tipe Barang Vendor
             </label>
             <Controller
-              name="vendorTypes"
+              name="vendor_type"
               control={control}
               rules={{ required: "Please select at least one kategori" }}
               render={({ field }) => (
@@ -125,9 +143,9 @@ const FormAddVendor = () => {
                 />
               )}
             />
-            {errors.kategoriBarang && (
+            {errors.vendor_type && (
               <p className="mt-1 text-sm text-red-600">
-                {errors.kategoriBarang.message}
+                {errors.vendor_type.message}
               </p>
             )}
           </div>
@@ -141,10 +159,12 @@ const FormAddVendor = () => {
               type="text"
               placeholder="Value"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              {...register("pic", { required: "PIC is required" })}
+              {...register("pic_name", { required: "PIC is required" })}
             />
-            {errors.pic && (
-              <p className="mt-1 text-sm text-red-600">{errors.pic.message}</p>
+            {errors.pic_name && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.pic_name.message}
+              </p>
             )}
           </div>
 
@@ -158,13 +178,13 @@ const FormAddVendor = () => {
                 type="text"
                 placeholder="Value"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("picContact", {
+                {...register("pic_phone", {
                   required: "Contact is required",
                 })}
               />
-              {errors.picContact && (
+              {errors.pic_phone && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.picContact.message}
+                  {errors.pic_phone.message}
                 </p>
               )}
             </div>
@@ -176,7 +196,7 @@ const FormAddVendor = () => {
                 type="email"
                 placeholder="Value"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("picEmail", {
+                {...register("pic_email", {
                   required: "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -184,9 +204,9 @@ const FormAddVendor = () => {
                   },
                 })}
               />
-              {errors.picEmail && (
+              {errors.pic_email && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.picEmail.message}
+                  {errors.pic_email.message}
                 </p>
               )}
             </div>
@@ -239,6 +259,7 @@ const FormAddVendor = () => {
                     disabled
                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 pr-28"
                     placeholder="document name"
+                    value={input.file ? input.file.name : ""}
                   />
                   <label className="absolute right-1 px-4 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
                     Browse File
@@ -261,6 +282,6 @@ const FormAddVendor = () => {
       </form>
     </div>
   );
-};
+});
 
 export default FormAddVendor;
