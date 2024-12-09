@@ -11,9 +11,9 @@ const initialState = {
 // Async thunk for fetching Tipe Barang
 export const fetchTipeBarang = createAsyncThunk(
   "tipeBarang/fetchTipeBarang",
-  async () => {
+  async ({ page = 1, perPage = 10 }) => {
     const response = await ApiService.fetchData({
-      url: "goods-category",
+      url: `goods-category?page=${page}&per_page=${perPage}`,
       method: "get",
     });
     return response.data;

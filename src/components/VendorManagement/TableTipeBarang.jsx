@@ -12,16 +12,25 @@ const TableTipeBarang = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { data, status, error } = useSelector((state) => state.tipeBarang);
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setId] = useState(null);
 
-  console.log(id);
+  console.log(data);
 
   useEffect(() => {
-    dispatch(fetchTipeBarang());
-  }, [dispatch]);
+    // Fetch data whenever currentPage or itemsPerPage changes
+    dispatch(fetchTipeBarang({ page: currentPage, perPage: itemsPerPage }));
+  }, [dispatch, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    // Set totalPages when data changes
+    if (data && data.last_page) {
+      setTotalPages(data.last_page);
+    }
+  }, [data]);
 
   const handleDelete = async (id) => {
     try {
@@ -31,6 +40,18 @@ const TableTipeBarang = () => {
     } catch (error) {
       console.error("Failed to delete category:", error);
     }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (items) => {
+    setItemsPerPage(items);
+    setCurrentPage(1); // Reset to first page when items per page changes
   };
 
   const capitalizeFirstLetter = (string) => {
@@ -104,8 +125,10 @@ const TableTipeBarang = () => {
       <div className="mt-4 text-sm">
         <PaginationBtn
           currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          itemsPerPage={20}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
         />
       </div>
       <ConfirmationModal
