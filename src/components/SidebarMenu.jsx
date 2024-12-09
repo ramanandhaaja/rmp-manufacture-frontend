@@ -1,9 +1,26 @@
 import React from "react";
 import { ChevronDown, ChevronUp, NotepadText } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const SidebarMenu = () => {
   const [openMenus, setOpenMenus] = React.useState(["R&D"]);
-  const [activeItem, setActiveItem] = React.useState("Prosedur");
+  const [activeItem, setActiveItem] = React.useState("");
+  const location = useLocation();
+
+  React.useEffect(() => {
+    const path = location.pathname;
+    if (path.includes("/vendor-management/vendor")) {
+      setActiveItem("vendor");
+      setOpenMenus((prev) =>
+        prev.includes("Vendor") ? prev : [...prev, "Vendor"]
+      );
+    } else if (path.includes("/vendor-management/tipe-barang")) {
+      setActiveItem("tipe-barang");
+      setOpenMenus((prev) =>
+        prev.includes("Vendor") ? prev : [...prev, "Vendor"]
+      );
+    }
+  }, [location]);
 
   const toggleMenu = (menu) => {
     setOpenMenus((prev) =>
@@ -139,16 +156,27 @@ const SidebarMenu = () => {
           {openMenus.includes("Vendor") && (
             <div className="ml-12 space-y-2 py-1">
               <a
-                href="/vendor-management/vendor-list"
-                className="block py-1.5 text-gray-400 hover:text-gray-600 text-[14px]"
+                href="/vendor-management/vendor"
+                onClick={() => setActiveItem("vendor")}
+                className={`block py-1.5 text-[14px] ${
+                  activeItem === "vendor"
+                    ? "text-blue-600 font-medium"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
               >
-                Vendor List
+                Vendor
               </a>
+
               <a
-                href="#"
-                className="block py-1.5 text-gray-400 hover:text-gray-600 text-[14px]"
+                href="/vendor-management/tipe-barang"
+                onClick={() => setActiveItem("tipe-barang")}
+                className={`block py-1.5 text-[14px] ${
+                  activeItem === "tipe-barang"
+                    ? "text-blue-600 font-medium"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
               >
-                Add Vendor
+                Tipe Barang
               </a>
             </div>
           )}

@@ -5,7 +5,13 @@ const SearchAndActionBtn = ({
   buttonClassName,
   showBtnImport = false,
   showAddBtn = false,
+  showBtnExport = false,
+  showBtnFilter = false,
   onClickAddBtn,
+  onClickFilter,
+  filterButtonRef,
+  onClickExport,
+  onClickImport,
 }) => {
   return (
     <div className="flex justify-between mb-6">
@@ -31,16 +37,27 @@ const SearchAndActionBtn = ({
             />
           </svg>
         </div>
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2">
-          <Filter size={16} />
-          Filter
-        </button>
+        {showBtnFilter && (
+          <button
+            ref={filterButtonRef}
+            onClick={onClickFilter}
+            className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2"
+          >
+            <Filter size={16} />
+            Filter
+          </button>
+        )}
       </div>
       <div className="flex gap-3">
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2">
-          Export
-          <Upload size={16} />
-        </button>
+        {showBtnExport && (
+          <button
+            onClick={onClickExport}
+            className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2"
+          >
+            Export
+            <Upload size={16} />
+          </button>
+        )}
         {showBtnImport && (
           <>
             <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 flex items-center gap-2">

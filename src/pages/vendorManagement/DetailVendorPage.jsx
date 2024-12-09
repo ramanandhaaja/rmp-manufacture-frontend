@@ -63,7 +63,9 @@ const DetailVendorPage = () => {
                   <p className="text-sm">{vendorData.namaVendor}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-gray-500 w-32">Kategori</p>
+                  <p className="text-sm text-gray-500 w-32">
+                    Tipe Barang Vendor
+                  </p>
                   <p className="text-sm">{vendorData.kategori}</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -83,9 +85,7 @@ const DetailVendorPage = () => {
                   <p className="text-sm">{vendorData.alamat}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-gray-500 w-32">
-                    Tipe Barang Vendor
-                  </p>
+                  <p className="text-sm text-gray-500 w-32">Kategori Barang</p>
                   <p className="text-sm">{vendorData.tipeBarangVendor}</p>
                 </div>
               </div>
