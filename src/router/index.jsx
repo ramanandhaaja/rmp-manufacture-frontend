@@ -4,6 +4,8 @@ import TestPage from "../pages/TestPage";
 import VendorManagement from "../pages/vendorManagement/index";
 import AddVendorPage from "../pages/vendorManagement/AddVendorPage";
 import DetailVendorPage from "../pages/vendorManagement/DetailVendorPage";
+import TipeBarangPage from "../pages/vendorManagement/TipeBarangPage";
+import AddTipeBarangPage from "../pages/vendorManagement/AddTipeBarangPage";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +17,7 @@ const router = createBrowserRouter([
     element: <TestPage />,
   },
   {
-    path: "/vendor-management/vendor-list",
+    path: "/vendor-management/vendor",
     element: <VendorManagement />,
   },
   {
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
   {
     path: "/vendor-management/detail-vendor",
     element: <DetailVendorPage />,
+  },
+  {
+    path: "/vendor-management/tipe-barang",
+    element: <TipeBarangPage />,
+  },
+  {
+    path: "/vendor-management/add-tipe-barang",
+    element: <AddTipeBarangPage />,
   },
 ]);
 
