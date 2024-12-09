@@ -14,14 +14,14 @@ const AddTipeBarangPage = () => {
   const formRef = useRef();
 
   const handleSubmit = async (data) => {
+    setLoading(true);
     // Transform tipeBarang to its value not object
 
     const transformedData = {
       ...data,
       goods_type: data.goods_type?.value || data.goods_type,
     };
-    setLoading(true);
-    console.log(transformedData);
+
     try {
       const response = await postTipeBarang(transformedData);
 

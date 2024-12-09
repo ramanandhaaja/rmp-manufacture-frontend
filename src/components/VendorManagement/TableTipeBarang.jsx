@@ -18,8 +18,6 @@ const TableTipeBarang = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setId] = useState(null);
 
-  console.log(data);
-
   useEffect(() => {
     // Fetch data whenever currentPage or itemsPerPage changes
     dispatch(fetchTipeBarang({ page: currentPage, perPage: itemsPerPage }));
@@ -35,7 +33,7 @@ const TableTipeBarang = () => {
   const handleDelete = async (id) => {
     try {
       await deleteTipeBarang(id);
-      dispatch(fetchTipeBarang());
+      window.location.reload();
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to delete category:", error);
