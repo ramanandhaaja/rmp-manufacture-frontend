@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 
 const CMSHeader = () => {
   return (
@@ -31,11 +31,7 @@ const CMSHeader = () => {
 
           {/* Profile */}
           <div className="flex items-center space-x-3">
-            <img
-              src="/api/placeholder/40/40"
-              alt="Profile"
-              className="w-10 h-10 rounded-full border-2 border-gray-200"
-            />
+            <User className="w-7 h-7 rounded-full border-2 border-gray-600 mr-2 mb-1" />
             <div className="flex flex-col">
               <span className="font-semibold text-gray-800">Atalanta Ahlgren</span>
               <span className="text-sm text-gray-500">Managing Director, Superadmin</span>
