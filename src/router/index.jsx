@@ -25,6 +25,10 @@ const router = createBrowserRouter([
     element: <AddVendorPage />,
   },
   {
+    path: "/vendor-management/edit-vendor/:id",
+    element: <AddVendorPage />,
+  },
+  {
     path: "/vendor-management/detail-vendor/:id",
     element: <DetailVendorPage />,
   },
@@ -34,6 +38,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/vendor-management/add-tipe-barang",
+    element: <AddTipeBarangPage />,
+  },
+  {
+    path: "/vendor-management/edit-tipe-barang/:id",
     element: <AddTipeBarangPage />,
   },
 ]);

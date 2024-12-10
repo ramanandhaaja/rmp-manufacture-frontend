@@ -4,7 +4,10 @@ import ApiService from "../../services/ApiService";
 // Initial state
 const initialState = {
   data: [],
+  barangPerId: [],
   status: "idle",
+  statusFetchBarangId: "idle",
+  errorFetchBarangId: null,
   error: null,
 };
 
@@ -14,6 +17,16 @@ export const fetchTipeBarang = createAsyncThunk(
   async ({ page = 1, perPage = 10 }) => {
     const response = await ApiService.fetchData({
       url: `goods-category?page=${page}&per_page=${perPage}`,
+      method: "get",
+    });
+    return response.data;
+  }
+);
+export const fetchTipeBarangId = createAsyncThunk(
+  "tipeBarang/fetchTipeBarangId",
+  async (id) => {
+    const response = await ApiService.fetchData({
+      url: `goods-category/${id}`,
       method: "get",
     });
     return response.data;
@@ -37,6 +50,18 @@ const tipeBarangSlice = createSlice({
       .addCase(fetchTipeBarang.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch Tipe Barang";
+      })
+      .addCase(fetchTipeBarangId.pending, (state) => {
+        state.statusFetchBarangId = "loading";
+      })
+      .addCase(fetchTipeBarangId.fulfilled, (state, action) => {
+        state.statusFetchBarangId = "succeeded";
+        state.barangPerId = action.payload;
+      })
+      .addCase(fetchTipeBarangId.rejected, (state, action) => {
+        state.statusFetchBarangId = "failed";
+        state.errorFetchBarangId =
+          action.errorFetchBarangId.message || "Failed to fetch Barang per Id";
       });
   },
 });
