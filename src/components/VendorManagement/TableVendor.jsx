@@ -167,11 +167,9 @@ const VendorTable = () => {
                     },
                     {
                       label: "Edit",
-                      // onClick: () => {
-                      //   navigate(
-                      //     `/vendor-management/detail-vendor/${vendor.id}`
-                      //   );
-                      // },
+                      onClick: () => {
+                        navigate(`/vendor-management/edit-vendor/${vendor.id}`);
+                      },
                     },
                   ]}
                 >

@@ -1,17 +1,18 @@
 import Button from "../../components/Button";
 import LayoutRightSpace from "../../components/layout/LayoutRightSpace";
-import FormAddTipeBarang from "../../components/VendorManagement/FormAddTipeBarang";
+import FormAddTipeBarang from "../../components/VendorManagement/FormAddKategoriBarang";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
 import { useState, useRef } from "react";
 import { CircleAlert } from "lucide-react";
 import { postTipeBarang } from "../../services/TipeBarangService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AddTipeBarangPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const formRef = useRef();
+  const isEditMode = window.location.pathname.includes("edit");
 
   const handleSubmit = async (data) => {
     setLoading(true);
@@ -48,7 +49,7 @@ const AddTipeBarangPage = () => {
     <LayoutRightSpace>
       <div className=" flex justify-between ">
         <h1 className="text-2xl font-semibold text-indigo-900 ">
-          Add Tipe Barang
+          {isEditMode ? "Edit Kategori Barang" : "Add Kategori Barang"}
         </h1>
         <Button
           title={"Kirim"}

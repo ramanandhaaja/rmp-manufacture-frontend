@@ -10,18 +10,23 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { forwardRef, useImperativeHandle } from "react";
 import { fetchTipeBarang } from "../../store/vendorManagement/tipeBarangSlice";
+import { useParams } from "react-router-dom";
 
 const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
   const dispatch = useDispatch();
-
+  const { id } = useParams();
   const { data } = useSelector((state) => state.tipeBarang);
+  const { vendorDetails } = useSelector((state) => state.vendorList);
+
   const [documentInputs, setDocumentInputs] = useState([]);
+  const isEditMode = window.location.pathname.includes("edit");
 
   const {
     register,
     handleSubmit,
     control,
     getValues,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -38,7 +43,32 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
 
   useEffect(() => {
     dispatch(fetchTipeBarang({ page: 1, perPage: 10 }));
-  }, [dispatch]);
+    if (isEditMode) dispatch(fetchVendorById(id));
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (vendorDetails && isEditMode) {
+      reset({
+        name: vendorDetails.name,
+        goods_category:
+          vendorDetails.goods_category?.map((category) => ({
+            value: category,
+            label: category,
+          })) || [],
+        vendor_type: vendorDetails.vendor_type
+          ? {
+              value: vendorDetails.vendor_type,
+              label: vendorDetails.vendor_type,
+            }
+          : null,
+        pic_name: vendorDetails.pic_name,
+        pic_phone: vendorDetails.pic_phone,
+        pic_email: vendorDetails.pic_email,
+        address: vendorDetails.address,
+        documents: vendorDetails.documents,
+      });
+    }
+  }, [vendorDetails, reset]);
 
   const vendorTypeOptions =
     data?.data?.map((item) => ({

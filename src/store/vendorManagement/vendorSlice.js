@@ -8,6 +8,8 @@ const initialState = {
   status: "idle",
   postStatus: "idle",
   deleteStatus: "idle",
+  editStatus: "idle",
+  editError: null,
   postError: null,
   deleteError: null,
   error: null,
@@ -57,6 +59,18 @@ export const deleteVendor = createAsyncThunk(
     return response.status;
   }
 );
+
+export const editVendor = createAsyncThunk(
+  "vendorList/editVendor",
+  async ({ vendorId, vendorData }) => {
+    const response = await ApiService.fetchData({
+      url: `vendors/${vendorId}`,
+      method: "put",
+      data: vendorData,
+    });
+    return response.data;
+  }
+);
 // Create the slice
 const vendorListSlice = createSlice({
   name: "vendorList",
@@ -75,6 +89,7 @@ const vendorListSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch vendor list";
       })
+      //vendor details reducer
       .addCase(fetchVendorById.pending, (state) => {
         state.status = "loading";
       })
@@ -86,6 +101,8 @@ const vendorListSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch vendor details";
       })
+
+      //create vendor reducer
       .addCase(createVendor.pending, (state) => {
         state.postStatus = "loading";
       })
@@ -100,6 +117,8 @@ const vendorListSlice = createSlice({
         state.postStatus = "failed";
         state.postError = action.postError.message || "Failed to create vendor";
       })
+
+      //delete vendor reducer
       .addCase(deleteVendor.pending, (state) => {
         state.deleteStatus = "loading";
       })
@@ -116,6 +135,26 @@ const vendorListSlice = createSlice({
       .addCase(deleteVendor.rejected, (state, action) => {
         state.deleteStatus = "failed";
         state.deleteError = action.error.message || "Failed to delete vendor";
+      })
+
+      //edit vendor reducer
+      .addCase(editVendor.pending, (state) => {
+        state.editStatus = "loading";
+      })
+      .addCase(editVendor.fulfilled, (state, action) => {
+        state.editStatus = "succeeded";
+        if (Array.isArray(state.data)) {
+          const index = state.data.findIndex(
+            (vendor) => vendor.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.data[index] = action.payload; // Update the vendor in the state
+          }
+        }
+      })
+      .addCase(editVendor.rejected, (state, action) => {
+        state.editStatus = "failed";
+        state.editError = action.editError || "Failed to edit vendor";
       });
   },
 });

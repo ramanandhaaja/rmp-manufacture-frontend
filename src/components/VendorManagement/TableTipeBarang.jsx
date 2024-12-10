@@ -99,7 +99,9 @@ const TableTipeBarang = () => {
                       {
                         label: "Edit",
                         onClick: () => {
-                          console.log("Edit vendor:", category.id);
+                          navigate(
+                            `/vendor-management/edit-tipe-barang/${category.id}`
+                          );
                         },
                       },
                       {
