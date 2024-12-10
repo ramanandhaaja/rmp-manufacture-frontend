@@ -21,24 +21,23 @@ const AddVendorPage = () => {
   const isEditMode = window.location.pathname.includes("edit");
   const { id } = useParams();
 
-  const handleButtonClick = async () => {
+  const handleSubmit = async () => {
     if (formRef.current) {
       const formData = formRef.current.getFormValues(); // Get form values
-
       const formattedData = {
         ...formData,
         vendor_type: formData.vendor_type?.value || formData.goods_type,
         goods_category:
           formData.goods_category?.map((item) => item.value) ||
           formData.goods_category,
-        // status: "active",
-        // verification_status: "verified",
+        documents: formData.documents?.map((item) => ({ file: item })) || [],
       };
+      console.log(formattedData);
 
       try {
         setLoading(true);
         const response = await dispatch(createVendor(formattedData));
-
+        console.log(response);
         // Check the status of the post request
         if (response.meta.requestStatus === "fulfilled") {
           console.log("Vendor created successfully!");
@@ -113,7 +112,7 @@ const AddVendorPage = () => {
           onClose={() => setIsModalOpen(false)}
           title="Anda yakin ingin menambahkan vendor ini?"
           subtitle="Klik Konfirmasi untuk melanjutkan"
-          onConfirm={handleButtonClick}
+          onConfirm={handleSubmit}
           icon={<CircleAlert size={48} />}
           loading={loading}
         />

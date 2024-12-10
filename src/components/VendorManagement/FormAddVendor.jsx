@@ -27,6 +27,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
     control,
     getValues,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -38,6 +39,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
       pic_email: "",
       address: "",
       documents: [],
+      documentsDescription: [],
     },
   });
 
@@ -84,17 +86,19 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
         alert("File size should not exceed 20MB");
         return;
       }
+      const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Only PDF, JPG, and PNG files are allowed");
+        return;
+      }
+
       setDocumentInputs((prevInputs) => {
         const newInputs = [...prevInputs];
         newInputs[index] = { ...newInputs[index], file: file };
         return newInputs;
       });
 
-      const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-      if (!allowedTypes.includes(file.type)) {
-        alert("Only PDF, JPG, and PNG files are allowed");
-        return;
-      }
+      setValue(`documents.${index}`, file);
     }
   };
 
@@ -108,7 +112,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
     submit: () => handleSubmit(onSubmit)(),
     getFormValues: () => getValues(),
   }));
-  
+
   return (
     <div className="bg-white rounded-lg p-4 pt-6 md:p-6 lg:p-6 xl:p-6">
       <form>
@@ -298,7 +302,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
                       type="file"
                       hidden
                       accept=".pdf,.jpg,.jpeg,.png"
-                      {...register(`documents.${index}`)}
+                      {...register(`documents${index}`)}
                       onChange={(e) => handleFileChange(e, index)}
                     />
                   </label>
@@ -306,6 +310,21 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
                 <p className="text-sm text-gray-500 mt-1">
                   Supported formats : PDF, JPG, PNG with maximum size 20 MB
                 </p>
+                <div className="py-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows="4"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    {...register(`documentsDescription.${index}`)}
+                  />
+                  {errors.documentsDescription && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.documentsDescription.message}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
