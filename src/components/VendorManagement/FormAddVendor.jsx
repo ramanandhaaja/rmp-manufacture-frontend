@@ -78,6 +78,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
     submit: () => handleSubmit(onSubmit)(),
     getFormValues: () => getValues(),
   }));
+  
   return (
     <div className="bg-white rounded-lg p-4 pt-6 md:p-6 lg:p-6 xl:p-6">
       <form>

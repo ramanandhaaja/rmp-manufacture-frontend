@@ -121,12 +121,15 @@ const DetailVendorPage = () => {
                       <p className="text-sm text-gray-500 mb-3">
                         {doc.file_name.split('/').pop().length > 20 ? `${doc.file_name.split('/').pop().substring(0, 20)}...` : doc.file_name.split('/').pop()}  
                       </p>
+                      <p>
+                      { `${window.location.origin}/${doc.file_name}`}
+                      </p>
                       <button
                         className="flex items-center px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                         onClick={() => {
                           const fileName = doc.file_name.split('/').pop();
                           const link = document.createElement('a');
-                          link.href = doc.file_name; // Update with the correct file path
+                          link.href = `${window.location.origin}/${doc.file_name}`; 
                           link.download = fileName;
                           document.body.appendChild(link);
                           link.click();
