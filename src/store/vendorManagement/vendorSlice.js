@@ -37,6 +37,7 @@ export const fetchVendorById = createAsyncThunk(
   }
 );
 
+
 export const createVendor = createAsyncThunk(
   "vendorList/createVendor",
   async (vendorData) => {
@@ -44,6 +45,9 @@ export const createVendor = createAsyncThunk(
       url: `vendors`,
       method: "post",
       data: vendorData,
+      headers: {
+        'Content-Type': 'multipart/form-data', // Important for file uploads
+      },
     });
     return response.data;
   }
