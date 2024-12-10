@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, NotepadText } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const SidebarMenu = () => {
-  const [openMenus, setOpenMenus] = React.useState(["R&D"]);
+  const [openMenus, setOpenMenus] = React.useState([]);
   const [activeItem, setActiveItem] = React.useState("");
   const location = useLocation();
 

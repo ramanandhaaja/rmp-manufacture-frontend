@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchVendorById } from "../../store/vendorManagement/vendorSlice";
 import { useParams } from "react-router-dom";
 
+export const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const DetailVendorPage = () => {
   const [activeTab, setActiveTab] = useState("detail");
   const dispatch = useDispatch();
@@ -119,13 +121,19 @@ const DetailVendorPage = () => {
                       </svg>
                       <p className="font-medium">Document{index + 1}</p>
                       <p className="text-sm text-gray-500 mb-3">
-                        {doc.file_name}
+                        {doc.file_name.split('/').pop().length > 20 ? `${doc.file_name.split('/').pop().substring(0, 20)}...` : doc.file_name.split('/').pop()}  
                       </p>
                       <button
                         className="flex items-center px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                        onClick={() =>
-                          console.log(`Downloading ${doc.file_name}`)
-                        }
+                        onClick={() => {
+                          const fileName = doc.file_name.split('/').pop();
+                          const link = document.createElement('a');
+                          link.href = `${VITE_BASE_URL}/${doc.file_name}`; 
+                          link.download = fileName;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }}
                       >
                         <svg
                           className="w-4 h-4 mr-2"
