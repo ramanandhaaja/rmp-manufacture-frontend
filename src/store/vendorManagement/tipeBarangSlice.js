@@ -7,6 +7,8 @@ const initialState = {
   barangPerId: [],
   status: "idle",
   statusFetchBarangId: "idle",
+  statusEdit: "idle",
+  errorEdit: null,
   errorFetchBarangId: null,
   error: null,
 };
@@ -33,6 +35,18 @@ export const fetchTipeBarangId = createAsyncThunk(
   }
 );
 
+export const editTipeBarang = createAsyncThunk(
+  "tipeBarang/editTipeBarang",
+  async ({ barangId, data }) => {
+    const response = await ApiService.fetchData({
+      url: `goods-category/${barangId}`,
+      method: "put",
+      data: data,
+    });
+    return response.data;
+  }
+);
+
 // Create the slice
 const tipeBarangSlice = createSlice({
   name: "tipeBarang",
@@ -40,6 +54,7 @@ const tipeBarangSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      //fetch tipe barang reducer
       .addCase(fetchTipeBarang.pending, (state) => {
         state.status = "loading";
       })
@@ -51,6 +66,9 @@ const tipeBarangSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch Tipe Barang";
       })
+
+      //fetch tipe barang per id reducer
+
       .addCase(fetchTipeBarangId.pending, (state) => {
         state.statusFetchBarangId = "loading";
       })
@@ -62,6 +80,27 @@ const tipeBarangSlice = createSlice({
         state.statusFetchBarangId = "failed";
         state.errorFetchBarangId =
           action.errorFetchBarangId.message || "Failed to fetch Barang per Id";
+      })
+
+      //edit tipe barang reducer
+
+      .addCase(editTipeBarang.pending, (state) => {
+        state.statusEdit = "loading";
+      })
+      .addCase(editTipeBarang.fulfilled, (state, action) => {
+        state.statusEdit = "succeeded";
+        if (Array.isArray(state.data)) {
+          const index = state.data.findIndex(
+            (barang) => barang.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.data[index] = action.payload; // Update the barang in the state
+          }
+        }
+      })
+      .addCase(editTipeBarang.rejected, (state, action) => {
+        state.statusEdit = "failed";
+        state.errorEdit = action.errorEdit.message || "Failed to edit barang";
       });
   },
 });

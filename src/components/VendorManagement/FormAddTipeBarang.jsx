@@ -38,7 +38,7 @@ const FormAddTipeBarang = forwardRef(({ onSubmit }, ref) => {
   ];
 
   useEffect(() => {
-    dispatch(fetchTipeBarangId(id));
+    if (isEditMode) dispatch(fetchTipeBarangId(id));
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -51,7 +51,12 @@ const FormAddTipeBarang = forwardRef(({ onSubmit }, ref) => {
               label: barangPerId.goods_type,
             }
           : null,
-        status: barangPerId.status,
+        status: barangPerId.status
+          ? {
+              value: barangPerId.status,
+              label: barangPerId.status,
+            }
+          : null,
       });
     }
   }, []);
@@ -65,7 +70,6 @@ const FormAddTipeBarang = forwardRef(({ onSubmit }, ref) => {
               Nama Kategori Barang
             </label>
             <input
-              defaultValue={isEditMode && barangPerId ? barangPerId.name : ""}
               type="text"
               placeholder="Masukkan nama"
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -87,9 +91,6 @@ const FormAddTipeBarang = forwardRef(({ onSubmit }, ref) => {
               Tipe Barang
             </label>
             <Controller
-              defaultValue={
-                isEditMode && barangPerId ? barangPerId.goods_type : ""
-              }
               name="goods_type"
               control={control}
               rules={{ required: "Please select at least one kategori" }}
@@ -114,13 +115,6 @@ const FormAddTipeBarang = forwardRef(({ onSubmit }, ref) => {
                 Status Barang
               </label>
               <Controller
-                defaultValue={
-                  optionsStatus.find(
-                    (option) =>
-                      option.value ===
-                      (isEditMode && barangPerId ? barangPerId.status : "")
-                  ) || null
-                }
                 name="status"
                 control={control}
                 rules={{ required: "Please select at least one status" }}

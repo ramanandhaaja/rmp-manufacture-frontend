@@ -1,11 +1,13 @@
 import Button from "../../components/Button";
 import LayoutRightSpace from "../../components/layout/LayoutRightSpace";
-import FormAddTipeBarang from "../../components/VendorManagement/FormAddKategoriBarang";
+import FormAddTipeBarang from "../../components/VendorManagement/FormAddTipeBarang";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
 import { useState, useRef } from "react";
 import { CircleAlert } from "lucide-react";
 import { postTipeBarang } from "../../services/TipeBarangService";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { editTipeBarang } from "../../store/vendorManagement/tipeBarangSlice";
 
 const AddTipeBarangPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +15,8 @@ const AddTipeBarangPage = () => {
   const navigate = useNavigate();
   const formRef = useRef();
   const isEditMode = window.location.pathname.includes("edit");
+  const { id } = useParams();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (data) => {
     setLoading(true);
@@ -45,6 +49,39 @@ const AddTipeBarangPage = () => {
       formRef.current.submit();
     }
   };
+
+  const handleEdit = async () => {
+    if (formRef.current) {
+      const formData = formRef.current.getFormValues();
+
+      const transformedData = {
+        ...formData,
+        goods_type: formData.goods_type?.value || formData.goods_type,
+        status: formData.status?.value || formData.status,
+      };
+
+      try {
+        setLoading(true);
+
+        const response = await dispatch(
+          editTipeBarang({ barangId: id, data: transformedData })
+        );
+        if (response.meta.requestStatus === "fulfilled") {
+          console.log("Edited successfully!");
+          setIsModalOpen(false);
+          navigate("/vendor-management/tipe-barang");
+        } else {
+          console.error("Failed to edit barang:", postError);
+          alert(`Failed to edit barang: ${postError}`);
+        }
+      } catch (error) {
+        console.error("Error edit barang:", error);
+        alert("An error occurred while editing barang.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
   return (
     <LayoutRightSpace>
       <div className=" flex justify-between ">
@@ -59,15 +96,27 @@ const AddTipeBarangPage = () => {
       </div>
       <div className="border-b border-gray-400 my-4"></div>
       <FormAddTipeBarang ref={formRef} onSubmit={handleSubmit} />
-      <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Anda yakin ingin menambahkan tipe barang ini?"
-        subtitle="Klik Konfirmasi untuk melanjutkan"
-        onConfirm={handleButtonClick}
-        icon={<CircleAlert size={48} />}
-        loading={loading}
-      />
+      {!isEditMode ? (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Anda yakin ingin menambahkan tipe barang ini?"
+          subtitle="Klik Konfirmasi untuk melanjutkan"
+          onConfirm={handleButtonClick}
+          icon={<CircleAlert size={48} />}
+          loading={loading}
+        />
+      ) : (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Anda yakin ingin mengubah tipe barang ini?"
+          subtitle="Klik Konfirmasi untuk melanjutkan"
+          onConfirm={handleEdit}
+          icon={<CircleAlert size={48} />}
+          loading={loading}
+        />
+      )}
     </LayoutRightSpace>
   );
 };
