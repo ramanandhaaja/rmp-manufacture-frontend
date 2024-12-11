@@ -1,5 +1,7 @@
-import React from 'react';
-import { Bell, User } from 'lucide-react';
+import React, { useState } from "react";
+import { Bell, User } from "lucide-react";
+import Profile from "./Profile";
+import PopupMenu from "./PopUpMenu";
 
 const CMSHeader = () => {
   return (
@@ -8,11 +10,7 @@ const CMSHeader = () => {
         {/* Left section - Logo and Title */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
-            <img
-              src="/RMPlogo.png"
-              alt="Royal Medica logo"
-              className="h-8"
-            />
+            <img src="/RMPlogo.png" alt="Royal Medica logo" className="h-8" />
           </div>
           <div className="text-blue-500 font-medium">
             Factory Management System
@@ -20,23 +18,16 @@ const CMSHeader = () => {
         </div>
 
         {/* Right section - Notifications and Profile */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2">
           {/* Notifications */}
-          <div className="relative cursor-pointer">
+          <div className="relative cursor-pointer mr-3">
             <Bell className="w-6 h-6 text-gray-600 hover:text-gray-800" />
             <span className="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 text-xs text-white bg-red-500 rounded-full font-medium">
               4
             </span>
           </div>
 
-          {/* Profile */}
-          <div className="flex items-center space-x-3">
-            <User className="w-7 h-7 rounded-full border-2 border-gray-600 mr-2 mb-1" />
-            <div className="flex flex-col">
-              <span className="font-semibold text-gray-800">Atalanta Ahlgren</span>
-              <span className="text-sm text-gray-500">Managing Director, Superadmin</span>
-            </div>
-          </div>
+          <Profile />
         </div>
       </header>
     </div>
