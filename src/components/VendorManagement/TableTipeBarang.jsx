@@ -4,8 +4,10 @@ import PopupMenu from "../PopUpMenu";
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, Trash } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTipeBarang } from "../../store/vendorManagement/tipeBarangSlice";
-import { deleteTipeBarang } from "../../services/TipeBarangService";
+import {
+  fetchTipeBarang,
+  deleteTipeBarang,
+} from "../../store/vendorManagement/tipeBarangSlice";
 import ConfirmationModal from "../modal/ConfirmationModal";
 
 const TableTipeBarang = () => {
@@ -32,7 +34,7 @@ const TableTipeBarang = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteTipeBarang(id);
+      await dispatch(deleteTipeBarang(id));
       window.location.reload();
       setIsModalOpen(false);
     } catch (error) {
