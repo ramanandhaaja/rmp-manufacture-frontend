@@ -6,6 +6,7 @@ import AddVendorPage from "../pages/vendorManagement/AddVendorPage";
 import DetailVendorPage from "../pages/vendorManagement/DetailVendorPage";
 import TipeBarangPage from "../pages/vendorManagement/TipeBarangPage";
 import AddTipeBarangPage from "../pages/vendorManagement/AddTipeBarangPage";
+import LoginPage from "../pages/LoginPage";
 
 const router = createBrowserRouter([
   {
@@ -13,8 +14,8 @@ const router = createBrowserRouter([
     element: <RNDPages />,
   },
   {
-    path: "/test",
-    element: <TestPage />,
+    path: "/login",
+    element: <LoginPage />,
   },
   {
     path: "/vendor-management/vendor",
