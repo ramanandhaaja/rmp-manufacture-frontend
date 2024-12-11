@@ -24,21 +24,33 @@ const AddVendorPage = () => {
   const handleSubmit = async () => {
     if (formRef.current) {
       const formData = formRef.current.getFormValues(); // Get form values
-      const formattedData = {
-        ...formData,
-        vendor_type: formData.vendor_type?.value || formData.goods_type,
-        goods_category:
-          formData.goods_category?.map((item) => item.value) ||
-          formData.goods_category,
-        documents: formData.documents?.map((item) => ({ file: item })) || [],
-      };
-      console.log(formattedData);
-
+      const formDataObj = new FormData();
+      
+      // Append basic fields
+      formDataObj.append('name', formData.name);
+      formDataObj.append('vendor_type', formData.vendor_type?.value || formData.goods_type);
+      
+      // Append goods category array
+      formData.goods_category?.forEach(category => {
+        formDataObj.append('goods_category[]', category.value);
+      });
+      
+      // Append other basic fields
+      formDataObj.append('pic_name', formData.pic_name);
+      formDataObj.append('pic_phone', formData.pic_phone);
+      formDataObj.append('pic_email', formData.pic_email);
+      formDataObj.append('address', formData.address);
+      
+      // Append documents with proper indexing
+      formData.documents?.forEach((file, index) => {
+        formDataObj.append(`documents[${index}][file]`, file);
+        formDataObj.append(`documents[${index}][description]`, formData.documentsDescription?.[index] || '');
+      });
+  
       try {
         setLoading(true);
-        const response = await dispatch(createVendor(formattedData));
+        const response = await dispatch(createVendor(formDataObj));
         console.log(response);
-        // Check the status of the post request
         if (response.meta.requestStatus === "fulfilled") {
           console.log("Vendor created successfully!");
           setIsModalOpen(false);
@@ -49,7 +61,6 @@ const AddVendorPage = () => {
         }
       } catch (error) {
         console.error("Error creating vendor:", error);
-        alert("An error occurred while creating the vendor.");
       } finally {
         setLoading(false);
       }
