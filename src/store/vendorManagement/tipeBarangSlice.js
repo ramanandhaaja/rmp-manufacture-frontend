@@ -8,6 +8,10 @@ const initialState = {
   status: "idle",
   statusFetchBarangId: "idle",
   statusEdit: "idle",
+  deleteStatus: "idle",
+  postStatus: "idle",
+  deleteError: null,
+  postError: null,
   errorEdit: null,
   errorFetchBarangId: null,
   error: null,
@@ -42,6 +46,32 @@ export const editTipeBarang = createAsyncThunk(
       url: `goods-category/${barangId}`,
       method: "put",
       data: data,
+    });
+    return response.data;
+  }
+);
+
+export const postTipeBarang = createAsyncThunk(
+  "tipeBarang/postTipeBarang",
+  async (data) => {
+    const response = await ApiService.fetchData({
+      url: `goods-category`,
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    });
+    return response.data;
+  }
+);
+
+export const deleteTipeBarang = createAsyncThunk(
+  "tipeBarang/deleteTipeBarang",
+  async (id) => {
+    const response = await ApiService.fetchData({
+      url: `goods-category/${id}`,
+      method: "delete",
     });
     return response.data;
   }
@@ -82,6 +112,22 @@ const tipeBarangSlice = createSlice({
           action.errorFetchBarangId.message || "Failed to fetch Barang per Id";
       })
 
+      //post tipe barang reducer
+      .addCase(postTipeBarang.pending, (state) => {
+        state.postStatus = "loading";
+      })
+      .addCase(postTipeBarang.fulfilled, (state, action) => {
+        if (!Array.isArray(state.data)) {
+          state.data = [];
+        }
+        state.data.push(action.payload);
+      })
+      .addCase(postTipeBarang.rejected, (state, action) => {
+        state.postStatus = "failed";
+        state.postError =
+          action.postError.message || "Failed to create tipe barang";
+      })
+
       //edit tipe barang reducer
 
       .addCase(editTipeBarang.pending, (state) => {
@@ -101,6 +147,25 @@ const tipeBarangSlice = createSlice({
       .addCase(editTipeBarang.rejected, (state, action) => {
         state.statusEdit = "failed";
         state.errorEdit = action.errorEdit.message || "Failed to edit barang";
+      })
+
+      //delete tipe barang reducer
+      .addCase(deleteTipeBarang.pending, (state) => {
+        state.deleteStatus = "loading";
+      })
+      .addCase(deleteTipeBarang.fulfilled, (state, action) => {
+        state.deleteStatus = "succeeded";
+        if (Array.isArray(state.data)) {
+          state.data = state.data.filter(
+            (vendor) => vendor.id !== action.payload
+          );
+        } else {
+          console.error("state.data is not an array:", state.data);
+        }
+      })
+      .addCase(deleteTipeBarang.rejected, (state, action) => {
+        state.deleteStatus = "failed";
+        state.deleteError = action.error.message || "Failed to delete vendor";
       });
   },
 });
