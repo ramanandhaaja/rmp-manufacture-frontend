@@ -7,12 +7,11 @@ import DetailVendorPage from "../pages/vendorManagement/DetailVendorPage";
 import TipeBarangPage from "../pages/vendorManagement/TipeBarangPage";
 import AddTipeBarangPage from "../pages/vendorManagement/AddTipeBarangPage";
 import LoginPage from "../pages/LoginPage";
+import PurchaseRequestPage from "../pages/PurchaseManagement/PurchaseRequest";
+import AddPurchaseRequestPage from "../pages/PurchaseManagement/AddPurchaseRequest";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <RNDPages />,
-  },
+  { path: "/", element: <RNDPages />, },
   {
     path: "/login",
     element: <LoginPage />,
@@ -45,6 +44,15 @@ const router = createBrowserRouter([
     path: "/vendor-management/edit-tipe-barang/:id",
     element: <AddTipeBarangPage />,
   },
+  {
+    path: "/purchase-management/purchase-request",
+    element: <PurchaseRequestPage />,
+  },
+  {
+    path: "/purchase-management/add-purchase-request",
+    element: <AddPurchaseRequestPage />,
+  },
+  
 ]);
 
 export default router;
