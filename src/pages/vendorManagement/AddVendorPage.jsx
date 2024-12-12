@@ -17,7 +17,9 @@ const AddVendorPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const formRef = useRef();
-  const { postStatus, postError } = useSelector((state) => state.vendorList);
+  const { vendorDetails, postStatus, postError } = useSelector(
+    (state) => state.vendorList
+  );
   const isEditMode = window.location.pathname.includes("edit");
   const { id } = useParams();
 
@@ -25,28 +27,34 @@ const AddVendorPage = () => {
     if (formRef.current) {
       const formData = formRef.current.getFormValues(); // Get form values
       const formDataObj = new FormData();
-      
+
       // Append basic fields
-      formDataObj.append('name', formData.name);
-      formDataObj.append('vendor_type', formData.vendor_type?.value || formData.goods_type);
-      
+      formDataObj.append("name", formData.name);
+      formDataObj.append(
+        "vendor_type",
+        formData.vendor_type?.value || formData.goods_type
+      );
+
       // Append goods category array
-      formData.goods_category?.forEach(category => {
-        formDataObj.append('goods_category[]', category.value);
+      formData.goods_category?.forEach((category) => {
+        formDataObj.append("goods_category[]", category.value);
       });
-      
+
       // Append other basic fields
-      formDataObj.append('pic_name', formData.pic_name);
-      formDataObj.append('pic_phone', formData.pic_phone);
-      formDataObj.append('pic_email', formData.pic_email);
-      formDataObj.append('address', formData.address);
-      
+      formDataObj.append("pic_name", formData.pic_name);
+      formDataObj.append("pic_phone", formData.pic_phone);
+      formDataObj.append("pic_email", formData.pic_email);
+      formDataObj.append("address", formData.address);
+
       // Append documents with proper indexing
       formData.documents?.forEach((file, index) => {
         formDataObj.append(`documents[${index}][file]`, file);
-        formDataObj.append(`documents[${index}][description]`, formData.documentsDescription?.[index] || '');
+        formDataObj.append(
+          `documents[${index}][description]`,
+          formData.documentsDescription?.[index] || ""
+        );
       });
-  
+
       try {
         setLoading(true);
         const response = await dispatch(createVendor(formDataObj));
@@ -103,6 +111,47 @@ const AddVendorPage = () => {
       }
     }
   };
+
+  const renderModal = () => {
+    if (isEditMode && vendorDetails?.verification_status === "verified") {
+      return (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Anda yakin ingin mengubah vendor ini?"
+          subtitle="Data ini sudah diverifikasi. Apakah anda tetap ingin mengubah data ini?"
+          onConfirm={handleEdit}
+          icon={<CircleAlert size={48} />}
+          loading={loading}
+        />
+      );
+    }
+    if (isEditMode) {
+      return (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Anda yakin ingin menambahkan vendor ini?"
+          subtitle="Klik Konfirmasi untuk melanjutkan"
+          onConfirm={handleSubmit}
+          icon={<CircleAlert size={48} />}
+          loading={loading}
+        />
+      );
+    }
+    return (
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Anda yakin ingin menambahkan vendor ini?"
+        subtitle="Klik Konfirmasi untuk melanjutkan"
+        onConfirm={handleSubmit}
+        icon={<CircleAlert size={48} />}
+        loading={loading}
+      />
+    );
+  };
+
   return (
     <LayoutRightSpace>
       <div className=" flex justify-between ">
@@ -117,27 +166,7 @@ const AddVendorPage = () => {
       </div>
       <div className="border-b border-gray-400 my-4"></div>
       <FormAddVendor ref={formRef} />
-      {!isEditMode ? (
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Anda yakin ingin menambahkan vendor ini?"
-          subtitle="Klik Konfirmasi untuk melanjutkan"
-          onConfirm={handleSubmit}
-          icon={<CircleAlert size={48} />}
-          loading={loading}
-        />
-      ) : (
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Anda yakin ingin mengubah vendor ini?"
-          subtitle="Klik Konfirmasi untuk melanjutkan"
-          onConfirm={handleEdit}
-          icon={<CircleAlert size={48} />}
-          loading={loading}
-        />
-      )}
+      {renderModal()}
     </LayoutRightSpace>
   );
 };

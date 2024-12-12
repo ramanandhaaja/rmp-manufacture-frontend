@@ -9,6 +9,7 @@ import {
   deleteTipeBarang,
 } from "../../store/vendorManagement/tipeBarangSlice";
 import ConfirmationModal from "../modal/ConfirmationModal";
+import { capitalizeFirstLetter } from "../../utils/helpers";
 
 const TableTipeBarang = () => {
   const navigate = useNavigate();
@@ -52,11 +53,6 @@ const TableTipeBarang = () => {
   const handleItemsPerPageChange = (items) => {
     setItemsPerPage(items);
     setCurrentPage(1); // Reset to first page when items per page changes
-  };
-
-  const capitalizeFirstLetter = (string) => {
-    if (!string) return "";
-    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   if (status === "loading") return <div>Loading...</div>;
