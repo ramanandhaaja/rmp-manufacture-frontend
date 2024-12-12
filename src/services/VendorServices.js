@@ -6,3 +6,14 @@ export async function getVendorList() {
     method: "get",
   });
 }
+
+export async function putVerficationStatus({ id, data }) {
+  return ApiService.fetchData({
+    url: `vendors/updateStatus/${id}`,
+    method: "put",
+    data,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}

@@ -7,16 +7,16 @@ import {
   onSignInSuccess,
   onSignOutSuccess,
 } from "../../store/Auth/sessionSlice";
+import { setUser, userLoggedOut } from "../../store/Auth/userSlice";
 
 const useAuth = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [query] = useSearchParams();
-  const { token, signedIn, refreshToken, user } = useSelector(
+  const { token, signedIn, refreshToken } = useSelector(
     (state) => state.auth.session
   );
 
-  const { roles } = useSelector((state) => state.auth.user);
   const signIn = async (values) => {
     try {
       const resp = await loginApi(values);
@@ -24,10 +24,12 @@ const useAuth = () => {
       if (resp.data) {
         const { token } = resp.data.data;
         const { user } = resp.data.data;
-        dispatch(onSignInSuccess({ token }));
+        dispatch(onSignInSuccess({ token: token }));
+        dispatch(setUser({ user: user }));
         const redirectUrl = query.get(REDIRECT_URL_KEY);
-        window.sessionStorage.setItem("isLogin", true);
-        window.sessionStorage.setItem("user", JSON.stringify(user));
+        window.localStorage.setItem("isLogin", true);
+        window.localStorage.setItem("user", JSON.stringify(user));
+        window.localStorage.setItem("token", token);
 
         navigate(redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath);
         return {
@@ -45,9 +47,12 @@ const useAuth = () => {
   };
 
   const handleSignOut = () => {
-    window.sessionStorage.setItem("isLogin", false);
-    window.sessionStorage.removeItem("user");
+    window.localStorage.setItem("isLogin", false);
+    window.localStorage.removeItem("user");
+    window.localStorage.removeItem("token");
+
     dispatch(onSignOutSuccess());
+    dispatch(userLoggedOut());
     navigate(appConfig.unAuthenticatedEntryPath);
   };
 
@@ -59,8 +64,7 @@ const useAuth = () => {
     token,
     signedIn,
     refreshToken,
-    user,
-    roles,
+    userLoggedOut,
   };
 };
 

@@ -1,9 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Bell, User } from "lucide-react";
 import Profile from "./Profile";
-import PopupMenu from "./PopUpMenu";
+import { useSelector, useDispatch } from "react-redux";
+import { onSignInSuccess } from "../store/Auth/sessionSlice";
+import { setUser } from "../store/Auth/userSlice";
 
 const CMSHeader = () => {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth.session);
+
+  useEffect(() => {
+    if (!token) {
+      const getToken = localStorage.getItem("token");
+      const getUser = JSON.parse(localStorage.getItem("user"));
+      if (getToken) {
+        dispatch(onSignInSuccess({ token: getToken }));
+        dispatch(setUser({ user: getUser }));
+      }
+    }
+  }, [dispatch, token]);
+
   return (
     <div className="max-w-[calc(100%-10px)] mx-auto">
       <header className="w-full flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shadow-sm rounded-bl-lg rounded-br-lg">
