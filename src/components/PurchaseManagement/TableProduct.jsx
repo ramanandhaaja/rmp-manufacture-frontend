@@ -1,16 +1,12 @@
 import { useState, useEffect } from "react";
 import { MoreVertical, Trash } from "lucide-react";
-import PaginationBtn from "../PaginationBtn";
 import PopupMenu from "../PopUpMenu";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../modal/ConfirmationModal";
 
-const TablePurchaseRequest = () => {
+const TableProduct = () => {
   const navigate = useNavigate();
-  const [totalPages, setTotalPages] = useState(1);
   const [vendorId, setVendorId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   
@@ -19,17 +15,18 @@ const TablePurchaseRequest = () => {
       <table className="w-full">
         <thead>
           <tr className="bg-gray-50">
-            <th className="py-3 px-4 text-left text-indigo-900 text-sm">ID</th>
             <th className="py-3 px-4 text-left text-indigo-900 text-sm">
-              Item Permintaan
+              Kode</th>
+            <th className="py-3 px-4 text-left text-indigo-900 text-sm">
+              Barang
             </th>
             <th className="py-3 px-4 text-left text-indigo-900 text-sm">
-              Tanggal Permintaan
+              Jenis Barang
             </th>
             <th className="py-3 px-4 text-left text-indigo-900 text-sm">
-              Tanggal Persetujuan</th>
+              QTY</th>
             <th className="py-3 px-4 text-left text-indigo-900 text-sm">
-              Status
+              UOM
             </th>
             <th className="py-3 px-4 text-left text-indigo-900 text-sm"></th>
           </tr>
@@ -82,13 +79,6 @@ const TablePurchaseRequest = () => {
       </table>
       
       <div className="mt-4 text-sm">
-        <PaginationBtn
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={'#'}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={'#'}
-        />
         <ConfirmationModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -100,9 +90,9 @@ const TablePurchaseRequest = () => {
       </div>
 
 
-      
+
     </div>
   );
 };
 
-export default TablePurchaseRequest;
+export default TableProduct;

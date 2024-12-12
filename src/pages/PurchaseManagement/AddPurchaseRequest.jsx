@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import Button from "../../components/Button";
 import LayoutRightSpace from "../../components/layout/LayoutRightSpace";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
-import FormAddVendor from "../../components/VendorManagement/FormAddVendor";
+import FormAddPurchaseRequest from "../../components/PurchaseManagement/FormAddPurchaseRequest";
 import { CircleAlert } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -107,16 +107,16 @@ const AddPurchaseRequestPage = () => {
     <LayoutRightSpace>
       <div className=" flex justify-between ">
         <h1 className="text-2xl font-semibold text-indigo-900 ">
-          {isEditMode ? "Edit Vendor" : "Add Vendor"}
+          {isEditMode ? "Edit Permintaan Pembelian" : "Add Permintaaan Pembelian"}
         </h1>
         <Button
-          title={"Kirim"}
+          title={"Kirim Permintaaan"}
           color={"bg-indigo-900"}
           onClick={() => setIsModalOpen(true)}
         />
       </div>
       <div className="border-b border-gray-400 my-4"></div>
-      <FormAddVendor ref={formRef} />
+      <FormAddPurchaseRequest ref={formRef} />
       {!isEditMode ? (
         <ConfirmationModal
           isOpen={isModalOpen}
