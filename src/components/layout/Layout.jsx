@@ -14,6 +14,7 @@ const Layout = ({ children }) => {
           </div>
         </div>
       </div>
+      <ErrorModal />
     </div>
   );
 };

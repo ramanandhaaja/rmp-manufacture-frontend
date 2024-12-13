@@ -1,5 +1,6 @@
 import CMSHeader from "../CMSHeader";
 import SidebarMenu from "../SidebarMenu";
+import ErrorModal from "../modal/ErrorModal";
 
 const LayoutRightSpace = ({ children, content }) => {
   return (
@@ -14,6 +15,7 @@ const LayoutRightSpace = ({ children, content }) => {
           <div className="w-[200px] rounded-lg p-4">{content}</div>
         </div>
       </div>
+      <ErrorModal />
     </div>
   );
 };
