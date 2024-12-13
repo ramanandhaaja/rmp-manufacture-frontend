@@ -9,7 +9,7 @@ import {
 } from "../../store/Auth/sessionSlice";
 import { setUser, userLoggedOut } from "../../store/Auth/userSlice";
 
-const useAuth = () => {
+function useAuth() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [query] = useSearchParams();
@@ -66,6 +66,6 @@ const useAuth = () => {
     refreshToken,
     userLoggedOut,
   };
-};
+}
 
 export default useAuth;

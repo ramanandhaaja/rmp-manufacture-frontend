@@ -1,7 +1,7 @@
 import { putVerficationStatus } from "../../services/VendorServices";
 import { useState } from "react";
 
-const useVerification = () => {
+function useVerification() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -35,5 +35,5 @@ const useVerification = () => {
     }
   };
   return { setStatusApi, loading, error, success, message };
-};
+}
 export default useVerification;

@@ -47,7 +47,12 @@ const DetailVendorPage = () => {
       id: id,
       data: data.verification_status.value,
     });
-    console.log(data.verification_status.value);
+    if (response.status === "error") {
+      alert(response.message);
+      setIsModalOpen(false);
+    } else {
+      setIsModalOpen(false);
+    }
   };
 
   return (

@@ -15,5 +15,6 @@ export async function putVerficationStatus({ id, data }) {
     headers: {
       "Content-Type": "application/json",
     },
+    withCredentials: true,
   });
 }
