@@ -10,6 +10,8 @@ import Button from "../../components/Button";
 import InputModal from "../../components/modal/InputModal";
 import { CircleAlert } from "lucide-react";
 import useVerification from "../../utils/hooks/useVerification";
+import { setError } from "../../store/statusErrorSlice";
+import { set } from "date-fns";
 
 export const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -21,6 +23,8 @@ const DetailVendorPage = () => {
     (state) => state.vendorList
   );
   const { token, user } = useSelector((state) => state.auth.user);
+  const { isError, message } = useSelector((state) => state.errorStatus);
+
   const { id } = useParams();
   const { setStatusApi } = useVerification();
 
@@ -45,10 +49,11 @@ const DetailVendorPage = () => {
   const handleVerify = async (data) => {
     const response = await setStatusApi({
       id: id,
-      data: data.verification_status.value,
+      data: { verification_status: data.verification_status.value },
     });
     if (response.status === "error") {
-      alert(response.message);
+      dispatch(setError(response.message));
+      // alert(response.message);
       setIsModalOpen(false);
     } else {
       setIsModalOpen(false);
