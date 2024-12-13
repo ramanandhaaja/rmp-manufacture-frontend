@@ -1,5 +1,6 @@
 import CMSHeader from "../CMSHeader";
 import SidebarMenu from "../SidebarMenu";
+import ErrorModal from "../modal/ErrorModal";
 
 const Layout = ({ children }) => {
   return (

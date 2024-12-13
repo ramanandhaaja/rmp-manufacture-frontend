@@ -13,3 +13,11 @@ export async function loginApi(data) {
     },
   });
 }
+
+export async function getPermissionApi(params) {
+  return ApiService.fetchData({
+    url: `login`,
+    method: "get",
+    params,
+  });
+}
