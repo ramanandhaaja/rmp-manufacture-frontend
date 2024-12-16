@@ -7,19 +7,24 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchTipeBarang,
   deleteTipeBarang,
-} from "../../store/vendorManagement/tipeBarangSlice";
+} from "../../store/vendorManagement/kategoriBarangSlice";
 import ConfirmationModal from "../modal/ConfirmationModal";
 import { capitalizeFirstLetter } from "../../utils/helpers";
+import usePagination from "../../utils/hooks/usePagination";
 
 const TableTipeBarang = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data, status, error } = useSelector((state) => state.tipeBarang);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const { data, status, error } = useSelector((state) => state.kategoriBarang);
   const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setId] = useState(null);
+  const {
+    currentPage,
+    itemsPerPage,
+    handlePageChange,
+    handleItemsPerPageChange,
+  } = usePagination(1, 10, totalPages);
 
   useEffect(() => {
     // Fetch data whenever currentPage or itemsPerPage changes
@@ -41,18 +46,6 @@ const TableTipeBarang = () => {
     } catch (error) {
       console.error("Failed to delete category:", error);
     }
-  };
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  // Handle items per page change
-  const handleItemsPerPageChange = (items) => {
-    setItemsPerPage(items);
-    setCurrentPage(1); // Reset to first page when items per page changes
   };
 
   if (status === "loading") return <div>Loading...</div>;

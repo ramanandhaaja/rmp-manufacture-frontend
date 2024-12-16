@@ -1,5 +1,5 @@
 import React from "react";
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, LoaderCircle } from "lucide-react";
 
 const ConfirmationModal = ({
   isOpen,
@@ -8,7 +8,7 @@ const ConfirmationModal = ({
   title,
   icon,
   subtitle,
-  isLoading = false,
+  loading = false,
 }) => {
   if (!isOpen) return null;
 
@@ -34,7 +34,14 @@ const ConfirmationModal = ({
             onClick={onConfirm}
             className="w-[186px]  py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
           >
-            {isLoading ? "Loading..." : "Konfirmasi"}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                {" "}
+                <LoaderCircle className="animate-spin" />
+              </span>
+            ) : (
+              "Konfirmasi"
+            )}
           </button>
         </div>
       </div>

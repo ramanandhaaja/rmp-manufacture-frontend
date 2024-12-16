@@ -7,10 +7,12 @@ function useVerification() {
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const setStatusApi = async (id, data) => {
+  const setStatusApi = async ({ id, data }) => {
     try {
-      const response = await putVerficationStatus(id, data);
-      if (response.success == true) {
+      const response = await putVerficationStatus({ id, data });
+      console.log(response);
+      if (response.data.success == true) {
+        console.log(response);
         setSuccess(true);
         setMessage(response.message);
         return {
@@ -18,6 +20,7 @@ function useVerification() {
           message: response.message,
         };
       } else {
+        console.log(response);
         setError(response.message || "Failed to update status");
         return {
           status: "error",
@@ -25,6 +28,7 @@ function useVerification() {
         };
       }
     } catch (err) {
+      console.log("catch error", err);
       setError(err.message || "An error occurred");
       return {
         status: "error",

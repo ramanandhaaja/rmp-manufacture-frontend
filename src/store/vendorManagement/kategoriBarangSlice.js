@@ -19,7 +19,7 @@ const initialState = {
 
 // Async thunk for fetching Tipe Barang
 export const fetchTipeBarang = createAsyncThunk(
-  "tipeBarang/fetchTipeBarang",
+  "kategoriBarang/fetchTipeBarang",
   async ({ page = 1, perPage = 10 }) => {
     const response = await ApiService.fetchData({
       url: `goods-category?page=${page}&per_page=${perPage}`,
@@ -29,7 +29,7 @@ export const fetchTipeBarang = createAsyncThunk(
   }
 );
 export const fetchTipeBarangId = createAsyncThunk(
-  "tipeBarang/fetchTipeBarangId",
+  "kategoriBarang/fetchTipeBarangId",
   async (id) => {
     const response = await ApiService.fetchData({
       url: `goods-category/${id}`,
@@ -40,7 +40,7 @@ export const fetchTipeBarangId = createAsyncThunk(
 );
 
 export const editTipeBarang = createAsyncThunk(
-  "tipeBarang/editTipeBarang",
+  "kategoriBarang/editTipeBarang",
   async ({ barangId, data }) => {
     const response = await ApiService.fetchData({
       url: `goods-category/${barangId}`,
@@ -52,7 +52,7 @@ export const editTipeBarang = createAsyncThunk(
 );
 
 export const postTipeBarang = createAsyncThunk(
-  "tipeBarang/postTipeBarang",
+  "kategoriBarang/postTipeBarang",
   async (data) => {
     const response = await ApiService.fetchData({
       url: `goods-category`,
@@ -67,7 +67,7 @@ export const postTipeBarang = createAsyncThunk(
 );
 
 export const deleteTipeBarang = createAsyncThunk(
-  "tipeBarang/deleteTipeBarang",
+  "kategoriBarang/deleteTipeBarang",
   async (id) => {
     const response = await ApiService.fetchData({
       url: `goods-category/${id}`,
@@ -78,8 +78,8 @@ export const deleteTipeBarang = createAsyncThunk(
 );
 
 // Create the slice
-const tipeBarangSlice = createSlice({
-  name: "tipeBarang",
+const kategoriBarangSlice = createSlice({
+  name: "kategoriBarang",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -170,4 +170,4 @@ const tipeBarangSlice = createSlice({
   },
 });
 
-export default tipeBarangSlice.reducer;
+export default kategoriBarangSlice.reducer;
