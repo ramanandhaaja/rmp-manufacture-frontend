@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Button from "../../components/Button";
 import LayoutRightSpace from "../../components/layout/LayoutRightSpace";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
@@ -22,11 +22,34 @@ const AddVendorPage = () => {
   );
   const isEditMode = window.location.pathname.includes("edit");
   const { id } = useParams();
+  const [isFormValid, setIsFormValid] = useState(false);
 
-  const handleSubmit = async () => {
+  const validateForm = (data) => {
+    return (
+      data.name !== "" &&
+      data.pic_name !== "" &&
+      data.pic_phone !== "" &&
+      data.pic_email !== "" &&
+      data.address !== "" &&
+      data.vendor_type !== "" &&
+      data.goods_category.length > 0
+    );
+  };
+
+  const handleAdd = async () => {
     if (formRef.current) {
-      const formData = formRef.current.getFormValues(); // Get form values
+      const formData = formRef.current?.getFormValues(); // Get form values
       const formDataObj = new FormData();
+
+      const isValid = validateForm(formData);
+      setIsFormValid(isValid);
+
+      if (!isValid) {
+        console.log("Form is invalid");
+        alert("Form is invalid");
+        setIsModalOpen(false);
+        return;
+      }
 
       // Append basic fields
       formDataObj.append("name", formData.name);
@@ -58,7 +81,6 @@ const AddVendorPage = () => {
       try {
         setLoading(true);
         const response = await dispatch(createVendor(formDataObj));
-        console.log(response);
         if (response.meta.requestStatus === "fulfilled") {
           console.log("Vendor created successfully!");
           setIsModalOpen(false);
@@ -74,11 +96,9 @@ const AddVendorPage = () => {
       }
     }
   };
-
   const handleEdit = async () => {
     if (formRef.current) {
       const formData = formRef.current.getFormValues();
-
       const formattedData = {
         ...formData,
         vendor_type: formData.vendor_type?.value || formData.goods_type,
@@ -91,7 +111,6 @@ const AddVendorPage = () => {
 
       try {
         setLoading(true);
-
         const response = await dispatch(
           editVendor({ vendorId: id, vendorData: formattedData })
         );
@@ -109,6 +128,12 @@ const AddVendorPage = () => {
       } finally {
         setLoading(false);
       }
+    }
+  };
+
+  const handleFormSubmit = () => {
+    if (formRef.current) {
+      formRef.current.submit();
     }
   };
 
@@ -131,9 +156,9 @@ const AddVendorPage = () => {
         <ConfirmationModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title="Anda yakin ingin menambahkan vendor ini?"
+          title="Anda yakin ingin mengubah vendor ini?"
           subtitle="Klik Konfirmasi untuk melanjutkan"
-          onConfirm={handleSubmit}
+          onConfirm={handleEdit}
           icon={<CircleAlert size={48} />}
           loading={loading}
         />
@@ -145,7 +170,7 @@ const AddVendorPage = () => {
         onClose={() => setIsModalOpen(false)}
         title="Anda yakin ingin menambahkan vendor ini?"
         subtitle="Klik Konfirmasi untuk melanjutkan"
-        onConfirm={handleSubmit}
+        onConfirm={handleFormSubmit}
         icon={<CircleAlert size={48} />}
         loading={loading}
       />
@@ -165,7 +190,10 @@ const AddVendorPage = () => {
         />
       </div>
       <div className="border-b border-gray-400 my-4"></div>
-      <FormAddVendor ref={formRef} />
+      <FormAddVendor
+        ref={formRef}
+        onSubmit={isEditMode ? handleEdit : handleAdd}
+      />
       {renderModal()}
     </LayoutRightSpace>
   );

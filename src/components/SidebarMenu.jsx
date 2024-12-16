@@ -14,10 +14,23 @@ const SidebarMenu = () => {
       setOpenMenus((prev) =>
         prev.includes("Vendor") ? prev : [...prev, "Vendor"]
       );
-    } else if (path.includes("/vendor-management/tipe-barang")) {
+    }
+    if (path.includes("/vendor-management/tipe-barang")) {
       setActiveItem("tipe-barang");
       setOpenMenus((prev) =>
         prev.includes("Vendor") ? prev : [...prev, "Vendor"]
+      );
+    }
+    if (path.includes("/purchase-management/purchase-request")) {
+      setActiveItem("purchase-request");
+      setOpenMenus((prev) =>
+        prev.includes("Purchase") ? prev : [...prev, "Purchase"]
+      );
+    }
+    if (path.includes("/purchase-management/master-data-barang")) {
+      setActiveItem("master-data-barang");
+      setOpenMenus((prev) =>
+        prev.includes("Purchase") ? prev : [...prev, "Purchase"]
       );
     }
   }, [location]);
@@ -134,7 +147,6 @@ const SidebarMenu = () => {
           )}
         </div>
 
-
         {/* Purchase Management */}
 
         <div className="w-full">
@@ -158,14 +170,25 @@ const SidebarMenu = () => {
             <div className="ml-12 space-y-2 py-1">
               <a
                 href="/purchase-management/purchase-request"
-                onClick={() => setActiveItem("Purchase")}
+                onClick={() => setActiveItem("purchase-request")}
                 className={`block py-1.5 text-[14px] ${
-                  activeItem === "Purchase"
+                  activeItem === "purchase-request"
                     ? "text-blue-600 font-medium"
                     : "text-gray-400 hover:text-gray-600"
                 }`}
               >
                 Purchase Request
+              </a>
+              <a
+                href="/purchase-management/master-data-barang"
+                onClick={() => setActiveItem("master-data-barang")}
+                className={`block py-1.5 text-[14px] ${
+                  activeItem === "master-data-barang"
+                    ? "text-blue-600 font-medium"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                Master Data Barang
               </a>
             </div>
           )}

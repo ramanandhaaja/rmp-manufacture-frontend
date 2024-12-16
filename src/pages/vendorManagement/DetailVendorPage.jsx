@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Tabs from "../../components/Tabs";
 
 import LayoutRightSpace from "../../components/layout/LayoutRightSpace";
@@ -11,7 +11,6 @@ import InputModal from "../../components/modal/InputModal";
 import { CircleAlert } from "lucide-react";
 import useVerification from "../../utils/hooks/useVerification";
 import { setError } from "../../store/statusErrorSlice";
-import { set } from "date-fns";
 
 export const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -27,6 +26,7 @@ const DetailVendorPage = () => {
 
   const { id } = useParams();
   const { setStatusApi } = useVerification();
+  const modalRef = useRef(null);
 
   const tabData = [
     { name: "detail", label: "Detail Vendor" },
@@ -51,12 +51,19 @@ const DetailVendorPage = () => {
       id: id,
       data: { verification_status: data.verification_status.value },
     });
+    console.log(response);
     if (response.status === "error") {
       dispatch(setError(response.message));
       // alert(response.message);
       setIsModalOpen(false);
     } else {
       setIsModalOpen(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (modalRef.current) {
+      modalRef.current.submit();
     }
   };
 
@@ -219,6 +226,8 @@ const DetailVendorPage = () => {
         )}
       </div>
       <InputModal
+        ref={modalRef}
+        onSubmit={handleVerify}
         onClose={() => setIsModalOpen(false)}
         icon={<CircleAlert size={48} />}
         isOpen={isModalOpen}
@@ -227,7 +236,7 @@ const DetailVendorPage = () => {
           "Anda akan memverifikasi vendor ini. Pastikan data sudah sesuai."
         }
         selectOptions={handleOptions()}
-        onConfirm={handleVerify}
+        onConfirm={handleSubmit}
       />
     </LayoutRightSpace>
   );

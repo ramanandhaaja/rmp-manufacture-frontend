@@ -9,13 +9,13 @@ import {
 } from "../../store/vendorManagement/vendorSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { forwardRef, useImperativeHandle } from "react";
-import { fetchTipeBarang } from "../../store/vendorManagement/tipeBarangSlice";
+import { fetchTipeBarang } from "../../store/vendorManagement/kategoriBarangSlice";
 import { useParams } from "react-router-dom";
 
 const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const { data } = useSelector((state) => state.tipeBarang);
+  const { data } = useSelector((state) => state.kategoriBarang);
   const { vendorDetails } = useSelector((state) => state.vendorList);
 
   const [documentInputs, setDocumentInputs] = useState([]);
@@ -68,6 +68,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
         pic_email: vendorDetails.pic_email,
         address: vendorDetails.address,
         documents: vendorDetails.documents,
+        documentsDescription: vendorDetails.documentsDescription,
       });
     }
   }, [vendorDetails, reset]);
@@ -120,7 +121,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
           {/* Vendor Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nama Vendor
+              Nama Vendor <span>*</span>
             </label>
             <input
               type="text"
@@ -138,7 +139,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
           {/* notes: tambah btn + untuk input tipe */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Kategori Barang
+              Kategori Barang <span>*</span>
             </label>
             <Controller
               name="goods_category"
@@ -163,7 +164,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tipe Barang Vendor
+              Tipe Barang Vendor <span>*</span>
             </label>
             <Controller
               name="vendor_type"
@@ -188,7 +189,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
           {/* PIC */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              PIC
+              PIC <span>*</span>
             </label>
             <input
               type="text"
@@ -207,7 +208,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kontak PIC
+                Kontak PIC <span>*</span>
               </label>
               <input
                 type="text"
@@ -215,6 +216,12 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 {...register("pic_phone", {
                   required: "Contact is required",
+                  validate: {
+                    isNumber: (value) =>
+                      !isNaN(value) || "Contact must be a number",
+                    isNotEmpty: (value) =>
+                      value.trim() !== "" || "Contact cannot be empty",
+                  },
                 })}
               />
               {errors.pic_phone && (
@@ -225,7 +232,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email PIC
+                Email PIC <span>*</span>
               </label>
               <input
                 type="email"
@@ -250,7 +257,7 @@ const FormAddVendor = forwardRef(({ onSubmit }, ref) => {
           {/* Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Alamat
+              Alamat <span>*</span>
             </label>
             <textarea
               rows="4"

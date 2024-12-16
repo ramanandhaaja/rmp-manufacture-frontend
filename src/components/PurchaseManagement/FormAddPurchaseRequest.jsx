@@ -9,7 +9,7 @@ import {
 } from "../../store/vendorManagement/vendorSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { forwardRef, useImperativeHandle } from "react";
-import { fetchTipeBarang } from "../../store/vendorManagement/tipeBarangSlice";
+import { fetchTipeBarang } from "../../store/vendorManagement/kategoriBarangSlice";
 import { useParams } from "react-router-dom";
 import { PurchaseReasonOptions } from "../../const/PurchaseManagement";
 import SearchAndActionBtn from "../SearchAndActionBtn";
@@ -18,7 +18,7 @@ import TableProduct from "./TableProduct";
 const FormAddPurchaseRequest = forwardRef(({ onSubmit }, ref) => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const { data } = useSelector((state) => state.tipeBarang);
+  const { data } = useSelector((state) => state.kategoriBarang);
   const { vendorDetails } = useSelector((state) => state.vendorList);
 
   const [documentInputs, setDocumentInputs] = useState([]);
@@ -62,9 +62,9 @@ const FormAddPurchaseRequest = forwardRef(({ onSubmit }, ref) => {
           })) || [],
         vendor_type: vendorDetails.vendor_type
           ? {
-            value: vendorDetails.vendor_type,
-            label: vendorDetails.vendor_type,
-          }
+              value: vendorDetails.vendor_type,
+              label: vendorDetails.vendor_type,
+            }
           : null,
         pic_name: vendorDetails.pic_name,
         pic_phone: vendorDetails.pic_phone,
@@ -221,7 +221,6 @@ const FormAddPurchaseRequest = forwardRef(({ onSubmit }, ref) => {
               </p>
             )}
           </div>
-
         </div>
       </form>
     </div>

@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import {
   editTipeBarang,
   postTipeBarang,
-} from "../../store/vendorManagement/tipeBarangSlice";
+} from "../../store/vendorManagement/kategoriBarangSlice";
 
 const AddTipeBarangPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

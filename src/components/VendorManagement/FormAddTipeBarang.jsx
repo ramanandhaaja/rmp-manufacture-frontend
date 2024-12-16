@@ -2,14 +2,14 @@ import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
 import { kategoriBarangOptions } from "../../const/vendorManagement/index";
 import { forwardRef, useEffect, useImperativeHandle } from "react";
-import { fetchTipeBarangId } from "../../store/vendorManagement/tipeBarangSlice";
+import { fetchTipeBarangId } from "../../store/vendorManagement/kategoriBarangSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const FormAddTipeBarang = forwardRef(({ onSubmit }, ref) => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const { barangPerId } = useSelector((state) => state.tipeBarang);
+  const { barangPerId } = useSelector((state) => state.kategoriBarang);
   const isEditMode = window.location.pathname.includes("edit");
 
   const {
