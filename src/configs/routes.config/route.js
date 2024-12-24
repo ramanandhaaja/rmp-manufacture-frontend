@@ -49,4 +49,26 @@ export const ROUTE_LIST = [
     component: React.lazy(() => import("views/PurchaseRequest")),
     authority: [],
   },
+  {
+    key: "purchase.request.add",
+    path: "/purchase/request/tambah",
+    component: React.lazy(() => import("views/PurchaseRequest/AddPurchaseReq")),
+    authority: [],
+  },
+  {
+    key: "purchase.request.detail",
+    path: "/purchase/request/detail/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseRequest/DetailPurchaseReq")
+    ),
+    authority: [],
+  },
+  {
+    key: "purchase.request.detail.informasi",
+    path: "/purchase/request/detail/informasi-pembelian/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseRequest/InformasiPembelian")
+    ),
+    authority: [],
+  },
 ];

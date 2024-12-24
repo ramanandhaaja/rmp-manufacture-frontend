@@ -15,11 +15,11 @@ const CustomTable = ({ data, columns, onEdit, onDelete }) => {
       </thead>
       <tbody className="divide-y divide-gray-100 bg-white w-full">
         {data?.map((item, index) => (
-          <tr key={item.id} className="hover:bg-gray-50">
+          <tr key={item.id} className="hover:bg-gray-50 ">
             {columns.map((column) => (
               <td
                 key={column.accessor}
-                className="py-6 px-2 text-gray-700 text-sm"
+                className="py-6 px-4 text-gray-700 text-sm text-left"
               >
                 {column.Cell
                   ? column.Cell({ row: { original: item } })

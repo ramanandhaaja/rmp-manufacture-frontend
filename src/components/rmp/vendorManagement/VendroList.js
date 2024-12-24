@@ -11,17 +11,21 @@ import capitalize from "components/ui/utils/capitalize";
 
 const VendorList = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [vendorId, setVendorId] = useState(null);
   const { getVendors, removeVendor, dataVendor } = useVendor();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const vendorListData = dataVendor?.data || [];
 
   useEffect(() => {
     getVendors();
-  }, []);
+    setTotal(dataVendor?.total);
+    setPageSize(dataVendor?.per_page);
+  }, [currentPage]);
 
   const columns = [
     {
@@ -140,9 +144,9 @@ const VendorList = () => {
       <CustomTable data={vendorListData} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
-          total={vendorListData?.length}
-          currentPage={dataVendor?.currentPage}
-          pageSize={dataVendor?.last_page}
+          total={total}
+          currentPage={currentPage}
+          pageSize={pageSize}
           onChange={handlePageChange}
           displayTotal
         />

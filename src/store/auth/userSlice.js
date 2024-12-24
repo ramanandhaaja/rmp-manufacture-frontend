@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const initialState = {
   authority: [],
   user: {},
+  userRole: "",
 };
 
 export const userSlice = createSlice({
@@ -12,10 +13,13 @@ export const userSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
+    setUserRole: (state, action) => {
+      state.userRole = action.payload;
+    },
     userLoggedOut: () => initialState,
   },
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser, setUserRole } = userSlice.actions;
 
 export default userSlice.reducer;

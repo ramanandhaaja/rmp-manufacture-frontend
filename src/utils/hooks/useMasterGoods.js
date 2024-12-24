@@ -21,12 +21,12 @@ function useMasterGoods() {
     try {
       const response = await getGoodsListApi();
       if (response.data) {
-        dispatch(setData(response.data?.data));
+        dispatch(setData(response.data?.data.data));
 
         return {
           status: "success",
           message: "",
-          data: response?.data,
+          data: response?.data?.data,
         };
       } else {
         console.log(response);
