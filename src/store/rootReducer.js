@@ -4,6 +4,7 @@ import auth from "./auth";
 import base from "./base";
 import vendor from "./vendorManagement/vendorSlice";
 import goodsCategory from "./goodsCategorySlice";
+import goodsType from "./goodsTypeSlice";
 import masterGoods from "./masterGoodsPurchaseSlice";
 import purchase from "./PurchaseRequest/purchaseSlice";
 
@@ -16,6 +17,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
     goodsCategory,
     masterGoods,
     purchase,
+    goodsType,
     ...asyncReducers,
   });
   return combinedReducer(state, action);

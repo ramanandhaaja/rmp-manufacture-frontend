@@ -44,6 +44,15 @@ const HeaderActionsEnd = () => {
     return undefined;
   };
 
+  const capitalizeRoles = (roles) => {
+    if (Array.isArray(roles) && roles.length > 0) {
+      return roles
+        .map((role) => role.charAt(0).toUpperCase() + role.slice(1))
+        .join(", ");
+    }
+    return "Superadmin"; // Default value if no roles are provided
+  };
+
   return (
     <div className="flex ">
       <div className="flex items-center">
@@ -61,8 +70,7 @@ const HeaderActionsEnd = () => {
           {capitalizeWords(user?.name) ?? "Atalanta Ahlgren"}
         </p>
         <div className="text-slate-500 text-xs">
-          {capitalizeWords(user.role?.map((role) => role)) ?? "Superadmin"}
-          {/* {dataUser?.user?.role?.level ?? "-"} */}
+          {capitalizeRoles(user?.roles)}
         </div>
       </div>
     </div>

@@ -395,3 +395,15 @@ export function generateCircleCoordinates(lat, lng, radius, numPoints = 15) {
   }
   return coords;
 }
+
+export const findDepartement = (id) => {
+  if (id === 1) {
+    return "Human Resources";
+  } else if (id === 2) {
+    return "Finance";
+  } else if (id === 3) {
+    return "IT Support";
+  } else {
+    return "Unknown";
+  }
+};
