@@ -7,6 +7,7 @@ const TableHeader = ({
   onClickImport,
   onClickExport,
   addBtnTitle,
+  showBtnAdd = true,
 }) => {
   return (
     <div className="flex justify-between mb-6">
@@ -17,9 +18,11 @@ const TableHeader = ({
       <div className="flex items-center gap-2">
         <Button onClick={onClickImport}>Import</Button>
         <Button onClick={onClickExport}>Export</Button>
-        <Button onClick={onClickAdd} variant="solid" className="text-white">
-          {addBtnTitle} <span className="text-lg">+</span>
-        </Button>
+        {showBtnAdd && (
+          <Button onClick={onClickAdd} variant="solid" className="text-white">
+            {addBtnTitle} <span className="text-lg">+</span>
+          </Button>
+        )}
       </div>
     </div>
   );

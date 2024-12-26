@@ -1,23 +1,26 @@
-import FormMasterGoods from "components/rmp/masterDataGoods/FormMasterGoods";
+import FormGoodsCategory from "components/rmp/masterDataGoodsCategory/FormMasterGoodsCategory";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useMasterGoods from "utils/hooks/useMasterGoods";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import { Notification, toast, Button } from "components/ui";
+import useGoodsCategory from "utils/hooks/useGoodsCategory";
 
-const AddGoods = () => {
+const AddGoodsCategory = () => {
   const formRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
-  const { createGoods } = useMasterGoods();
+  const { createGoodsCategory } = useGoodsCategory();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleFormData = async (form) => {
+    console.log(form);
+
     try {
       setIsLoading(true);
-      const response = await createGoods(form);
+      const response = await createGoodsCategory(form);
       console.log(response);
       if (response.status === "success") {
+        console.log("success");
         setTimeout(() => {
           toast.push(
             <Notification
@@ -29,8 +32,7 @@ const AddGoods = () => {
             }
           );
         }, 1000);
-        console.log("success");
-        navigate("/master-data/barang-purchase");
+        navigate("/master-data/kategori-barang");
       } else {
         toast.push(
           <Notification
@@ -64,7 +66,7 @@ const AddGoods = () => {
         <div className="flex justify-between p-2">
           <div>
             <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
-              Add Goods
+              Add Goods Category
             </h1>
           </div>
           <Button
@@ -77,7 +79,7 @@ const AddGoods = () => {
         </div>
         <div className="border-b border-gray-400 my-2"></div>
         <div className="p-4">
-          <FormMasterGoods ref={formRef} setFormData={handleFormData} />
+          <FormGoodsCategory ref={formRef} setFormData={handleFormData} />
         </div>
         <ConfirmationCustom
           isOpen={isOpen}
@@ -86,14 +88,12 @@ const AddGoods = () => {
           showSubmitBtn
           onConfirm={handleSubmit}
           confirmText="Konfirmasi"
-          title="Anda yakin ingin menambahkan vendor ini?"
+          title="Anda yakin ingin menambahkan kategori barang ini?"
           titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
           text="Klik Konfirmasi untuk melanjutkan"
           textClass="text-slate-500 text-base"
-          icon={<></>}
           isLoading={isLoading}
           disableCancel={false}
-          buttonForm=""
           buttonType="button"
           width={500}
           contentClassName="p-5 rounded-2xl"
@@ -103,4 +103,4 @@ const AddGoods = () => {
   );
 };
 
-export default AddGoods;
+export default AddGoodsCategory;

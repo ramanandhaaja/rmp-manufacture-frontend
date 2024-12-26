@@ -22,7 +22,7 @@ const VendorList = () => {
   const vendorListData = dataVendor?.data || [];
 
   useEffect(() => {
-    getVendors();
+    getVendors({ page: currentPage });
     setTotal(dataVendor?.total);
     setPageSize(dataVendor?.per_page);
   }, [currentPage]);

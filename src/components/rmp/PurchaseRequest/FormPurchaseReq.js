@@ -34,7 +34,6 @@ const FormPurchaseReq = forwardRef(
     const role = userRole[0];
     const { measurementUnits, getMeasurementUnits } = useMeasurement();
     const { goodsType } = useSelector((state) => state.goodsType);
-    console.log(goodsType);
 
     const initialValues = {
       request_date: "",
