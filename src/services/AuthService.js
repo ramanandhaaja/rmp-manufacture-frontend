@@ -31,11 +31,17 @@ export async function apiSignUp(data) {
   });
 }
 
-export async function apiSignOut(data) {
+// export async function apiSignOut(data) {
+//   return ApiService.fetchData({
+//     url: "/auth/logout",
+//     method: "post",
+//     data,
+//   });
+// }
+export async function apiSignOut() {
   return ApiService.fetchData({
-    url: "/auth/logout",
+    url: "/logout",
     method: "post",
-    data,
   });
 }
 

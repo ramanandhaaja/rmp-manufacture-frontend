@@ -41,10 +41,10 @@ function useAuth() {
           })
         );
 
-        if (resp.data.user) {
+        if (resp.data?.data.user) {
           dispatch(
             setUser(
-              resp.data.user || {
+              resp.data?.data.user || {
                 avatar: "",
                 userName: "Anonymous",
                 authority: ["USER"],
@@ -120,11 +120,13 @@ function useAuth() {
   const handleSignOut = () => {
     dispatch(onSignOutSuccess());
     dispatch(setUser(initialState));
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate(appConfig.unAuthenticatedEntryPath);
   };
 
   const signOut = async () => {
-    await apiSignOut({ refresh_token: refresh_token });
+    await apiSignOut();
     handleSignOut();
   };
 

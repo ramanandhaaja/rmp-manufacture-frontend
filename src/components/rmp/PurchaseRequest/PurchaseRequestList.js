@@ -29,7 +29,7 @@ const PurchaseRequestList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-
+  console.log(userRole);
   useEffect(() => {
     const fetchPurchaseRequests = async () => {
       setIsLoadingList(true);
@@ -100,7 +100,12 @@ const PurchaseRequestList = () => {
     <div>
       <TableHeader
         onClickAdd={() => navigate("/purchase/request/tambah")}
-        addBtnTitle={"Tambah Purchase Request"}
+        addBtnTitle={
+          userRole.includes("procurement")
+            ? "Proses Antrian Barang"
+            : "Tambah Permintaan Pembelian"
+        }
+        showBtnAdd={userRole.includes("factory-manager") ? false : true}
       />
       <CustomTable data={dataPurchase} columns={handleColumn()} />
       <div className="flex justify-end mt-2">

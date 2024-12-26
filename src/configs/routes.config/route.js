@@ -44,6 +44,20 @@ export const ROUTE_LIST = [
     authority: [],
   },
   {
+    key: "masterData.kategoriBarang",
+    path: "/master-data/kategori-barang",
+    component: React.lazy(() => import("views/masterGoodsCategory")),
+    authority: [],
+  },
+  {
+    key: "masterData.kategoriBarang.add",
+    path: "/master-data/kategori-barang/tambah-kategori-barang",
+    component: React.lazy(() =>
+      import("views/masterGoodsCategory/AddGoodsCategory")
+    ),
+    authority: [],
+  },
+  {
     key: "purchase.request",
     path: "/purchase/request",
     component: React.lazy(() => import("views/PurchaseRequest")),

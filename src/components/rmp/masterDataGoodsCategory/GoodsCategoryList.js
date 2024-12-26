@@ -1,5 +1,5 @@
 import CustomTable from "components/custom/CustomTable";
-import useMasterGoods from "utils/hooks/useMasterGoods";
+import useGoodsCategory from "utils/hooks/useGoodsCategory";
 import { useEffect, useState } from "react";
 import { formatDate } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,10 @@ import TableListDropdown from "components/template/TableListDropdown";
 import { Pagination, Alert } from "components/ui";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import TableHeader from "../TableHeader";
+import capitalize from "components/ui/utils/capitalize";
+import { Notification, toast } from "components/ui";
 
-const PurchaseGoodsList = () => {
+const GoodsCategoryList = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -16,7 +18,9 @@ const PurchaseGoodsList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [id, setId] = useState(null);
-  const { dataMasterGoods, getGoods, deleteGoods } = useMasterGoods();
+  const { getGoodsCategory, dataGoodsCategory, deleteGoodsCategory } =
+    useGoodsCategory();
+
   const columns = [
     {
       Header: "ID",
@@ -29,36 +33,23 @@ const PurchaseGoodsList = () => {
       Cell: ({ row }) => row.original.name,
     },
     {
-      Header: "Kategori Barang",
-      accessor: "category.name",
-      Cell: ({ row }) => {
-        return row.original.category.name;
-      },
+      Header: "Tipe Barang",
+      accessor: "goods_type",
+      Cell: ({ row }) => capitalize(row.original.goods_type) || "-",
     },
     {
-      Header: "Measurement",
-      accessor: "measurement",
+      Header: "Status Barang",
+      accessor: "status",
       Cell: ({ row }) => {
-        return row.original.measurement;
+        return capitalize(row.original.status);
       },
     },
-    {
-      Header: "Deskripsi",
-      accessor: "description",
-      Cell: ({ row }) => {
-        return row.original.description;
-      },
-    },
+
     {
       accessor: "action",
       Cell: ({ row }) => (
         <TableListDropdown
           dropdownItemList={[
-            {
-              label: "Lihat Detail",
-              onClick: () =>
-                navigate(`/vendor-management/detail-vendor/${row.original.id}`),
-            },
             {
               label: "Edit",
               onClick: () =>
@@ -78,9 +69,9 @@ const PurchaseGoodsList = () => {
   ];
 
   useEffect(() => {
-    const fetchMasterGoods = async () => {
+    const fetchGoodsCategory = async () => {
       try {
-        const response = await getGoods({ page: currentPage });
+        const response = await getGoodsCategory({ page: currentPage });
         const data = response.data;
         setTotal(data.total);
         setPageSize(data.per_page);
@@ -90,7 +81,7 @@ const PurchaseGoodsList = () => {
       }
     };
 
-    fetchMasterGoods();
+    fetchGoodsCategory();
   }, [currentPage]);
 
   const handlePageChange = (page) => {
@@ -100,21 +91,27 @@ const PurchaseGoodsList = () => {
   const handleDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await deleteGoods(id);
-      const data = response.data;
-      setTotal(data?.total);
-      setPageSize(data?.per_page);
+      const response = await deleteGoodsCategory(id);
+
       if (response.status === "success") {
         console.log("success");
-        navigate("/master-data/barang-purchase");
+        toast.push(
+          <Notification
+            type="success"
+            title={"Kategori Barang berhasil dihapus "}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        <Alert
-          message="Failed to delete goods"
-          type="danger"
-          showIcon
-          className="mb-4"
-        />;
         console.log(response.status);
+        toast.push(<Notification type="danger" title={response.message} />, {
+          placement: "top-center",
+        });
       }
     } catch (err) {
       console.log(err);
@@ -130,11 +127,11 @@ const PurchaseGoodsList = () => {
     <div>
       <TableHeader
         onClickAdd={() =>
-          navigate("/master-data/barang-purchase/tambah-barang-purchase")
+          navigate("/master-data/kategori-barang/tambah-kategori-barang")
         }
-        addBtnTitle={"Tambah Barang"}
+        addBtnTitle={"Tambah Kategori Barang"}
       />
-      <CustomTable data={dataMasterGoods} columns={columns} />
+      <CustomTable data={dataGoodsCategory?.data} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}
@@ -157,4 +154,4 @@ const PurchaseGoodsList = () => {
   );
 };
 
-export default PurchaseGoodsList;
+export default GoodsCategoryList;
