@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import TableListDropdown from "components/template/TableListDropdown";
 import TableHeader from "components/rmp/TableHeader";
 import { useNavigate } from "react-router-dom";
-import { Pagination, Alert } from "components/ui";
+import { Pagination, toast, Notification } from "components/ui";
 import { useState } from "react";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import capitalize from "components/ui/utils/capitalize";
@@ -19,12 +19,20 @@ const VendorList = () => {
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const vendorListData = dataVendor?.data || [];
-
   useEffect(() => {
-    getVendors({ page: currentPage });
-    setTotal(dataVendor?.total);
-    setPageSize(dataVendor?.per_page);
+    const fetchVendors = async () => {
+      try {
+        const response = await getVendors({ page: currentPage });
+        const data = response.data;
+        setTotal(data.total);
+        setPageSize(data.per_page);
+      } catch (error) {
+        console.error("Error fetching purchase requests:", error);
+      } finally {
+      }
+    };
+
+    fetchVendors();
   }, [currentPage]);
 
   const columns = [
@@ -115,14 +123,22 @@ const VendorList = () => {
       console.log(response);
       if (response.status === "success") {
         console.log("success");
-        navigate("/vendor-management/");
+        setTimeout(() => {
+          toast.push(
+            <Notification type="success" title="Berhasil menghapus vendor" />,
+            {
+              placement: "top-center",
+            }
+          );
+          window.location.reload();
+        }, 1000);
       } else {
-        <Alert
-          message="Failed to add vendor"
-          type="danger"
-          showIcon
-          className="mb-4"
-        />;
+        toast.push(
+          <Notification type="danger" title="Gagal menghapus vendor" />,
+          {
+            placement: "top-center",
+          }
+        );
         console.log(response.status);
       }
     } catch (err) {
@@ -141,7 +157,7 @@ const VendorList = () => {
         onClickAdd={() => navigate("/vendor-management/tambah-vendor")}
         addBtnTitle={"Tambah Vendor"}
       />
-      <CustomTable data={vendorListData} columns={columns} />
+      <CustomTable data={dataVendor?.data} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}

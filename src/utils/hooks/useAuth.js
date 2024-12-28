@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { setUser, initialState } from "store/auth/userSlice";
+import { setUser, initialState, setUserRole } from "store/auth/userSlice";
 import {
   apiSignIn,
   apiSignOut,
@@ -52,6 +52,7 @@ function useAuth() {
               }
             )
           );
+          localStorage.setItem("user", JSON.stringify(resp.data.data.user));
         }
         const redirectUrl = query.get(REDIRECT_URL_KEY);
         navigate(redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath);
@@ -120,6 +121,7 @@ function useAuth() {
   const handleSignOut = () => {
     dispatch(onSignOutSuccess());
     dispatch(setUser(initialState));
+    dispatch(setUserRole([]));
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     navigate(appConfig.unAuthenticatedEntryPath);

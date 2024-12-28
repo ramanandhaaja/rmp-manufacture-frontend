@@ -35,6 +35,17 @@ export async function putVendorsApi(id, data) {
     data,
   });
 }
+export async function putVerficationStatus(id, data) {
+  return ApiService.fetchData({
+    url: `vendors/updateStatus/${id}`,
+    method: "put",
+    data,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+}
 
 export async function deleteVendorsApi(id) {
   return ApiService.fetchData({
