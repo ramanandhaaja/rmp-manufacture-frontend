@@ -10,6 +10,7 @@ import Logo from "components/template/Logo";
 import { ScrollBar } from "components/ui";
 // import { NotificationSvg } from "assets/svg";
 import useUser from "utils/hooks/useUser";
+import useAuth from "utils/hooks/useAuth";
 
 const HeaderActionsStart = () => {
   return (
@@ -28,9 +29,10 @@ const HeaderActionsStart = () => {
 
 const HeaderActionsEnd = () => {
   const { user, getUser } = useUser();
+  const { authenticated } = useAuth();
+
   useEffect(() => {
-    const getToken = localStorage.getItem("token");
-    if (getToken) {
+    if (authenticated) {
       getUser();
     }
   }, []);
@@ -47,7 +49,10 @@ const HeaderActionsEnd = () => {
   const capitalizeRoles = (roles) => {
     if (Array.isArray(roles) && roles.length > 0) {
       return roles
-        .map((role) => role.charAt(0).toUpperCase() + role.slice(1))
+        .map(
+          (role) =>
+            role.charAt(0).toUpperCase() + role.slice(1).replace(/-/g, " ")
+        )
         .join(", ");
     }
     return "Superadmin"; // Default value if no roles are provided

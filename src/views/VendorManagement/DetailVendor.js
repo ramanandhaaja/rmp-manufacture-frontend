@@ -4,18 +4,17 @@ import { useParams } from "react-router-dom";
 import useVendor from "utils/hooks/vendorManagement/useVendor";
 import Tabs from "components/ui/Tabs";
 import LayoutRightSpace from "components/layout/LayoutRightSpace";
-import { Button } from "components/ui";
+import ModalMock from "components/custom/ModalMock";
+import { Notification, toast, Button } from "components/ui";
 export const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const DetailVendor = () => {
   const [activeTab, setActiveTab] = useState("detail");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
-  const { getVendorDetail, dataDetailVendor } = useVendor();
+  const { getVendorDetail, dataDetailVendor, setStatusVendor } = useVendor();
 
   const { id } = useParams();
-  //   const { setStatusApi } = useVerification();
-  const modalRef = useRef(null);
 
   useEffect(() => {
     getVendorDetail(id);
@@ -31,26 +30,39 @@ const DetailVendor = () => {
     return [{ label: "Verified", value: "verified" }];
   };
 
-  //   const handleVerify = async (data) => {
-  //     const response = await setStatusApi({
-  //       id: id,
-  //       data: { verification_status: data.verification_status.value },
-  //     });
-  //     console.log(response);
-  //     if (response.status === "error") {
-  //       dispatch(setError(response.message));
-  //       // alert(response.message);
-  //       setIsModalOpen(false);
-  //     } else {
-  //       setIsModalOpen(false);
-  //     }
-  //   };
+  const handleVerify = async (values) => {
+    const payload = values.verification_status?.value;
+    const response = await setStatusVendor(id, {
+      verification_status: payload,
+    });
+    if (response.status === "error") {
+      toast.push(
+        <Notification
+          type="danger"
+          title={"Terjadi kesalahan. Gagal verifikasi vendor"}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+      setIsModalOpen(false);
+    }
+    toast.push(
+      <Notification type="success" title={"Berhasil verifikasi vendor"} />,
+      {
+        placement: "top-center",
+      }
+    );
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
 
-  //   const handleSubmit = () => {
-  //     if (modalRef.current) {
-  //       modalRef.current.submit();
-  //     }
-  //   };
+  // const handleSave = (values) => {
+  //   console.log(values);
+  //   console.log("Selected status:", values.verification_status?.value);
+  //   setIsModalOpen(false);
+  // };
 
   return (
     <LayoutRightSpace>
@@ -81,7 +93,11 @@ const DetailVendor = () => {
             }
             color="bg-indigo-900 text-white"
           /> */}
-          <Button variant="solid" className="text-white">
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            variant="solid"
+            className="text-white"
+          >
             {dataDetailVendor.verification_status === "verified"
               ? "Ubah Verifikasi"
               : "Verifikasi Vendor"}
@@ -219,20 +235,15 @@ const DetailVendor = () => {
         </Tabs>
         {/* Content */}
       </div>
-      {/*       
-      <InputModal
-        ref={modalRef}
-        onSubmit={handleVerify}
-        onClose={() => setIsModalOpen(false)}
-        icon={<CircleAlert size={48} />}
+      <ModalMock
         isOpen={isModalOpen}
-        title={"Verifikasi Vendor"}
-        subtitle={
-          "Anda akan memverifikasi vendor ini. Pastikan data sudah sesuai."
-        }
-        selectOptions={handleOptions()}
-        onConfirm={handleSubmit}
-      /> */}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleVerify}
+        title="Update Status"
+        options={handleOptions()}
+        fieldName="verification_status"
+        label="Status"
+      />
     </LayoutRightSpace>
   );
 };

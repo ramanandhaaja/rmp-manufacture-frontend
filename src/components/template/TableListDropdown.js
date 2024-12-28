@@ -5,9 +5,9 @@ const TableListDropdown = ({ dropdownItemList }) => {
   return (
     <div>
       <Dropdown
-        menuStyle={{ minWidth: 205, marginTop: "20%", marginRight: "20px" }}
+        menuStyle={{ minWidth: 205, marginTop: "20%" }}
         renderTitle={<HiDotsHorizontal size={20} className="cursor-pointer" />}
-        placement="bottom-start"
+        placement="middle-end-bottom"
       >
         {dropdownItemList.map((item) => (
           <Dropdown.Item

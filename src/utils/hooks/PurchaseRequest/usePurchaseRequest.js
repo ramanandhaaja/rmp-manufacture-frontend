@@ -93,9 +93,9 @@ function usePurchaseReq() {
     }
   };
 
-  const updatePurchaseReq = async ({ id, data }) => {
+  const updatePurchaseReq = async (id, data) => {
     try {
-      const response = await putPurchaseReqApi({ id, data });
+      const response = await putPurchaseReqApi(id, data);
       if (response.data.status === "success") {
         return {
           status: "success",
@@ -153,7 +153,7 @@ function usePurchaseReq() {
     }
   };
 
-  const updatePurchaseReqStatus = async ({ id, data }) => {
+  const updatePurchaseReqStatus = async (id, data) => {
     try {
       const response = await putPurchaseReqUpdateStatusApi(id, data);
       if (response.data.status === "success") {

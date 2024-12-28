@@ -8,12 +8,39 @@ import useMasterGoods from "utils/hooks/useMasterGoods";
 import { findDepartement } from "utils/helpers";
 import { Button } from "components/ui";
 import { useNavigate } from "react-router-dom";
+import useUser from "utils/hooks/useUser";
+import ApprovalCard from "components/custom/ApprovalCard";
+import { Notification, toast } from "components/ui";
+import ConfirmationCustom from "components/custom/ConfirmationCustom";
+import ModalNoteInput from "components/custom/ModalNoteInput";
 
 const DetailPurchaseReq = () => {
   const navigate = useNavigate();
-  const { dataDetailPurchase, getDetailPurchaseReq } = usePurchaseReq();
+  const { dataDetailPurchase, getDetailPurchaseReq, updatePurchaseReqStatus } =
+    usePurchaseReq();
   const { getGoodsDetail, detailGoods } = useMasterGoods();
   const { id } = useParams();
+  const { userRole, user } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const [confirmModalProps, setConfirmModalProps] = useState({
+    title: "",
+    message: "",
+    onConfirm: null,
+    isOpen: false,
+  });
+
+  const [noteModalProps, setNoteModalProps] = useState({
+    title: "",
+    subtitle: "",
+    icon: null,
+    status: "",
+    isOpen: false,
+    onSave: null,
+  });
+
+  const isApprovalShown =
+    userRole?.includes("factory-manager") &&
+    dataDetailPurchase.status === "waiting";
 
   const columns = [
     {
@@ -42,6 +69,57 @@ const DetailPurchaseReq = () => {
     getDetailPurchaseReq(id);
   }, [id]);
 
+  const handleStatusUpdate = async (status, note = "") => {
+    setIsLoading(true);
+    try {
+      const payload = { status };
+      if (note) {
+        payload.note = note;
+      }
+
+      const response = await updatePurchaseReqStatus(id, payload);
+
+      if (response.status === "failed") {
+        toast.push(<Notification type="danger" title={response.message} />, {
+          placement: "top-center",
+        });
+        throw new Error("Failed to update status");
+      }
+
+      console.log(`Status updated successfully to: ${status}`);
+      toast.push(<Notification type="success" title={response.message} />, {
+        placement: "top-center",
+      });
+
+      setConfirmModalProps((prev) => ({ ...prev, isOpen: false }));
+      setNoteModalProps((prev) => ({ ...prev, isOpen: false }));
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenConfirmModal = (title, message, confirmHandler) => {
+    setConfirmModalProps({
+      title,
+      message,
+      onConfirm: confirmHandler,
+      isOpen: true,
+    });
+  };
+
+  const handleOpenNoteModal = ({ title, subtitle, icon, status, onSave }) => {
+    setNoteModalProps({
+      title,
+      subtitle,
+      icon,
+      status,
+      onSave,
+      isOpen: true,
+    });
+  };
+
   return (
     <LayoutRightSpace>
       <div className="flex justify-between">
@@ -55,7 +133,7 @@ const DetailPurchaseReq = () => {
               Disetujui
             </div>
           )}
-          {dataDetailPurchase.status === "unverified" && (
+          {dataDetailPurchase.status === "rejected" && (
             <div className="bg-red-200 text-gray-700 h-8 px-3 py-1 rounded-lg text-sm">
               Ditolak
             </div>
@@ -77,56 +155,90 @@ const DetailPurchaseReq = () => {
         </Button>
       </div>
       <div className="border-b border-gray-400 my-2"></div>
-
-      <div className="py-3 pt-6">
-        <div className="space-y-6 mb-8">
-          <div className="grid grid-cols-1 gap-4">
-            <div className="flex items-center gap-10">
-              <p className="text-sm text-gray-500 w-32">ID</p>
-              <p className="text-sm text-gray-700">
-                {dataDetailPurchase.id || "-"}
-              </p>
-            </div>
-            <div className="flex items-center gap-10">
-              <p className="text-sm text-gray-500 w-32">Departemen</p>
-              <p className="text-sm text-gray-700">
-                {findDepartement(dataDetailPurchase.department_id) || "-"}
-              </p>
-            </div>
-            <div className="flex items-center gap-11">
-              <p className="text-sm text-gray-500 w-42">Tanggal Pengajuan</p>
-              <p className="text-sm text-gray-700">
-                {dataDetailPurchase.request_date
-                  ? formatDate(dataDetailPurchase.request_date)
-                  : "-"}
-              </p>
-            </div>
-            <div className="flex items-center gap-[37px]">
-              <p className="text-sm text-gray-500 w-42">Tanggal Persetujuan</p>
-              <p className="text-sm text-gray-700">
-                {dataDetailPurchase.approval_date
-                  ? formatDate(dataDetailPurchase.approval_date)
-                  : "-"}
-              </p>
-            </div>
-            <div className="flex items-center gap-10">
-              <p className="text-sm text-gray-500 w-32">Dibeli Oleh</p>
-              <p className="text-sm text-gray-700">
-                {dataDetailPurchase.buyer || "-"}
-              </p>
-            </div>
-            <div className="flex items-center gap-10">
-              <p className="text-sm text-gray-500 w-32">Catatan</p>
-              <p className="text-sm text-gray-700">
-                {dataDetailPurchase.notes || "-"}
-              </p>
+      <div className="flex justify-between">
+        <div className="py-3 pt-6">
+          <div className="space-y-6 mb-8">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-center gap-10">
+                <p className="text-sm text-gray-500 w-32">ID</p>
+                <p className="text-sm text-gray-700">
+                  {dataDetailPurchase.id || "-"}
+                </p>
+              </div>
+              <div className="flex items-center gap-10">
+                <p className="text-sm text-gray-500 w-32">Departemen</p>
+                <p className="text-sm text-gray-700">
+                  {findDepartement(dataDetailPurchase.department_id) || "-"}
+                </p>
+              </div>
+              <div className="flex items-center gap-11">
+                <p className="text-sm text-gray-500 w-42">Tanggal Pengajuan</p>
+                <p className="text-sm text-gray-700">
+                  {dataDetailPurchase.request_date
+                    ? formatDate(dataDetailPurchase.request_date)
+                    : "-"}
+                </p>
+              </div>
+              <div className="flex items-center gap-[37px]">
+                <p className="text-sm text-gray-500 w-42">
+                  Tanggal Persetujuan
+                </p>
+                <p className="text-sm text-gray-700">
+                  {dataDetailPurchase.approval_date
+                    ? formatDate(dataDetailPurchase.approval_date)
+                    : "-"}
+                </p>
+              </div>
+              <div className="flex items-center gap-10">
+                <p className="text-sm text-gray-500 w-32">Dibeli Oleh</p>
+                <p className="text-sm text-gray-700">
+                  {dataDetailPurchase.buyer || "-"}
+                </p>
+              </div>
+              <div className="flex items-center gap-10">
+                <p className="text-sm text-gray-500 w-32">Catatan</p>
+                <p className="text-sm text-gray-700">
+                  {dataDetailPurchase.notes || "-"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
+        {isApprovalShown && (
+          <div className="py-4">
+            <ApprovalCard
+              handleStatusUpdate={handleStatusUpdate}
+              isLoading={isLoading}
+              onOpenConfirmModal={handleOpenConfirmModal}
+              onOpenNoteModal={handleOpenNoteModal}
+            />
+          </div>
+        )}
       </div>
       <div>
-        <CustomTable columns={columns} data={dataDetailPurchase.items} />
+        <div className="mt-4">
+          <CustomTable columns={columns} data={dataDetailPurchase.items} />
+        </div>
       </div>
+      <ConfirmationCustom
+        confirmText="Konfirmasi"
+        title={confirmModalProps.title}
+        text=" "
+        message={confirmModalProps.message}
+        onConfirm={confirmModalProps.onConfirm}
+        isOpen={confirmModalProps.isOpen}
+        onClose={() =>
+          setConfirmModalProps((prev) => ({ ...prev, isOpen: false }))
+        }
+        isLoading={isLoading}
+      />
+      <ModalNoteInput
+        {...noteModalProps}
+        onClose={() =>
+          setNoteModalProps((prev) => ({ ...prev, isOpen: false }))
+        }
+        isLoading={isLoading}
+      />
     </LayoutRightSpace>
   );
 };

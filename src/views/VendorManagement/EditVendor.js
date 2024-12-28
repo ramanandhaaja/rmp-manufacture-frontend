@@ -1,10 +1,10 @@
-import { Button, Alert } from "components/ui";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useVendor from "utils/hooks/vendorManagement/useVendor";
 import { useParams } from "react-router-dom";
 import FormVendor from "components/rmp/vendorManagement/FormVendor";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
+import { Notification, toast, Button } from "components/ui";
 
 const EditVendor = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,28 +26,23 @@ const EditVendor = () => {
   const handleFormData = async (form) => {
     try {
       setIsLoading(true);
-      const response = await updateVendor(id, form);
-      console.log(response);
+      const response = await updateVendor(id, { form });
       if (response.status === "success") {
         console.log("success");
-        navigate("/vendor-management/");
+        setTimeout(() => {
+          toast.push(<Notification type="success" title={response.message} />, {
+            placement: "top-center",
+          });
+          navigate("/vendor-management/");
+        }, 1000);
       } else {
-        <Alert
-          message="Failed to edit vendor"
-          type="danger"
-          showIcon
-          className="mb-4"
-        />;
+        toast.push(<Notification type="danger" title={response.message} />, {
+          placement: "top-center",
+        });
         console.log(response.status);
       }
     } catch (err) {
       console.log(err);
-      <Alert
-        message="Failed to edit vendor"
-        type="danger"
-        showIcon
-        className="mb-4"
-      />;
     } finally {
       setTimeout(() => {
         setIsLoading(false);
@@ -91,7 +86,7 @@ const EditVendor = () => {
         showSubmitBtn
         onConfirm={handleSubmit}
         confirmText="Konfirmasi"
-        title="Anda yakin ingin menambahkan vendor ini?"
+        title="Anda yakin ingin mengubah vendor ini?"
         titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
         text="Klik Konfirmasi untuk melanjutkan"
         textClass="text-slate-500 text-base"

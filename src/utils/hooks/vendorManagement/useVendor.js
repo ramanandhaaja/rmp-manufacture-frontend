@@ -3,6 +3,7 @@ import {
   getVendorsDetailsApi,
   postVendorsApi,
   putVendorsApi,
+  putVerficationStatus,
   deleteVendorsApi,
 } from "services/VendorServices";
 import { useDispatch, useSelector } from "react-redux";
@@ -89,6 +90,32 @@ function useVendor() {
     }
   };
 
+  const setStatusVendor = async (id, data) => {
+    try {
+      const response = await putVerficationStatus(id, data);
+      console.log(response);
+      if (response.data.success == true) {
+        console.log(response);
+        return {
+          status: "success",
+          message: response.message,
+        };
+      } else {
+        console.log(response);
+        return {
+          status: "error",
+          message: response.message,
+        };
+      }
+    } catch (err) {
+      console.log("catch error", err);
+      return {
+        status: "error",
+        message: err.message,
+      };
+    }
+  };
+
   const removeVendor = async (vendorId) => {
     try {
       const response = await deleteVendorsApi(vendorId);
@@ -121,6 +148,7 @@ function useVendor() {
     getVendorDetail,
     createVendor,
     updateVendor,
+    setStatusVendor,
     removeVendor,
   };
 }

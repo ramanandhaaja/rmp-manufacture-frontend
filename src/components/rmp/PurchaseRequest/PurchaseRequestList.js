@@ -11,25 +11,39 @@ import useUser from "utils/hooks/useUser";
 import usePurchaseRequest from "utils/hooks/PurchaseRequest/usePurchaseRequest";
 import { Notification, toast } from "components/ui";
 import { useSelector } from "react-redux";
+import ModalStatusInput from "components/custom/ModalStatusInput";
 
 const PurchaseRequestList = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenStatus, setIsOpenStatus] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingList, setIsLoadingList] = useState(true);
   const [id, setId] = useState(null);
-  const { dataPurchase, getPurchaseReqList, deletePurchaseReq } =
-    usePurchaseRequest();
-  const { columnsDepartment, columnsPpic } = useColumns(setIsOpen, setId);
+  const {
+    dataPurchase,
+    getPurchaseReqList,
+    deletePurchaseReq,
+    updatePurchaseReqStatus,
+  } = usePurchaseRequest();
+  const { columnsDepartment, columnsPpic, columnsFactoryManager } = useColumns(
+    setIsOpen,
+    setIsOpenStatus,
+    setId
+  );
+
   const { user, userRole } = useUser();
   const departemenColumn = columnsDepartment();
-  const otherColumn = columnsPpic();
+  const ppicColumn = columnsPpic();
+  const factoryManagerColumn = columnsFactoryManager();
+
   const { goodsType } = useSelector((state) => state.goodsType);
   const [purchaseReqList, setPurchaseReqList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  console.log(userRole);
+
   useEffect(() => {
     const fetchPurchaseRequests = async () => {
       setIsLoadingList(true);
@@ -58,9 +72,14 @@ const PurchaseRequestList = () => {
   const handleColumn = () => {
     if (userRole.includes("department")) {
       return departemenColumn;
-    } else {
-      return otherColumn;
     }
+    if (userRole.includes("ppic")) {
+      return ppicColumn;
+    }
+    if (userRole.includes("factory-manager")) {
+      return factoryManagerColumn;
+    }
+    return departemenColumn;
   };
 
   const handlePageChange = (page) => {
@@ -96,16 +115,46 @@ const PurchaseRequestList = () => {
     }
   };
 
+  const handleStatusUpdate = async (values) => {
+    try {
+      setIsLoading(true);
+      const response = await updatePurchaseReqStatus(id, {
+        status: values.status.value,
+      });
+      if (response.status === "success") {
+        toast.push(<Notification type="success" title={response.message} />, {
+          placement: "top-center",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        toast.push(<Notification type="danger" title={response.message} />, {
+          placement: "top-center",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+      setIsOpenStatus(false);
+    }
+  };
+
   return (
     <div>
       <TableHeader
         onClickAdd={() => navigate("/purchase/request/tambah")}
         addBtnTitle={
-          userRole.includes("procurement")
+          Array.isArray(userRole) && userRole.includes("procurement")
             ? "Proses Antrian Barang"
             : "Tambah Permintaan Pembelian"
         }
-        showBtnAdd={userRole.includes("factory-manager") ? false : true}
+        showBtnAdd={
+          Array.isArray(userRole) && userRole?.includes("factory-manager")
+            ? false
+            : true
+        }
       />
       <CustomTable data={dataPurchase} columns={handleColumn()} />
       <div className="flex justify-end mt-2">
@@ -126,6 +175,16 @@ const PurchaseRequestList = () => {
         text="Anda yakin akan menghapus data ini?"
         confirmText="Hapus"
         isLoading={isLoading}
+      />
+      <ModalStatusInput
+        isOpen={isOpenStatus}
+        onClose={() => setIsOpenStatus(false)}
+        // onConfirm={() => handleStatus(id)}
+        title="Konfirmasi Status"
+        text="Anda yakin akan mengubah status data ini?"
+        confirmText="Ubah Status"
+        isLoading={isLoading}
+        onSave={handleStatusUpdate}
       />
     </div>
   );
