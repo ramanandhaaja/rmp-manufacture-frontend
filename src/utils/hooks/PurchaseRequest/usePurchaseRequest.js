@@ -135,7 +135,7 @@ function usePurchaseReq() {
     }
   };
 
-  const updatePurchaseReqFollowUp = async ({ id, data }) => {
+  const updatePurchaseReqFollowUp = async (id, data) => {
     try {
       const response = await putPurchaseReqFollowUpApi(id, data);
       if (response.data.status === "success") {

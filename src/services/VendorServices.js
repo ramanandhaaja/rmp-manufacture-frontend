@@ -35,6 +35,7 @@ export async function putVendorsApi(id, data) {
     data,
   });
 }
+
 export async function putVerficationStatus(id, data) {
   return ApiService.fetchData({
     url: `vendors/updateStatus/${id}`,

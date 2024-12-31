@@ -90,12 +90,12 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
       {
         Header: "Departemen",
         accessor: "department_id",
-        Cell: ({ row }) => row.original.department_id,
+        Cell: ({ row }) => findDepartement(row.original.department_id) || "-",
       },
       {
         Header: "HOD",
         accessor: "hod",
-        Cell: ({ row }) => row.original.hod,
+        Cell: ({ row }) => row.original.hod || "-",
       },
       {
         Header: "Tanggal Permintaan",
@@ -114,7 +114,9 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
       {
         Header: "Dibeli Oleh",
         accessor: "buyer",
-        Cell: ({ row }) => row.original.buyer,
+        Cell: ({ row }) => {
+          return row.original.buyer || "-";
+        },
       },
       {
         Header: "Status",
@@ -127,29 +129,34 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
       },
       {
         accessor: "action",
-        Cell: ({ row }) => (
-          <TableListDropdown
-            dropdownItemList={[
-              {
-                label: "Lihat Detail",
-                onClick: () =>
-                  navigate(`/purchase/request/detail/${row.original.id}`),
-              },
-              {
-                label: "Edit",
-                //   onClick: () =>
-                //      navigate(`/vendor-management/edit-vendor/${row.original.id}`),
-              },
-              {
-                label: "Delete",
-                onClick: () => {
-                  setIsOpen(true);
-                  setId(row.original.id);
+        Cell: ({ row }) => {
+          const renderDropdown = () => {
+            if (row.original.buyer === null) {
+              return [
+                {
+                  label: "Follow-up Permintaan",
+                  onClick: () =>
+                    `/purchase/request/detail/follow-up/${row.original.id}`,
                 },
-              },
-            ]}
-          />
-        ),
+                {
+                  label: "Lihat Detail",
+                  onClick: () =>
+                    navigate(`/purchase/request/detail/${row.original.id}`),
+                },
+              ];
+            } else {
+              return [
+                {
+                  label: "Lihat Detail",
+                  onClick: () =>
+                    navigate(`/purchase/request/detail/${row.original.id}`),
+                },
+              ];
+            }
+          };
+
+          return <TableListDropdown dropdownItemList={renderDropdown()} />;
+        },
       },
     ],
     [navigate, setIsOpen, setId]

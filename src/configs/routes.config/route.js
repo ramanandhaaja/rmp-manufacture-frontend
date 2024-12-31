@@ -85,4 +85,26 @@ export const ROUTE_LIST = [
     ),
     authority: [],
   },
+  {
+    key: "purchase.request.detail.followUp",
+    path: "/purchase/request/detail/follow-up/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseRequest/DetailPurchaseReq")
+    ),
+    authority: [],
+  },
+  {
+    key: "purchase.procurement",
+    path: "/purchase/procurement",
+    component: React.lazy(() => import("views/PurchaseProcurement")),
+    authority: [],
+  },
+  // {
+  //   key: "purchase.procurement.detail",
+  //   path: "/purchase/procurement/detail/:id",
+  //   component: React.lazy(() =>
+  //     import("views/PurchaseProcurement/DetailPurchaseProcurement")
+  //   ),
+  //   authority: [],
+  // },
 ];
