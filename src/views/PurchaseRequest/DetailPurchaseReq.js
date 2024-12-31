@@ -1,6 +1,6 @@
 import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { formatDate } from "utils/helpers";
 import CustomTable from "components/custom/CustomTable";
@@ -10,18 +10,34 @@ import { Button } from "components/ui";
 import { useNavigate } from "react-router-dom";
 import useUser from "utils/hooks/useUser";
 import ApprovalCard from "components/custom/ApprovalCard";
-import { Notification, toast } from "components/ui";
+import {
+  Notification,
+  toast,
+  FormContainer,
+  FormItem,
+  Input,
+} from "components/ui";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import ModalNoteInput from "components/custom/ModalNoteInput";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import { Loading } from "components/shared";
 
 const DetailPurchaseReq = () => {
   const navigate = useNavigate();
-  const { dataDetailPurchase, getDetailPurchaseReq, updatePurchaseReqStatus } =
-    usePurchaseReq();
-  const { getGoodsDetail, detailGoods } = useMasterGoods();
+  const {
+    dataDetailPurchase,
+    getDetailPurchaseReq,
+    updatePurchaseReqStatus,
+    updatePurchaseReqFollowUp,
+  } = usePurchaseReq();
+  const [isLoadingList, setIsLoadingList] = useState(false);
   const { id } = useParams();
   const { userRole, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const isFollowUp =
+    window.location.pathname.includes("follow-up") && userRole.includes("ppic");
+  const formikRef = useRef(null);
   const [confirmModalProps, setConfirmModalProps] = useState({
     title: "",
     message: "",
@@ -66,7 +82,9 @@ const DetailPurchaseReq = () => {
   ];
 
   useEffect(() => {
+    setIsLoadingList(true);
     getDetailPurchaseReq(id);
+    setIsLoadingList(false);
   }, [id]);
 
   const handleStatusUpdate = async (status, note = "") => {
@@ -120,6 +138,75 @@ const DetailPurchaseReq = () => {
     });
   };
 
+  const FormBuyer = () => {
+    const handleFollowUp = async (values) => {
+      console.log(values);
+      try {
+        setIsLoading(true);
+        const response = await updatePurchaseReqFollowUp(id, {
+          buyer: values.buyer,
+        });
+        if (response.status === "success") {
+          toast.push(
+            <Notification
+              type="success"
+              title={response.message}
+              width={400}
+            />,
+            {
+              placement: "top-center",
+            }
+          );
+        } else {
+          toast.push(<Notification type="danger" title={response.message} />, {
+            placement: "top-center",
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    return (
+      <div className="py-4">
+        <Formik
+          innerRef={formikRef}
+          initialValues={{ buyer: "" }}
+          validationSchema={Yup.object().shape({
+            buyer: Yup.string().required("Buyer is required"),
+          })}
+          onSubmit={handleFollowUp}
+        >
+          {({ errors, touched }) => (
+            <Form className="space-y-6">
+              <FormContainer>
+                {/* Vendor Name */}
+                <FormItem
+                  label={
+                    <span>
+                      Dibeli Oleh <span>*</span>
+                    </span>
+                  }
+                  invalid={errors.buyer && touched.buyer}
+                  errorMessage={errors.buyer}
+                >
+                  <Field
+                    type="text"
+                    name="buyer"
+                    placeholder="Masukan pembeli"
+                    component={Input}
+                    uppercase={false}
+                  />
+                </FormItem>
+              </FormContainer>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    );
+  };
+
   return (
     <LayoutRightSpace>
       <div className="flex justify-between">
@@ -144,15 +231,24 @@ const DetailPurchaseReq = () => {
             </div>
           )}
         </div>
-        <Button
-          onClick={() =>
-            navigate(`/purchase/request/detail/informasi-pembelian/${id}`)
-          }
-          variant="solid"
-          className="text-white"
-        >
-          Informasi Pembelian
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() =>
+              navigate(`/purchase/request/detail/informasi-pembelian/${id}`)
+            }
+          >
+            Informasi Pembelian
+          </Button>
+          {isFollowUp && (
+            <Button
+              onClick={() => formikRef.current.handleSubmit()}
+              variant="solid"
+              className="text-white"
+            >
+              Kirim
+            </Button>
+          )}
+        </div>
       </div>
       <div className="border-b border-gray-400 my-2"></div>
       <div className="flex justify-between">
@@ -216,8 +312,15 @@ const DetailPurchaseReq = () => {
         )}
       </div>
       <div>
+        {isFollowUp && <FormBuyer />}
         <div className="mt-4">
-          <CustomTable columns={columns} data={dataDetailPurchase.items} />
+          {isLoadingList ? (
+            <div className="flex justify-center">
+              <Loading />
+            </div>
+          ) : (
+            <CustomTable columns={columns} data={dataDetailPurchase.items} />
+          )}
         </div>
       </div>
       <ConfirmationCustom

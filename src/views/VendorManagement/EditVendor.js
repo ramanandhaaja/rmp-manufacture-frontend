@@ -24,9 +24,10 @@ const EditVendor = () => {
   }, [id]);
 
   const handleFormData = async (form) => {
+    console.log(form);
     try {
       setIsLoading(true);
-      const response = await updateVendor(id, { form });
+      const response = await updateVendor(id, form);
       if (response.status === "success") {
         console.log("success");
         setTimeout(() => {
@@ -50,6 +51,7 @@ const EditVendor = () => {
       }, 1000);
     }
   };
+
   const handleSubmit = () => {
     if (formRef.current) {
       formRef.current.handleSubmit();
@@ -92,7 +94,6 @@ const EditVendor = () => {
         textClass="text-slate-500 text-base"
         isLoading={isLoading}
         disableCancel={false}
-        buttonForm=""
         buttonType="button"
         width={500}
         contentClassName="p-5 rounded-2xl"

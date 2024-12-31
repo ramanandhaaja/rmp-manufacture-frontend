@@ -551,3 +551,11 @@ export const RMPSTATUSLABEL = {
   rejected: "Ditolak",
   revised: "Direvisi",
 };
+
+export const RMPSTATUSCOLOR = {
+  approved: "bg-emerald-600 text-white",
+  verified: "bg-blue-600 text-white",
+  rejected: "bg-red-500 text-white",
+  revised: "bg-amber-400 text-white",
+  waiting: "bg-yellow-500 text-white",
+};

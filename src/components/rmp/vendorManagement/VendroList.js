@@ -8,6 +8,7 @@ import { Pagination, toast, Notification } from "components/ui";
 import { useState } from "react";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import capitalize from "components/ui/utils/capitalize";
+import { getStatusClassName } from "utils/helpers";
 
 const VendorList = () => {
   const navigate = useNavigate();
@@ -80,8 +81,12 @@ const VendorList = () => {
       Header: "Status Approval",
       accessor: "status",
       Cell: ({ row }) => (
-        <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-          {row.original.status}
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+            row.original.verification_status
+          )}`}
+        >
+          {row.original.verification_status}
         </span>
       ),
     },
@@ -134,7 +139,7 @@ const VendorList = () => {
         }, 1000);
       } else {
         toast.push(
-          <Notification type="danger" title="Gagal menghapus vendor" />,
+          <Notification type="danger" title="Berhasil menghapus vendor" />,
           {
             placement: "top-center",
           }

@@ -6,6 +6,7 @@ import Tabs from "components/ui/Tabs";
 import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import ModalMock from "components/custom/ModalMock";
 import { Notification, toast, Button } from "components/ui";
+import useUser from "utils/hooks/useUser";
 export const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const DetailVendor = () => {
@@ -13,7 +14,7 @@ const DetailVendor = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const { getVendorDetail, dataDetailVendor, setStatusVendor } = useVendor();
-
+  const { userRole } = useUser();
   const { id } = useParams();
 
   useEffect(() => {
@@ -93,15 +94,17 @@ const DetailVendor = () => {
             }
             color="bg-indigo-900 text-white"
           /> */}
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            variant="solid"
-            className="text-white"
-          >
-            {dataDetailVendor.verification_status === "verified"
-              ? "Ubah Verifikasi"
-              : "Verifikasi Vendor"}
-          </Button>
+          {userRole.includes("procurement") && (
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              variant="solid"
+              className="text-white"
+            >
+              {dataDetailVendor.verification_status === "verified"
+                ? "Ubah Verifikasi"
+                : "Verifikasi Vendor"}
+            </Button>
+          )}
         </div>
       </div>
 

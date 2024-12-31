@@ -1,6 +1,6 @@
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import FormVendor from "components/rmp/vendorManagement/FormVendor";
-import { Alert, Button } from "components/ui";
+import { Notification, toast, Button } from "components/ui";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useVendor from "utils/hooks/vendorManagement/useVendor";
@@ -18,24 +18,25 @@ const AddVendor = () => {
       const response = await createVendor(form);
       console.log(response);
       if (response.status === "success") {
-        console.log("success");
-        navigate("/vendor-management/");
+        setTimeout(() => {
+          toast.push(<Notification type="success" title={response.message} />, {
+            placement: "top-center",
+          });
+          navigate("/vendor-management/");
+        }, 1000);
       } else {
-        <Alert
-          message="Failed to add vendor"
-          type="danger"
-          showIcon
-          className="mb-4"
-        />;
+        toast.push(<Notification type="danger" title={response.message} />, {
+          placement: "top-center",
+        });
         console.log(response.status);
       }
     } catch (err) {
-      <Alert
-        message="Failed to add vendor"
-        type="danger"
-        showIcon
-        className="mb-4"
-      />;
+      toast.push(
+        <Notification type="danger" title={"Error while creating vendor"} />,
+        {
+          placement: "top-center",
+        }
+      );
       console.log(err);
     } finally {
       setTimeout(() => {
