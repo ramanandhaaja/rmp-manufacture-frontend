@@ -1,8 +1,8 @@
 import React, { forwardRef, useImperativeHandle } from "react";
 import { Formik, Form, Field } from "formik";
-import { Button } from "components/ui";
-
+import { Button, Dialog } from "components/ui";
 import * as Yup from "yup";
+import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 
 const ModalNoteInput = forwardRef(
   (
@@ -10,12 +10,14 @@ const ModalNoteInput = forwardRef(
       isOpen,
       onClose,
       onConfirm,
-      title,
-      icon,
-      subtitle,
+      title = "Note Input",
+      icon = <QuestionMarkCircledIcon height={56} width={56} color="#037DC3" />,
+      subtitle = "Please provide your input below.",
       isLoading = false,
       onSave,
       status,
+      width = 500,
+      contentClassName = "p-5 rounded-2xl",
     },
     ref
   ) => {
@@ -53,62 +55,69 @@ const ModalNoteInput = forwardRef(
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white rounded-lg w-[450px] min-h-[360px] overflow-y-auto flex flex-col items-center p-8">
-          <div className="mb-4">{icon}</div>
-          <h2 className="text-xl font-medium text-gray-900 mb-2 text-center">
+      <Dialog
+        isOpen={isOpen}
+        onClose={onClose}
+        width={width}
+        contentClassName={contentClassName}
+      >
+        <div className="flex flex-col justify-center items-center text-center py-4">
+          {icon}
+          <div className="mt-5 mb-3 text-main-100 text-xl font-bold">
             {title}
-          </h2>
-          <p className="text-gray-600 text-center mb-4">{subtitle}</p>
-
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit || onConfirm}
-          >
-            {({ errors, touched, handleSubmit }) => (
-              <Form className="w-full" onSubmit={handleSubmit}>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {status === "revised" ? "Catatan*" : "Catatan (opsional)"}
-                  </label>
-                  <Field
-                    as="textarea"
-                    rows="4"
-                    name="note"
-                    placeholder="Masukan catatan"
-                    className={`w-full px-3 py-2 border ${
-                      errors.note && touched.note
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    } rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500`}
-                  />
-                  {errors.note && touched.note && (
-                    <p className="mt-1 text-sm text-red-500">{errors.note}</p>
-                  )}
-                </div>
-                <div className="flex gap-4 mt-auto">
-                  <Button
-                    type="button"
-                    onClick={onClose}
-                    className="w-[186px] py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="solid"
-                    type="submit"
-                    className="w-[186px] py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Loading..." : "Confirm"}
-                  </Button>
-                </div>
-              </Form>
-            )}
-          </Formik>
+          </div>
+          <div className="text-slate-500 text-base">{subtitle}</div>
         </div>
-      </div>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit || onConfirm}
+        >
+          {({ errors, touched, handleSubmit }) => (
+            <Form className="w-full" onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {status === "revised" ? "Catatan*" : "Catatan (opsional)"}
+                </label>
+                <Field
+                  as="textarea"
+                  rows="4"
+                  name="note"
+                  placeholder="Masukan catatan"
+                  className={`w-full px-3 py-2 border ${
+                    errors.note && touched.note
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500`}
+                />
+                {errors.note && touched.note && (
+                  <p className="mt-1 text-sm text-red-500">{errors.note}</p>
+                )}
+              </div>
+              <div className="flex justify-center items-center gap-5 mt-5">
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={onClose}
+                  className="ltr:mr-2 rtl:ml-2 !bg-transparent !w-[120px] !h-10"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  loading={isLoading}
+                  type="submit"
+                  size="md"
+                  variant="solid"
+                  className="!w-[120px] !h-10"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Confirm"}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Dialog>
     );
   }
 );

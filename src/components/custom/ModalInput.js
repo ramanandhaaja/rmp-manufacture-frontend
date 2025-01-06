@@ -140,7 +140,7 @@ const InputModal = forwardRef(
                               }))
                             : measurementUnits?.map((unit) => ({
                                 value: unit.id,
-                                label: unit.abbreviation,
+                                label: unit.name,
                               }))
                         }
                         placeholder={field.placeholder}

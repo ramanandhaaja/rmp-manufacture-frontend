@@ -70,6 +70,14 @@ export const ROUTE_LIST = [
     authority: [],
   },
   {
+    key: "purchase.request.edit",
+    path: "/purchase/request/edit/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseRequest/EditPurchaseReq")
+    ),
+    authority: [],
+  },
+  {
     key: "purchase.request.detail",
     path: "/purchase/request/detail/:id",
     component: React.lazy(() =>

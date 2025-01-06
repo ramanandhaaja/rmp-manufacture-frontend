@@ -1,38 +1,44 @@
-import PurchaseRequestList from "components/rmp/PurchaseRequest/PurchaseRequestList";
-import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
-import useGoodsCategory from "utils/hooks/useGoodsCategory";
-import useMasterGoods from "utils/hooks/useMasterGoods";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
+import { useParams } from "react-router-dom";
 import FormPurchaseReq from "components/rmp/PurchaseRequest/FormPurchaseReq";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import { Notification, toast, Button } from "components/ui";
-import { useSelector } from "react-redux";
 
-const AddPurchaseReq = () => {
+const EditPurchaseReq = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("material");
-  const formRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const formRef = useRef();
   const navigate = useNavigate();
-  const { createPurchaseReq } = usePurchaseReq();
+  const { updatePurchaseReq, dataDetailPurchase, getDetailPurchaseReq } =
+    usePurchaseReq();
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      getDetailPurchaseReq(id);
+    }
+  }, [id]);
 
   const handleFormData = async (form) => {
     console.log(form);
     try {
       setIsLoading(true);
-      const response = await createPurchaseReq(form);
+      const response = await updatePurchaseReq(id, form);
       if (response.status === "success") {
         console.log("success");
-        navigate("/purchase/request");
         toast.push(<Notification type="success" title={response.message} />, {
           placement: "top-center",
         });
+        setTimeout(() => {
+          window.history.back();
+        }, 1000);
       } else {
-        console.log(response.status);
         toast.push(<Notification type="danger" title={response.message} />, {
           placement: "top-center",
         });
+        console.log(response.status);
       }
     } catch (err) {
       console.log(err);
@@ -53,11 +59,9 @@ const AddPurchaseReq = () => {
   return (
     <div>
       <div className="flex justify-between p-2">
-        <div>
-          <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
-            Tambah Permintaan Pembelian
-          </h1>
-        </div>
+        <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
+          Edit Permintaan Pembelian
+        </h1>
         <Button
           onClick={() => setIsOpen(true)}
           variant="solid"
@@ -66,9 +70,15 @@ const AddPurchaseReq = () => {
           Kirim
         </Button>
       </div>
-      <div className="border-b border-gray-400 "></div>
-
-      <FormPurchaseReq ref={formRef} setFormData={handleFormData} />
+      <div className="border-b border-gray-400 my-2"></div>
+      <div className="p-4">
+        <FormPurchaseReq
+          ref={formRef}
+          setFormData={handleFormData}
+          initialData={dataDetailPurchase}
+          isEdit={true}
+        />
+      </div>
       <ConfirmationCustom
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -76,7 +86,7 @@ const AddPurchaseReq = () => {
         showSubmitBtn
         onConfirm={handleSubmit}
         confirmText="Konfirmasi"
-        title="Anda yakin ingin membuat permintaan pembelian ini?"
+        title="Anda yakin ingin mengubah pembelian ini?"
         titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
         text="Klik Konfirmasi untuk melanjutkan"
         textClass="text-slate-500 text-base"
@@ -89,4 +99,5 @@ const AddPurchaseReq = () => {
     </div>
   );
 };
-export default AddPurchaseReq;
+
+export default EditPurchaseReq;

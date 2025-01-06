@@ -161,9 +161,6 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
           formData.append(key, values[key]);
         }
       });
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
 
       setFormData(formData);
     } catch (error) {
