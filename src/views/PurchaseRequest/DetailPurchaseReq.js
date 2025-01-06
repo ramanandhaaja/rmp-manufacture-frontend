@@ -22,6 +22,8 @@ import ModalNoteInput from "components/custom/ModalNoteInput";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Loading } from "components/shared";
+import { useSelector } from "react-redux";
+import TableListDropdown from "components/template/TableListDropdown";
 
 const DetailPurchaseReq = () => {
   const navigate = useNavigate();
@@ -38,6 +40,7 @@ const DetailPurchaseReq = () => {
   const isFollowUp =
     window.location.pathname.includes("follow-up") && userRole.includes("ppic");
   const formikRef = useRef(null);
+  const { goodsType } = useSelector((state) => state.goodsType);
   const [confirmModalProps, setConfirmModalProps] = useState({
     title: "",
     message: "",
@@ -78,6 +81,24 @@ const DetailPurchaseReq = () => {
     {
       Header: "UOM",
       accessor: "measurement",
+    },
+    {
+      accessor: "action",
+      Cell: ({ row }) => {
+        if (dataDetailPurchase.status !== "approved") {
+          return (
+            <TableListDropdown
+              dropdownItemList={[
+                {
+                  label: "Edit",
+                  onClick: () => navigate(`/purchase/request/edit/${id}`),
+                },
+              ]}
+            />
+          );
+        }
+        return null;
+      },
     },
   ];
 
@@ -136,6 +157,17 @@ const DetailPurchaseReq = () => {
       onSave,
       isOpen: true,
     });
+  };
+
+  const renderGoodsType = (type) => {
+    switch (type) {
+      case "material":
+        return "Material";
+      case "non-material":
+        return "Non Material";
+      default:
+        return "";
+    }
   };
 
   const FormBuyer = () => {
@@ -250,7 +282,13 @@ const DetailPurchaseReq = () => {
           )}
         </div>
       </div>
+
       <div className="border-b border-gray-400 my-2"></div>
+      <div>
+        <h2 className="text-lg font-semibold py-4">
+          Item Type: {renderGoodsType(goodsType)}
+        </h2>
+      </div>
       <div className="flex justify-between">
         <div className="py-3 pt-6">
           <div className="space-y-6 mb-8">
@@ -294,7 +332,7 @@ const DetailPurchaseReq = () => {
               <div className="flex items-center gap-10">
                 <p className="text-sm text-gray-500 w-32">Catatan</p>
                 <p className="text-sm text-gray-700">
-                  {dataDetailPurchase.notes || "-"}
+                  {dataDetailPurchase.purchase_reason || "-"}
                 </p>
               </div>
             </div>

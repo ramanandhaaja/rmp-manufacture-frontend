@@ -38,7 +38,7 @@ export async function putPurchaseReqApi(id, data) {
     url: `purchase-requests/${id}`,
     method: "put",
     headers: {
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json",
     },
     data,
   });

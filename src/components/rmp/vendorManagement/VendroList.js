@@ -86,7 +86,7 @@ const VendorList = () => {
             row.original.verification_status
           )}`}
         >
-          {row.original.verification_status}
+          {capitalize(row.original.verification_status)}
         </span>
       ),
     },

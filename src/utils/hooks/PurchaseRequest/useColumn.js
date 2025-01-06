@@ -4,8 +4,9 @@ import TableListDropdown from "components/template/TableListDropdown";
 import { useNavigate } from "react-router-dom";
 import capitalize from "components/ui/utils/capitalize";
 import { findDepartement } from "utils/helpers";
+import { getStatusClassName } from "utils/helpers";
 
-const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
+const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
   const navigate = useNavigate();
 
   const columnsDepartment = useCallback(
@@ -122,8 +123,12 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
         Header: "Status",
         accessor: "status",
         Cell: ({ row }) => (
-          <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-            {row.original.status}
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+              row.original.status
+            )}`}
+          >
+            {capitalize(row.original.status)}
           </span>
         ),
       },
@@ -208,7 +213,11 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
         Header: "Status",
         accessor: "status",
         Cell: ({ row }) => (
-          <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+              row.original.status
+            )}`}
+          >
             {capitalize(row.original.status)}
           </span>
         ),
@@ -259,7 +268,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
       {
         Header: "Kode",
         accessor: "id",
-        Cell: ({ row }) => row.original.goods_id,
+        Cell: ({ row }) => row.original.id,
       },
       {
         Header: "Barang",
@@ -269,12 +278,18 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
       {
         Header: "Kategori Barang",
         accessor: "goods_category",
-        Cell: ({ row }) => row.original.goods_category,
+        Cell: ({ row }) => row.original.goods_category_name,
+      },
+      {
+        Header: "Quantity",
+        accessor: "quantity",
+        Cell: ({ row }) => row.original.quantity,
       },
       {
         Header: "UOM",
         accessor: "measurement",
-        Cell: ({ row }) => row.original.measurement.label,
+        Cell: ({ row }) =>
+          row.original.measurement.label || row.original.measurement,
       },
 
       {
@@ -283,17 +298,9 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
           <TableListDropdown
             dropdownItemList={[
               {
-                label: "Lihat Detail",
-                // onClick: () => navigate(`/vendor-management/detail-vendor/${row.original.id}`),
-              },
-              {
-                label: "Edit",
-                // onClick: () => navigate(`/vendor-management/edit-vendor/${row.original.id}`),
-              },
-              {
                 label: "Delete",
                 onClick: () => {
-                  setIsOpen(true);
+                  setIsOpenDelete(true);
                   setId(row.original.id);
                 },
               },
@@ -302,7 +309,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setId) => {
         ),
       },
     ],
-    [navigate, setIsOpen, setId]
+    [setIsOpenDelete, setId]
   );
 
   return {
