@@ -10,7 +10,7 @@ import { findDepartement } from "utils/helpers";
 import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
 import capitalize from "components/ui/utils/capitalize";
 
-const ProcurementList = () => {
+const ProcurementReqList = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -144,7 +144,7 @@ const ProcurementList = () => {
         onClickAdd={() =>
           navigate("/master-data/barang-purchase/tambah-barang-purchase")
         }
-        addBtnTitle={"Tambah Barang"}
+        showBtnAdd={false}
       />
       <CustomTable data={approvedData} columns={columns} />
       <div className="flex justify-end mt-2">
@@ -169,4 +169,4 @@ const ProcurementList = () => {
   );
 };
 
-export default ProcurementList;
+export default ProcurementReqList;

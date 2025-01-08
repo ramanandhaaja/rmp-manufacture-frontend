@@ -102,6 +102,12 @@ export const ROUTE_LIST = [
     authority: [],
   },
   {
+    key: "purchase.request.antrianBarang",
+    path: "/purchase/request/antrian-barang",
+    component: React.lazy(() => import("views/PurchaseProcurement/ItemQueues")),
+    authority: [],
+  },
+  {
     key: "purchase.procurement",
     path: "/purchase/procurement",
     component: React.lazy(() => import("views/PurchaseProcurement")),

@@ -30,6 +30,7 @@ const PurchaseRequestList = () => {
   const { columnsDepartment, columnsPpic, columnsFactoryManager } = useColumns(
     setIsOpen,
     setIsOpenStatus,
+    null,
     setId
   );
 
@@ -37,7 +38,6 @@ const PurchaseRequestList = () => {
   const departemenColumn = columnsDepartment();
   const ppicColumn = columnsPpic();
   const factoryManagerColumn = columnsFactoryManager();
-
   const { goodsType } = useSelector((state) => state.goodsType);
   const [purchaseReqList, setPurchaseReqList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
