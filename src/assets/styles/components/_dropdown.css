@@ -56,7 +56,7 @@
 }
 
 .dropdown-submenu {
-  @apply ltr:left-full rtl:right-full top-0 origin-top;
+  @apply ltr:left-1 rtl:right-full top-0 origin-top;
 }
 
 .dropdown-submenu-item {
