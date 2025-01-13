@@ -405,10 +405,20 @@ export const findDepartement = (id) => {
   } else if (id === 3) {
     return "IT Support";
   } else {
-    return "Unknown";
+    return "-";
   }
 };
 
 export function getStatusClassName(status) {
   return RMPSTATUSCOLOR[status] || "bg-gray-500 text-white";
+}
+
+export function getCapitalizeType(type) {
+  if (type === "material") {
+    return "Material";
+  } else if (type === "non-material") {
+    return "Non Material";
+  } else {
+    return "-";
+  }
 }

@@ -1,14 +1,14 @@
 import CustomTable from "components/custom/CustomTable";
 import { useEffect, useState } from "react";
-import { formatDate } from "utils/helpers";
+import { formatDate, getCapitalizeType } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Pagination, Alert } from "components/ui";
 import CreatePOModal from "components/custom/ModalCreatePo";
 import TableHeader from "../TableHeader";
-import { FiEye } from "react-icons/fi";
 import { findDepartement } from "utils/helpers";
-import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
+import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import capitalize from "components/ui/utils/capitalize";
+import TableListDropdown from "components/template/TableListDropdown";
 
 const ProcurementOrderList = () => {
   const navigate = useNavigate();
@@ -19,19 +19,18 @@ const ProcurementOrderList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [id, setId] = useState(null);
-  const [approvedData, setApprovedData] = useState([]);
-  const { getPurchaseReqList } = usePurchaseReq();
+  const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
 
   const columns = [
     {
-      Header: "ID Request",
+      Header: "ID PO",
       accessor: "id",
       Cell: ({ row }) => row.original.id,
     },
     {
-      Header: "Item Permintaan",
-      accessor: "total_items",
-      Cell: ({ row }) => row.original.total_items,
+      Header: "Nama PO",
+      accessor: "po_name",
+      Cell: ({ row }) => row.original.po_name,
     },
 
     {
@@ -40,49 +39,57 @@ const ProcurementOrderList = () => {
       Cell: ({ row }) => findDepartement(row.original.department_id),
     },
     {
-      Header: "HOD",
-      accessor: "hod",
-      Cell: ({ row }) => row.original.hod || "-",
+      Header: "Kategori",
+      accessor: "category",
+      Cell: ({ row }) => row.original.category.name || "-",
     },
     {
-      Header: "Tanggal Permintaan",
-      accessor: "request_date",
+      Header: "Tipe",
+      accessor: "po_type",
       Cell: ({ row }) => {
-        return formatDate(row.original.request_date);
+        return getCapitalizeType(row.original.po_type);
       },
     },
     {
-      Header: "Tanggal Persetujuan",
-      accessor: "approval_date",
+      Header: "Tanggal Request PO",
+      accessor: "po_date",
       Cell: ({ row }) => {
-        return formatDate(row.original.approval_date);
+        return formatDate(row.original.po_date);
       },
     },
-    {
-      Header: "Dibeli Oleh",
-      accessor: "buyer",
-      Cell: ({ row }) => row.original.buyer || "-",
-    },
+
     {
       Header: "Status",
       accessor: "status",
       Cell: ({ row }) => (
         <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-          {capitalize(row.original.status)}
+          Belum Diproses
         </span>
       ),
     },
     {
       accessor: "action",
-      Cell: ({ row }) => {
-        const { status } = row.original;
-
-        return (
-          <button>
-            <FiEye />
-          </button>
-        );
-      },
+      Cell: ({ row }) => (
+        <TableListDropdown
+          dropdownItemList={[
+            {
+              label: "Proses PO",
+              onClick: () =>
+                navigate(`/purchase/pengadaan/detail/${row.original.id}`),
+            },
+            {
+              label: "Hapus PO",
+              //   onClick: () =>
+              //     navigate(`/vendor-management/edit-vendor/${row.original.id}`),
+            },
+            // {
+            //   label: "Lihat Detail",
+            //   onClick: () =>
+            //     navigate(`/purchase/pengadaan/detail/${row.original.id}`),
+            // },
+          ]}
+        />
+      ),
     },
   ];
 
@@ -90,12 +97,10 @@ const ProcurementOrderList = () => {
     const fetchPurchaseRequests = async () => {
       setIsLoading(true);
       try {
-        const response = await getPurchaseReqList({ currentPage });
-        const data = response.data.data;
+        const response = await getPoList({ currentPage });
+        const data = response.data;
         setTotal(data?.total);
         setPageSize(data?.per_page);
-        const approvedItems = data.filter((item) => item.status === "approved");
-        setApprovedData(approvedItems);
       } catch (error) {
         console.error("Error fetching purchase requests:", error);
       } finally {
@@ -145,11 +150,8 @@ const ProcurementOrderList = () => {
 
   return (
     <div>
-      <TableHeader
-        onClickAdd={() => setIsOpen(true)}
-        addBtnTitle={"Tambah PO"}
-      />
-      <CustomTable columns={columns} />
+      <TableHeader onClickAdd={() => setIsOpen(true)} addBtnTitle={"Buat PO"} />
+      <CustomTable data={dataPurchaseOrder} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}

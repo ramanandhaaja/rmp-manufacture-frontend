@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { dataDetailPurchase } from "store/PurchaseRequest/purchaseSlice";
 
 export const purchaseOrderSlice = createSlice({
   name: "purchaseOrder",
@@ -6,6 +7,7 @@ export const purchaseOrderSlice = createSlice({
     dataPurchaseOrder: [],
     dataPurchaseQueue: [],
     dataListPoNumber: [],
+    dataDetailPurchaseOrder: [],
   },
   reducers: {
     setDataPurchaseOrder: (state, action) => {
@@ -17,6 +19,9 @@ export const purchaseOrderSlice = createSlice({
     setDataListPoNumber: (state, action) => {
       state.dataListPoNumber = action.payload;
     },
+    setDataDetailPurchaseOrder: (state, action) => {
+      state.dataDetailPurchaseOrder = action.payload;
+    },
   },
 });
 
@@ -24,8 +29,10 @@ export const {
   dataPurchaseOrder,
   dataPurchaseQueue,
   dataListPoNumber,
+  dataDetailPurchaseOrder,
   setDataPurchaseOrder,
   setDataPurchaseQueue,
   setDataListPoNumber,
+  setDataDetailPurchaseOrder,
 } = purchaseOrderSlice.actions;
 export default purchaseOrderSlice.reducer;

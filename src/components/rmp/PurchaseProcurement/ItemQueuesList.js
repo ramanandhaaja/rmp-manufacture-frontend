@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import MaterialFilterSidebar from "components/custom/MaterialFilterSideBar";
 import CustomTable from "components/custom/CustomTable";
 import capitalize from "components/ui/utils/capitalize";
@@ -10,9 +10,9 @@ import Notification from "components/ui/Notification";
 import CreatePOModal from "components/custom/ModalCreatePo";
 import { toast } from "components/ui";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
+import { Loading } from "components/shared";
 
-const ItemQueuesList = () => {
-  const [activeCategory, setActiveCategory] = useState(null);
+const ItemQueuesList = ({ type }) => {
   const {
     getPoQueueList,
     dataPurchaseQueue,
@@ -33,6 +33,7 @@ const ItemQueuesList = () => {
   const idPurchaseItem = dataPurchaseQueue?.map(
     (item) => item.purchase_request_item_id
   );
+  const [activeCategory, setActiveCategory] = useState(null);
 
   const columns = [
     {
@@ -104,10 +105,17 @@ const ItemQueuesList = () => {
   ];
 
   useEffect(() => {
+    if (dataPurchaseQueue && dataPurchaseQueue.length > 0) {
+      const initialCategory = dataPurchaseQueue[0].goods_category_id;
+      setActiveCategory(initialCategory);
+    }
+  }, [dataPurchaseQueue]);
+
+  useEffect(() => {
     const fetchPoQueues = async () => {
       setIsLoading(true);
       try {
-        await getPoQueueList();
+        await getPoQueueList({ goods_type: type });
       } catch (error) {
         console.error("Error fetching purchase requests:", error);
       } finally {
@@ -187,6 +195,13 @@ const ItemQueuesList = () => {
     }
   };
 
+  const filteredData = useMemo(() => {
+    if (!activeCategory) return dataPurchaseQueue;
+    return dataPurchaseQueue?.filter(
+      (item) => item.goods_category_id === activeCategory
+    );
+  }, [dataPurchaseQueue, activeCategory]);
+
   return (
     <div className="px-2 py-6">
       <div className="flex justify-center pb-3">
@@ -223,16 +238,24 @@ const ItemQueuesList = () => {
           </Notification>
         )}
       </div>
-      <div className="flex gap-6 border border-gray-200 rounded-xl">
-        <MaterialFilterSidebar
-          data={dataPurchaseQueue}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
-        <div className="flex-1 p-4">
-          <CustomTable data={dataPurchaseQueue} columns={columns} />
+      {isLoading ? (
+        <div className="flex justify-center items-center w-full h-full">
+          <Loading loading={isLoading} />
         </div>
-      </div>
+      ) : (
+        <div className="flex gap-6 border border-gray-200 rounded-xl">
+          <>
+            <MaterialFilterSidebar
+              data={dataPurchaseQueue}
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+            <div className="flex-1 p-4">
+              <CustomTable data={filteredData} columns={columns} />
+            </div>
+          </>
+        </div>
+      )}
       <CreatePOModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

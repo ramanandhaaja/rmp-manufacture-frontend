@@ -117,6 +117,7 @@ const VendorList = () => {
       ),
     },
   ];
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
