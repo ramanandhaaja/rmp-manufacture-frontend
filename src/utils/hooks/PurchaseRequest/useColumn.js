@@ -174,11 +174,6 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
         accessor: "id",
         Cell: ({ row }) => row.original.id,
       },
-      {
-        Header: "Item Permintaan",
-        accessor: "total_items",
-        Cell: ({ row }) => row.original.total_items,
-      },
 
       {
         Header: "Departemen",

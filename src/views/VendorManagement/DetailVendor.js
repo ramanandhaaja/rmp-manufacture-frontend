@@ -7,6 +7,7 @@ import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import ModalMock from "components/custom/ModalMock";
 import { Notification, toast, Button } from "components/ui";
 import useUser from "utils/hooks/useUser";
+import { getCapitalizeType } from "utils/helpers";
 export const REACT_APP_BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const DetailVendor = () => {
@@ -132,7 +133,9 @@ const DetailVendor = () => {
                       <p className="text-sm text-gray-500 w-32">
                         Tipe Barang Vendor
                       </p>
-                      <p className="text-sm">{dataDetailVendor.vendor_type}</p>
+                      <p className="text-sm">
+                        {getCapitalizeType(dataDetailVendor.vendor_type)}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-gray-500 w-32">PIC</p>

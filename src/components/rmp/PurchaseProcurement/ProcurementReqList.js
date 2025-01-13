@@ -90,10 +90,12 @@ const ProcurementReqList = () => {
       setIsLoading(true);
       try {
         const response = await getPurchaseReqList({ currentPage });
-        const data = response.data.data;
+        const data = response.data;
         setTotal(data?.total);
         setPageSize(data?.per_page);
-        const approvedItems = data.filter((item) => item.status === "approved");
+        const approvedItems = data?.data.filter(
+          (item) => item.status === "approved"
+        );
         setApprovedData(approvedItems);
       } catch (error) {
         console.error("Error fetching purchase requests:", error);

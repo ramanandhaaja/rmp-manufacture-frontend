@@ -2,7 +2,7 @@ import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { formatDate } from "utils/helpers";
+import { formatDate, getCapitalizeType } from "utils/helpers";
 import CustomTable from "components/custom/CustomTable";
 import useMasterGoods from "utils/hooks/useMasterGoods";
 import { findDepartement } from "utils/helpers";
@@ -159,17 +159,6 @@ const DetailPurchaseReq = () => {
     });
   };
 
-  const renderGoodsType = (type) => {
-    switch (type) {
-      case "material":
-        return "Material";
-      case "non-material":
-        return "Non Material";
-      default:
-        return "";
-    }
-  };
-
   const FormBuyer = () => {
     const handleFollowUp = async (values) => {
       console.log(values);
@@ -286,7 +275,7 @@ const DetailPurchaseReq = () => {
       <div className="border-b border-gray-400 my-2"></div>
       <div>
         <h2 className="text-lg font-semibold py-4">
-          Item Type: {renderGoodsType(goodsType)}
+          Item Type: {getCapitalizeType(goodsType)}
         </h2>
       </div>
       <div className="flex justify-between">

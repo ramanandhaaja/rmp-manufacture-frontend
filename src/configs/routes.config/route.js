@@ -109,16 +109,24 @@ export const ROUTE_LIST = [
   },
   {
     key: "purchase.procurement",
-    path: "/purchase/procurement",
+    path: "/purchase/pengadaan",
     component: React.lazy(() => import("views/PurchaseProcurement")),
     authority: [],
   },
-  // {
-  //   key: "purchase.procurement.detail",
-  //   path: "/purchase/procurement/detail/:id",
-  //   component: React.lazy(() =>
-  //     import("views/PurchaseProcurement/DetailPurchaseProcurement")
-  //   ),
-  //   authority: [],
-  // },
+  {
+    key: "purchase.procurement.detail",
+    path: "/purchase/pengadaan/detail/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseProcurement/DetailPurchaseProcurement")
+    ),
+    authority: [],
+  },
+  {
+    key: "purchase.procurement.detail.vendorOffer",
+    path: "/purchase/pengadaan/penawaran-vendor/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseProcurement/VendorOffer")
+    ),
+    authority: [],
+  },
 ];

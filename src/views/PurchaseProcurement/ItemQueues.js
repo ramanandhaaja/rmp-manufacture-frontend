@@ -26,10 +26,10 @@ const ItemQueues = () => {
           </Tabs.TabList>
         </div>
         <Tabs.TabContent value="material">
-          <ItemQueuesList />
+          <ItemQueuesList type="material" />
         </Tabs.TabContent>
         <Tabs.TabContent value="non-material">
-          <ItemQueuesList />
+          <ItemQueuesList type="non-material" />
         </Tabs.TabContent>
       </Tabs>
     </div>

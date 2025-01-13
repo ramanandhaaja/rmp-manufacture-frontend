@@ -518,7 +518,7 @@ const navigationConfig = [
     subMenu: [
       {
         key: "purchase.procurement",
-        path: "/purchase/procurement",
+        path: "/purchase/pengadaan",
         title: "Pengadaan",
         icon: "",
         translateKey: "nav.purchase.procurement",

@@ -16,9 +16,17 @@ export async function getCategoryTotalItemsReqApi(params) {
   });
 }
 
-export async function getPurchaseOrderItemQueuesApi() {
+export async function getPurchaseOrderItemQueuesApi(params) {
   return ApiService.fetchData({
     url: `purchase-order/item-queues`,
+    method: "get",
+    params,
+  });
+}
+
+export async function getPurchaseOrderDetailsApi(id) {
+  return ApiService.fetchData({
+    url: `purchase-order/${id}`,
     method: "get",
   });
 }
@@ -45,6 +53,18 @@ export async function postPurchaseOrderApi(data) {
 export async function postAddItemToPoApi(data) {
   return ApiService.fetchData({
     url: `purchase-order/add-item-to-po`,
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function postConfirmPoApi(data) {
+  return ApiService.fetchData({
+    url: `purchase-order/manage-vendors-for-po`,
     method: "post",
     headers: {
       "Content-Type": "application/json",
