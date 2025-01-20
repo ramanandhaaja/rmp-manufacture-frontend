@@ -130,39 +130,90 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
 
   const handleSubmit = (values, { setSubmitting }) => {
     try {
-      const formData = new FormData();
+      if (isEdit) {
+        // For edit, create a JSON structure
+        const payload = {
+          id: values.id,
+          name: values.name,
+          goods_category: values.goods_category,
+          vendor_type: values.vendor_type,
+          pic_name: values.pic_name,
+          pic_phone: values.pic_phone,
+          pic_email: values.pic_email,
+          address: values.address,
+          status: values.status,
+          verification_status: values.verification_status,
 
-      // Append form values
-      Object.keys(values).forEach((key) => {
-        if (key === "documents") {
-          // Handle documents separately
+          documents: documentInputs
+            .map((input) => {
+              if (input.file) {
+                // For new files
+                return {
+                  file_name: `vendor_documents/${input.file.name}`,
+                  description: input.description || "",
+                };
+              } else if (input.existingFile) {
+                // For existing files
+                return {
+                  file_name: input.existingFile,
+                  description: input.description || "",
+                };
+              }
+              return null;
+            })
+            .filter(Boolean), // Remove null entries
+        };
+
+        // If there are new files, we need to send as FormData
+        const hasNewFiles = documentInputs.some((input) => input.file);
+
+        if (hasNewFiles) {
+          const formData = new FormData();
+
+          // Add the JSON payload
+          formData.append("payload", JSON.stringify(payload));
+
+          // Add new files separately
           documentInputs.forEach((input, index) => {
             if (input.file) {
-              formData.append(`documents[${index}]`, input.file);
-            }
-            if (input.description) {
-              formData.append(
-                `documentDescriptions[${index}]`,
-                input.description
-              );
-            }
-            if (input.existingFile) {
-              formData.append(
-                `existingDocuments[${index}]`,
-                input.existingFile
-              );
+              formData.append(`files[${index}]`, input.file);
             }
           });
-        } else if (Array.isArray(values[key])) {
-          values[key].forEach((item) => {
-            formData.append(`${key}[]`, item);
-          });
-        } else {
-          formData.append(key, values[key]);
-        }
-      });
 
-      setFormData(formData);
+          setFormData(formData);
+        } else {
+          // If no new files, just send the JSON payload
+          setFormData(payload);
+        }
+      } else {
+        // For create (POST), use FormData as before
+        const formData = new FormData();
+
+        Object.keys(values).forEach((key) => {
+          if (key !== "documents" && !Array.isArray(values[key])) {
+            formData.append(key, values[key]);
+          } else if (Array.isArray(values[key]) && key !== "documents") {
+            values[key].forEach((item) => {
+              formData.append(`${key}[]`, item);
+            });
+          }
+        });
+
+        documentInputs.forEach((input, index) => {
+          if (input.file) {
+            formData.append(`documents[${index}][file]`, input.file);
+            formData.append(
+              `documents[${index}]`,
+              JSON.stringify({
+                file_name: `vendor_documents/${input.file.name}`,
+                description: input.description || "",
+              })
+            );
+          }
+        });
+
+        setFormData(formData);
+      }
     } catch (error) {
       console.error("Form submission error:", error);
     } finally {
@@ -185,23 +236,27 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
   // Reset the form when initialData changes
   useEffect(() => {
     if (formikRef.current && initialData) {
+      // Initialize form values
       formikRef.current.resetForm({
-        values: initialData,
+        values: {
+          ...initialData,
+          // Ensure documents array is properly initialized
+          documents: initialData.documents || [],
+        },
       });
-      // Reset document inputs if needed
+
+      // Initialize document inputs for edit mode
       if (isEdit && initialData?.documents) {
-        setDocumentInputs(
-          initialData.documents.map((doc, index) => ({
-            id: index + 1,
-            file: null,
-            description: doc.description || "",
-            existingFile: doc.file_name,
-          }))
-        );
+        const documentInputsData = initialData.documents.map((doc, index) => ({
+          id: index + 1,
+          file: null, // No file initially since it's existing
+          description: doc.description || "",
+          existingFile: doc.file_name, // Store the existing file name
+        }));
+        setDocumentInputs(documentInputsData);
       }
-      // Force a re-render of Formik
+
       setKey((prev) => prev + 1);
-      formikRef.current?.setFieldValue("documents", initialData.documents);
     }
   }, [initialData, isEdit]);
 
@@ -253,7 +308,7 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
             >
               <Select
                 name="goods_category"
-                options={dataGoodsCategory.map((category) => ({
+                options={dataGoodsCategory?.map((category) => ({
                   value: category.id,
                   label: category.name,
                 }))}

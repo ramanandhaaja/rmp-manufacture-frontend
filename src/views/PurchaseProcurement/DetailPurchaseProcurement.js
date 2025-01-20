@@ -2,9 +2,8 @@ import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { formatDate, getCapitalizeType } from "utils/helpers";
-import CustomTable from "components/custom/CustomTable";
-import { findDepartement } from "utils/helpers";
+
+import { findDepartement, formatDate } from "utils/helpers";
 import { Button } from "components/ui";
 import { useNavigate } from "react-router-dom";
 import useUser from "utils/hooks/useUser";
@@ -17,15 +16,18 @@ import {
 } from "components/ui";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import TableListDropdown from "components/template/TableListDropdown";
-import SearchBar from "components/custom/SearchBar";
-import { FiPlus, FiTrash } from "react-icons/fi";
 import ModalAddGoods from "components/custom/ModalAddGoods";
 import Steps from "components/ui/Steps";
 import Tabs from "components/ui/Tabs";
 import ChooseVendorList from "components/rmp/PurchaseProcurement/ChooseVendorList";
+import { useDispatch } from "react-redux";
+import { setIdPo } from "store/PurchaseOrder/purchaseOrderSlice";
+import AddPoGoodsList from "components/rmp/PurchaseProcurement/AddPoGoodsList";
+import { set } from "lodash";
 
 const DetailPurchaseOrder = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     dataDetailPurchaseOrder,
     getPoDetail,
@@ -44,59 +46,18 @@ const DetailPurchaseOrder = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [tableData, setTableData] = useState([]);
   const [itemRequestId, setItemRequestId] = useState(null);
   const [dataItemAdded, setDataItemAdded] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [isOpenConfirmation, setIsOpenConfirmation] = useState(false);
+  const [isOpenConfirmationAdd, setIsOpenConfirmationAdd] = useState(false);
   const [payloadVendor, setPayloadVendor] = useState(null);
+  const [dataTableItems, setTableDataItems] = useState([]);
 
   const handlePayloadVendorChange = (data) => {
     setPayloadVendor(data);
   };
-
-  const columns = [
-    {
-      Header: "ID Pembelian",
-      accessor: "purchase_request_id",
-    },
-    {
-      Header: "Kode",
-      accessor: "goods_id",
-      Cell: ({ row }) => row.original.goods_id || "-",
-    },
-    {
-      Header: "Barang",
-      accessor: "goods_name",
-      Cell: ({ row }) => row.original.goods_name || "-",
-    },
-    {
-      Header: "Departemen",
-      accessor: "department_name",
-      Cell: ({ row }) => "-",
-    },
-    {
-      Header: "QTY",
-      accessor: "quantity",
-      Cell: ({ row }) => row.original.quantity || "-",
-    },
-    {
-      Header: "UOM",
-      accessor: "measurement",
-      Cell: ({ row }) => row.original.measurement || "-",
-    },
-    {
-      accessor: "action",
-      Cell: () => {
-        return (
-          <button className="cursor-pointer">
-            <FiTrash size={24} color="red" />
-          </button>
-        );
-      },
-    },
-  ];
 
   const columnsAddModal = [
     {
@@ -138,6 +99,7 @@ const DetailPurchaseOrder = () => {
     {
       accessor: "action",
       Cell: ({ row }) => {
+        console.log(row.original);
         return (
           <TableListDropdown
             dropdownItemList={[
@@ -150,14 +112,14 @@ const DetailPurchaseOrder = () => {
                     po_number: dataDetailPurchaseOrder?.po_number,
                     goods_name: row.original.goods_name,
                     goods_id: row.original.goods_id,
+                    purchase_request_id: row.original.purchase_request_id,
+                    goods_category_name: row.original.goods_category,
+                    quantity: row.original.quantity,
+                    measurement: row.original.measurement,
                   };
                   if (idRequest && data) {
                     setDataItemAdded(data);
-                    setItemRequestId(idRequest);
-
-                    setTimeout(() => {
-                      handleAddToPo();
-                    }, 0);
+                    handleAddItem(data);
                   } else {
                     console.log("Invalid ID:", idRequest);
                   }
@@ -170,36 +132,29 @@ const DetailPurchaseOrder = () => {
     },
   ];
 
-  //   const handleAddItem = (item) => {
-  //     const transformedItem = {
-  //       id: item.goods.value,
-  //       goods_name: item.goods.label,
-  //       goods_category_name: item.goods_category.label,
-  //       quantity: item.quantity,
-  //       measurement: item.measurement,
-  //       measurement_id: item.measurement.value,
-  //     };
+  useEffect(() => {
+    if (id) {
+      getPoDetail(id);
+      getPoQueueList(id);
+    }
+  }, [id]);
 
-  //     setTableData([...tableData, transformedItem]);
-  //     // setIsOpen(false);
-  //   };
-
-  const handleAddToPo = async () => {
+  const handleAddToPo = async (itemRequestId) => {
     try {
       setIsLoadingAdd(true);
       const payload = {
         purchase_order_id: id,
         request_item_id: itemRequestId,
       };
+      console.log(payload);
+      return;
       const resp = await addToExistingPo(payload);
 
       if (resp.status === "success") {
-        setShowNotification(true);
-
-        await getPoDetail(id);
         setTimeout(() => {
+          handleNextStep();
           handleClose();
-        }, 3000);
+        }, 2000);
       } else {
         toast.push(
           <Notification
@@ -226,57 +181,27 @@ const DetailPurchaseOrder = () => {
       );
     } finally {
       setIsLoadingAdd(false);
+      handleClose();
     }
   };
-  console.log(payloadVendor);
-  const handleConfirm = async () => {
-    if (!payloadVendor) return;
-    try {
-      setIsLoadingAdd(true);
 
-      const resp = await confirmPo(payloadVendor);
-      if (resp.status === "success") {
-        toast.push(
-          <Notification
-            type="success"
-            title={`PO ${dataDetailPurchaseOrder?.po_number}-${dataDetailPurchaseOrder?.po_name} berhasil diilis`}
-            width={700}
-          />,
-          {
-            placement: "top-center",
-          }
-        );
-        setTimeout(() => {
-          setIsOpenConfirmation(false);
-          navigate("/purchase/pengadaan");
-        }, 1000);
-      } else {
-        toast.push(
-          <Notification
-            type="danger"
-            title="Maaf terjadi kesalahan, gagal merilis PO"
-            width={700}
-          />,
-          {
-            placement: "top-center",
-          }
-        );
-      }
-    } catch (error) {
-      console.log(error);
-      toast.push(
-        <Notification
-          type="danger"
-          title="Maaf terjadi kesalahan, gagal merilis PO"
-          width={700}
-        />,
-        {
-          placement: "top-center",
-        }
-      );
-    } finally {
-      setIsLoadingAdd(false);
+  useEffect(() => {
+    if (dataDetailPurchaseOrder.items) {
+      setTableDataItems(dataDetailPurchaseOrder.items);
     }
+  }, []);
+
+  const handleAddItem = async (item) => {
+    setTableDataItems([...dataTableItems, item]);
+    setShowNotification(true);
+
+    setTimeout(() => {
+      handleClose();
+    }, 2000);
+  };
+  console.log(dataTableItems);
+  const handleDeleteItem = (id) => {
+    setTableDataItems((prevData) => prevData.filter((item) => item.id !== id));
   };
 
   const handleNextStep = () => {
@@ -294,6 +219,7 @@ const DetailPurchaseOrder = () => {
       setIsLoadingList(true);
       try {
         const resp = await getPoDetail(id);
+        dispatch(setIdPo(id));
       } catch (error) {
         console.error("Error fetching purchase requests:", error);
       } finally {
@@ -327,12 +253,6 @@ const DetailPurchaseOrder = () => {
     fetchPoQueues();
   }, [dataDetailPurchaseOrder]);
 
-  useEffect(() => {
-    if (dataDetailPurchaseOrder) {
-      setTableData(dataDetailPurchaseOrder.items);
-    }
-  }, [dataDetailPurchaseOrder]);
-
   const handleClose = () => {
     setIsOpen(false);
     setShowNotification(false);
@@ -346,6 +266,9 @@ const DetailPurchaseOrder = () => {
   const StepComponent = () => {
     return (
       <div className="p-4">
+        <p className="text-sm text-gray-600 font-medium py-2">
+          Tahapan proses PO
+        </p>
         <Steps current={currentStep} onChange={handleStepChange} vertical>
           <Steps.Item
             title="Daftar Barang"
@@ -390,11 +313,11 @@ const DetailPurchaseOrder = () => {
       </div>
       <Tabs value={activeTab} onChange={handleStepChange} variant="underline">
         <Tabs.TabList>
-          <Tabs.TabNav value={0} className="flex-col">
+          <Tabs.TabNav value={0} className="flex-col" disabled>
             <span className="text-base">Daftar Barang</span>
             <span className="text-sm text-gray-500">Langkah 1</span>
           </Tabs.TabNav>
-          <Tabs.TabNav value={1} className="flex-col">
+          <Tabs.TabNav value={1} className="flex-col" disabled>
             <span className="text-base">Daftar Vendor</span>
             <span className="text-sm text-gray-500">Langkah 2</span>
           </Tabs.TabNav>
@@ -402,72 +325,12 @@ const DetailPurchaseOrder = () => {
         <div className="border-b border-gray-400 "></div>
 
         <Tabs.TabContent value={0}>
-          <div className="flex justify-between mt-4">
-            <div className="py-3 pt-6">
-              <div className="space-y-6 mb-4">
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="flex items-center gap-10">
-                    <p className="text-sm text-gray-500 w-32">Nama PO</p>
-                    <p className="text-sm text-gray-700">
-                      {dataDetailPurchaseOrder.po_name || "-"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <p className="text-sm text-gray-500 w-32">Tipe </p>
-                    <p className="text-sm text-gray-700">
-                      {getCapitalizeType(dataDetailPurchaseOrder.po_type) ||
-                        "-"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <p className="text-sm text-gray-500 w-32">Kategori</p>
-                    <p className="text-sm text-gray-700">
-                      {dataDetailPurchaseOrder.category_name || "-"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-[37px]">
-                    <p className="text-sm text-gray-500 w-42">
-                      Tanggal Request PO
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      {dataDetailPurchaseOrder.po_date
-                        ? formatDate(dataDetailPurchaseOrder.po_date)
-                        : "-"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <p className="text-sm text-gray-500 w-32">Departemen</p>
-                    <p className="text-sm text-gray-700">
-                      {dataDetailPurchaseOrder.departement || "-"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <p className="text-sm text-gray-500 w-32">Catatan</p>
-                    <p className="text-sm text-gray-700">
-                      {dataDetailPurchaseOrder.note || "-"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div className="py-4">
-              <div className="flex justify-between my-4">
-                <SearchBar placeholder="cari barang" />
-                <Button type="button" onClick={() => setIsOpen(true)}>
-                  <span className="gap-2 flex items-center">
-                    <FiPlus />
-                    Tambah Barang
-                  </span>
-                </Button>
-              </div>
-              <CustomTable
-                data={dataDetailPurchaseOrder.items}
-                columns={columns}
-              />
-            </div>
-          </div>
+          <AddPoGoodsList
+            dataDetailPurchaseOrder={dataDetailPurchaseOrder}
+            setIsOpen={setIsOpen}
+            dataTableItems={dataTableItems}
+            handleDeleteItem={handleDeleteItem}
+          />
         </Tabs.TabContent>
         <Tabs.TabContent value={1}>
           <ChooseVendorList onPayloadVendorChange={handlePayloadVendorChange} />
@@ -481,7 +344,7 @@ const DetailPurchaseOrder = () => {
         {activeTab == 0 ? (
           <Button
             variant="solid"
-            onClick={handleNextStep}
+            onClick={handleAddToPo}
             disabled={activeTab == 1}
           >
             Selanjutnya
@@ -495,9 +358,18 @@ const DetailPurchaseOrder = () => {
       <ConfirmationCustom
         isOpen={isOpenConfirmation}
         onClose={() => setIsOpenConfirmation(false)}
-        onConfirm={handleConfirm}
+        // onConfirm={handleConfirm}
         title="Buat Purchase Order ? "
         text="Pastikan data yang anda masukan sudah benar, PO ini akan dikirimkan ke direksi untuk ditinjau, silahkan pantau progress melalui halaman List Purchase Order"
+        confirmText="Konfirmasi"
+        isLoading={isLoadingAdd}
+      />
+      <ConfirmationCustom
+        isOpen={isOpenConfirmationAdd}
+        onClose={() => setIsOpenConfirmationAdd(false)}
+        onConfirm={() => handleAddToPo(itemRequestId)}
+        title="Tambah Barang ke Purchase Order  "
+        text="Anda yakin ingin menambahkan barang ke PO ini ?"
         confirmText="Konfirmasi"
         isLoading={isLoadingAdd}
       />

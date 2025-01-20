@@ -12,9 +12,8 @@ const EditVendor = () => {
   const [isLoadingList, setIsLoadingList] = useState(false);
   const formRef = useRef();
   const navigate = useNavigate();
-  const { updateVendor } = useVendor();
   const { id } = useParams();
-  const { dataDetailVendor, getVendorDetail } = useVendor();
+  const { dataDetailVendor, getVendorDetail, updateVendor } = useVendor();
 
   useEffect(() => {
     if (id) {
@@ -24,25 +23,47 @@ const EditVendor = () => {
   }, [id]);
 
   const handleFormData = async (form) => {
-    console.log(form);
     try {
       setIsLoading(true);
       const response = await updateVendor(id, form);
       if (response.status === "success") {
-        console.log("success");
-        setTimeout(() => {
-          toast.push(<Notification type="success" title={response.message} />, {
+        toast.push(
+          <Notification
+            type="success"
+            title="Vendor berhasil diubah"
+            width={700}
+          />,
+          {
             placement: "top-center",
-          });
+          }
+        );
+        setTimeout(() => {
           navigate("/vendor-management/");
         }, 1000);
       } else {
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, Vendor gagal diubah"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
         console.log(response.status);
       }
     } catch (err) {
+      toast.push(
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan,Vendor gagal diubah"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
       console.log(err);
     } finally {
       setTimeout(() => {

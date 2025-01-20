@@ -1,9 +1,10 @@
 import ApiService from "./ApiService";
 
-export async function getVendorsListApi() {
+export async function getVendorsListApi(params) {
   return ApiService.fetchData({
     url: `vendors`,
     method: "get",
+    params,
   });
 }
 
@@ -18,9 +19,6 @@ export async function postVendorsApi(data) {
   return ApiService.fetchData({
     url: `vendors`,
     method: "post",
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
     data,
   });
 }
@@ -29,9 +27,6 @@ export async function putVendorsApi(id, data) {
   return ApiService.fetchData({
     url: `vendors/${id}`,
     method: "put",
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
     data,
   });
 }
