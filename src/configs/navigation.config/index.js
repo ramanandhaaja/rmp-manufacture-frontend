@@ -519,7 +519,7 @@ const navigationConfig = [
       {
         key: "purchase.procurement",
         path: "/purchase/pengadaan",
-        title: "Pengadaan",
+        title: "Pengadaan ",
         icon: "",
         translateKey: "nav.purchase.procurement",
         type: NAV_ITEM_TYPE_ITEM,
@@ -539,7 +539,7 @@ const navigationConfig = [
       {
         key: "purchase.request",
         path: "/purchase/request",
-        title: "Permintaan",
+        title: "Permintaan Pembelian",
         icon: "",
         translateKey: "nav.purchase.request",
         type: NAV_ITEM_TYPE_ITEM,
@@ -724,7 +724,7 @@ const navigationConfig = [
       {
         key: "masterData.barangPurchase",
         path: "/master-data/barang-purchase",
-        title: "Barang Purchase",
+        title: "Barang Pembelian",
         icon: "",
         translateKey: "nav.base.users",
         type: NAV_ITEM_TYPE_ITEM,

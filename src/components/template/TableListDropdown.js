@@ -24,7 +24,7 @@ const TableListDropdown = ({ dropdownItemList, placement }) => {
                   )}
                 </div>
               }
-              placement="middle-start-bottom"
+              placement="middle-start-top"
               className="text-black "
             >
               {item.subMenu.map((subItem) => (
