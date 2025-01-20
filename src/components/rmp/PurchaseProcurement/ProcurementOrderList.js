@@ -2,7 +2,7 @@ import CustomTable from "components/custom/CustomTable";
 import { useEffect, useState } from "react";
 import { formatDate, getCapitalizeType } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
-import { Pagination, Alert } from "components/ui";
+import { Pagination, Notification, toast } from "components/ui";
 import CreatePOModal from "components/custom/ModalCreatePo";
 import TableHeader from "../TableHeader";
 import { findDepartement } from "utils/helpers";
@@ -27,6 +27,7 @@ const ProcurementOrderList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Convert PageConfigOrderList listFields to DataTable columns
   const columns = PageConfigOrderList.listFields
@@ -109,9 +110,29 @@ const ProcurementOrderList = () => {
     }
   };
 
+  const handlePoCreated = () => {
+    if (isSubmitted) {
+      toast.push(
+        <Notification
+          title="PO Baru Berhasil Dibuat"
+          duration={2000}
+          closable
+          type="success"
+          width={700}
+          onClose={() => setIsSubmitted(false)}
+        />,
+        { placement: "top-center" }
+      );
+      fetchData();
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
+  useEffect(() => {
+    handlePoCreated();
+  }, [isSubmitted]);
 
   const handlePaginationChange = (page) => {
     fetchData({
@@ -194,6 +215,7 @@ const ProcurementOrderList = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         isLoading={isLoading}
+        setSubmitted={setIsSubmitted}
       />
     </div>
   );

@@ -13,7 +13,12 @@ import useGoodsCategory from "utils/hooks/useGoodsCategory";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import { useEffect } from "react";
 
-const CreatePOModal = ({ isOpen, onClose, setSubmitted, setSubmittedData }) => {
+const CreatePOModal = ({
+  isOpen,
+  onClose,
+  setSubmitted = () => {},
+  setSubmittedData = () => {},
+}) => {
   const validationSchema = Yup.object().shape({
     po_name: Yup.string().required("Nama PO harus diisi"),
     goods_category_id: Yup.number().nullable().required("Kategori harus diisi"),

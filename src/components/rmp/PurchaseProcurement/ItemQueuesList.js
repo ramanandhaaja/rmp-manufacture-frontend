@@ -32,6 +32,7 @@ const ItemQueuesList = ({ type }) => {
   const [idGoods, setIdGoods] = useState(null);
   const [idItemRequest, setIdItemRequest] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
+  const [showNotificationItem, setShowNotificationAddItem] = useState(false);
 
   const columns = [
     {
@@ -98,6 +99,7 @@ const ItemQueuesList = ({ type }) => {
                 })) || [],
             },
           ]}
+          placement={"top-end"}
         />
       ),
     },
@@ -157,7 +159,7 @@ const ItemQueuesList = ({ type }) => {
       const resp = await addToExistingPo(payload);
       if (resp.status === "success") {
         setIsAdded(true);
-        setShowNotification(true);
+        setShowNotificationAddItem(true);
         setIsOpenConfirmation(false);
       } else {
         toast.push(
@@ -221,11 +223,11 @@ const ItemQueuesList = ({ type }) => {
             tersebut
           </Notification>
         )}
-        {isAdded && showNotification && (
+        {showNotificationItem && (
           <Notification
             duration={8000}
             onClose={() => {
-              setShowNotification(false);
+              setShowNotificationAddItem(false);
               setIsAdded(false);
             }}
             type="info"
