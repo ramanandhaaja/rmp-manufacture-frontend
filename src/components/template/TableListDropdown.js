@@ -1,7 +1,7 @@
 import { Dropdown } from "components/ui";
 import { HiDotsHorizontal } from "react-icons/hi";
 
-const TableListDropdown = ({ dropdownItemList }) => {
+const TableListDropdown = ({ dropdownItemList, placement }) => {
   return (
     <div className="relative">
       <Dropdown
@@ -9,7 +9,7 @@ const TableListDropdown = ({ dropdownItemList }) => {
         renderTitle={
           <HiDotsHorizontal size={20} className="cursor-pointer text-black" />
         }
-        placement="bottom-end"
+        placement={placement}
       >
         {dropdownItemList.map((item) =>
           item.subMenu ? (

@@ -9,164 +9,191 @@ import { findDepartement } from "utils/helpers";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import capitalize from "components/ui/utils/capitalize";
 import TableListDropdown from "components/template/TableListDropdown";
+import DataTable from "components/shared/DataTable";
+import { Tools } from "./Tools";
+import { PageConfigOrderList } from "./config";
 
 const ProcurementOrderList = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [localState, setLocalState] = useState({
+    params: {
+      page: 1,
+      per_page: 10,
+      q: "",
+      options: {},
+    },
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [id, setId] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
 
-  const columns = [
-    {
-      Header: "ID PO",
-      accessor: "id",
-      Cell: ({ row }) => row.original.id,
-    },
-    {
-      Header: "Nama PO",
-      accessor: "po_name",
-      Cell: ({ row }) => row.original.po_name,
-    },
-
-    {
-      Header: "Departemen",
-      accessor: "department_id",
-      Cell: ({ row }) => findDepartement(row.original.department_id),
-    },
-    {
-      Header: "Kategori",
-      accessor: "category",
-      Cell: ({ row }) => row.original.category.name || "-",
-    },
-    {
-      Header: "Tipe",
-      accessor: "po_type",
+  // Convert PageConfigOrderList listFields to DataTable columns
+  const columns = PageConfigOrderList.listFields
+    .filter((field) => field.is_show)
+    .map((field) => ({
+      Header: field.label,
+      accessor: field.key,
+      sortable: field.sortable,
+      width: field.width,
       Cell: ({ row }) => {
-        return getCapitalizeType(row.original.po_type);
+        const value = row.original[field.key];
+        switch (field.key) {
+          case "department_id":
+            return findDepartement(value);
+          case "category":
+            return row.original.category?.name || "-";
+          case "po_type":
+            return getCapitalizeType(value);
+          case "po_date":
+            return formatDate(value);
+          case "status":
+            return (
+              <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                Belum Diproses
+              </span>
+            );
+          default:
+            return value;
+        }
       },
-    },
-    {
-      Header: "Tanggal Request PO",
-      accessor: "po_date",
-      Cell: ({ row }) => {
-        return formatDate(row.original.po_date);
-      },
-    },
+    }));
 
-    {
-      Header: "Status",
-      accessor: "status",
-      Cell: ({ row }) => (
-        <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-          Belum Diproses
-        </span>
-      ),
-    },
-    {
+  // Add action column with dropdown
+  if (PageConfigOrderList.enableActions) {
+    columns.push({
+      Header: "Action",
       accessor: "action",
-      Cell: ({ row }) => (
-        <TableListDropdown
-          dropdownItemList={[
-            {
-              label: "Proses PO",
-              onClick: () =>
-                navigate(`/purchase/pengadaan/detail/${row.original.id}`),
-            },
-            {
-              label: "Hapus PO",
-              //   onClick: () =>
-              //     navigate(`/vendor-management/edit-vendor/${row.original.id}`),
-            },
-            // {
-            //   label: "Lihat Detail",
-            //   onClick: () =>
-            //     navigate(`/purchase/pengadaan/detail/${row.original.id}`),
-            // },
-          ]}
-        />
-      ),
-    },
-  ];
+      width: "100px",
+      Cell: ({ row }) => {
+        return (
+          <TableListDropdown
+            placement={
+              dataPurchaseOrder.length > 1 && row.index < 1
+                ? "bottom-end"
+                : "top-end"
+            }
+            dropdownItemList={[
+              {
+                label: "Proses PO",
+                onClick: () =>
+                  navigate(`/purchase/pengadaan/proses-po/${row.original.id}`),
+              },
+              {
+                label: "Hapus PO",
+                onClick: () => handleDelete(row.original.id),
+              },
+            ]}
+          />
+        );
+      },
+    });
+  }
+  const fetchData = async (params = localState.params) => {
+    setIsLoading(true);
+    try {
+      const response = await getPoList(params);
+      const data = response.data;
+      setLocalState((prev) => ({
+        ...prev,
+        params: {
+          ...params,
+          total: data?.total,
+          per_page: data?.per_page,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPurchaseRequests = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getPoList({ currentPage });
-        const data = response.data;
-        setTotal(data?.total);
-        setPageSize(data?.per_page);
-      } catch (error) {
-        console.error("Error fetching purchase requests:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    fetchData();
+  }, []);
 
-    fetchPurchaseRequests();
-  }, [currentPage]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-  const handleSave = (values) => {
-    console.log("Form values:", values);
-    setIsModalOpen(false);
+  const handlePaginationChange = (page) => {
+    fetchData({
+      ...localState.params,
+      page,
+    });
   };
 
-  //   const handleDelete = async () => {
-  //     try {
-  //       setIsLoading(true);
-  //       const response = await deleteGoods(id);
-  //       const data = response.data;
-  //       setTotal(data?.total);
-  //       setPageSize(data?.per_page);
-  //       if (response.status === "success") {
-  //         console.log("success");
-  //         navigate("/master-data/barang-purchase");
-  //       } else {
-  //         <Alert
-  //           message="Failed to delete goods"
-  //           type="danger"
-  //           showIcon
-  //           className="mb-4"
-  //         />;
-  //         console.log(response.status);
-  //       }
-  //     } catch (err) {
-  //       console.log(err);
-  //     } finally {
-  //       setTimeout(() => {
-  //         setIsLoading(false);
-  //         setIsOpen(false);
-  //       }, 1000);
-  //     }
-  //   };
+  const handlePageSizeChange = (size) => {
+    fetchData({
+      ...localState.params,
+      per_page: size,
+      page: 1,
+    });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await fetchData();
+    } catch (error) {
+      console.error("Error deleting PO:", error);
+    }
+  };
+  const onSort = (sort, sortingColumn) => {
+    fetchData({
+      ...localState.params,
+      order_by: sort.key,
+      sort_by: sort.order,
+      page: 1,
+    });
+  };
 
   return (
-    <div>
-      <TableHeader onClickAdd={() => setIsOpen(true)} addBtnTitle={"Buat PO"} />
-      <CustomTable data={dataPurchaseOrder} columns={columns} />
-      <div className="flex justify-end mt-2">
-        <Pagination
-          total={total}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          onChange={handlePageChange}
-          displayTotal
-        />
-      </div>
+    <div className="space-y-4">
+      <Tools
+        localState={localState}
+        getData={fetchData}
+        deleteIds={selectedIds}
+        setIds={setSelectedIds}
+        pageConfig={PageConfigOrderList}
+        setOpenModal={setIsModalOpen}
+      />
+
+      <DataTable
+        columns={columns}
+        data={dataPurchaseOrder}
+        loading={isLoading}
+        pagingData={{
+          total: localState.params.total || 0,
+          pageIndex: localState.params.page,
+          pageSize: localState.params.per_page,
+        }}
+        onSort={onSort}
+        onPaginationChange={handlePaginationChange}
+        onSelectChange={handlePageSizeChange}
+        selectable={PageConfigOrderList.enableBulkDelete}
+        onCheckBoxChange={(checked, row) => {
+          if (checked) {
+            setSelectedIds((prev) => [...prev, row.id]);
+          } else {
+            setSelectedIds((prev) => prev.filter((id) => id !== row.id));
+          }
+        }}
+        onIndeterminateCheckBoxChange={(checked, rows) => {
+          if (checked) {
+            const ids = rows.map((row) => row.original.id);
+            setSelectedIds(ids);
+          } else {
+            setSelectedIds([]);
+          }
+        }}
+        showHeader={true}
+        showPagination={PageConfigOrderList.enablePagination}
+        showLimitPerPage={PageConfigOrderList.enableLimitPerPage}
+        borderlessRow={false}
+        wrapClass="mb-4"
+      />
 
       <CreatePOModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onSave={handleSave}
-        isLoading={false}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isLoading={isLoading}
       />
     </div>
   );

@@ -5,7 +5,8 @@ import {
   getPurchaseOrderDetailsApi,
   postPurchaseOrderApi,
   postAddItemToPoApi,
-  postConfirmPoApi,
+  postPoVendorApi,
+  postVendorOfferApi,
   patchItemToAnotherPoApi,
 } from "services/ProcurementService";
 import { useDispatch, useSelector } from "react-redux";
@@ -146,11 +147,33 @@ function usePurchaseOrder() {
     }
   };
 
-  const confirmPo = async (data) => {
+  const confirmPoVendors = async (data) => {
     try {
-      const response = await postConfirmPoApi(data);
+      const response = await postPoVendorApi(data);
       console.log(response);
       if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
+  const submitVendorOffer = async (data) => {
+    try {
+      const response = await postVendorOfferApi(data);
+      console.log(response);
+      if (response.status === 201) {
         return {
           status: "success",
           message: response.data.message,
@@ -191,8 +214,9 @@ function usePurchaseOrder() {
     getListExistingPo,
     getPoDetail,
     createPurchaseOrder,
-    confirmPo,
+    confirmPoVendors,
     addToExistingPo,
+    submitVendorOffer,
     movePurchaseOrder,
     dataPurchaseQueue,
     dataPurchaseOrder,

@@ -16,9 +16,9 @@ function useVendor() {
   const dispatch = useDispatch();
   const { dataVendor, dataDetailVendor } = useSelector((state) => state.vendor);
 
-  const getVendors = async () => {
+  const getVendors = async (params) => {
     try {
-      const response = await getVendorsListApi();
+      const response = await getVendorsListApi(params);
       if (response.data) {
         dispatch(setData(response.data));
         return { status: "success", message: "", data: response.data };
@@ -74,8 +74,7 @@ function useVendor() {
   const updateVendor = async (id, data) => {
     try {
       const response = await putVendorsApi(id, data);
-      console.log(response);
-      if (response.data.status === "success") {
+      if (response.status === 200) {
         return { status: "success", message: response.data.message };
       } else {
         console.log(response);

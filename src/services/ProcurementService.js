@@ -62,13 +62,22 @@ export async function postAddItemToPoApi(data) {
   });
 }
 
-export async function postConfirmPoApi(data) {
+export async function postPoVendorApi(data) {
   return ApiService.fetchData({
     url: `purchase-order/manage-vendors-for-po`,
     method: "post",
     headers: {
       "Content-Type": "application/json",
     },
+    data,
+    withCredentials: true,
+  });
+}
+export async function postVendorOfferApi(data) {
+  return ApiService.fetchData({
+    url: `purchase-order/submit-vendor-offers`,
+    method: "post",
+
     data,
     withCredentials: true,
   });

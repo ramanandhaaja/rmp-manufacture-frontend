@@ -115,7 +115,7 @@ export const ROUTE_LIST = [
   },
   {
     key: "purchase.procurement.detail",
-    path: "/purchase/pengadaan/detail/:id",
+    path: "/purchase/pengadaan/proses-po/:id",
     component: React.lazy(() =>
       import("views/PurchaseProcurement/DetailPurchaseProcurement")
     ),

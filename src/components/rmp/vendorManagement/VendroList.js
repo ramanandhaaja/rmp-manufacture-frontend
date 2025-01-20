@@ -129,13 +129,13 @@ const VendorList = () => {
       console.log(response);
       if (response.status === "success") {
         console.log("success");
+        toast.push(
+          <Notification type="success" title="Berhasil menghapus vendor" />,
+          {
+            placement: "top-center",
+          }
+        );
         setTimeout(() => {
-          toast.push(
-            <Notification type="success" title="Berhasil menghapus vendor" />,
-            {
-              placement: "top-center",
-            }
-          );
           window.location.reload();
         }, 1000);
       } else {

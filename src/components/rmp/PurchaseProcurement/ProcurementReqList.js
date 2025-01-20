@@ -1,172 +1,161 @@
-import CustomTable from "components/custom/CustomTable";
+// ProcurementReqList.js
 import { useEffect, useState } from "react";
-import { formatDate } from "utils/helpers";
+import { formatDate, findDepartement } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
-import { Pagination, Alert } from "components/ui";
-import ConfirmationCustom from "components/custom/ConfirmationCustom";
-import TableHeader from "../TableHeader";
+import { Alert } from "components/ui";
+import DataTable from "components/shared/DataTable";
+import { Tools } from "./Tools";
 import { FiEye } from "react-icons/fi";
-import { findDepartement } from "utils/helpers";
 import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
 import capitalize from "components/ui/utils/capitalize";
+import { PageConfigReqList } from "./config";
 
 const ProcurementReqList = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [localState, setLocalState] = useState({
+    params: {
+      page: 1,
+      per_page: 10,
+      q: "",
+      options: {},
+    },
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [id, setId] = useState(null);
   const [approvedData, setApprovedData] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const { getPurchaseReqList } = usePurchaseReq();
 
-  const columns = [
-    {
-      Header: "ID Request",
-      accessor: "id",
-      Cell: ({ row }) => row.original.id,
-    },
-    {
-      Header: "Item Permintaan",
-      accessor: "total_items",
-      Cell: ({ row }) => row.original.total_items,
-    },
+  // Convert PageConfigReqList listFields to DataTable columns
+  const columns = PageConfigReqList.listFields
+    .filter((field) => field.is_show)
+    .map((field) => ({
+      Header: field.label,
+      accessor: field.key,
+      sortable: field.sortable,
+      width: field.width,
+      Cell: ({ row }) => {
+        const value = row.original[field.key];
+        switch (field.key) {
+          case "department_id":
+            return findDepartement(value);
+          case "request_date":
+          case "approval_date":
+            return formatDate(value);
+          case "status":
+            return (
+              <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                {capitalize(value)}
+              </span>
+            );
+          case "hod":
+          case "buyer":
+            return value || "-";
+          default:
+            return value;
+        }
+      },
+    }));
 
-    {
-      Header: "Departemen",
-      accessor: "department_id",
-      Cell: ({ row }) => findDepartement(row.original.department_id),
-    },
-    {
-      Header: "HOD",
-      accessor: "hod",
-      Cell: ({ row }) => row.original.hod || "-",
-    },
-    {
-      Header: "Tanggal Permintaan",
-      accessor: "request_date",
-      Cell: ({ row }) => {
-        return formatDate(row.original.request_date);
-      },
-    },
-    {
-      Header: "Tanggal Persetujuan",
-      accessor: "approval_date",
-      Cell: ({ row }) => {
-        return formatDate(row.original.approval_date);
-      },
-    },
-    {
-      Header: "Dibeli Oleh",
-      accessor: "buyer",
-      Cell: ({ row }) => row.original.buyer || "-",
-    },
-    {
-      Header: "Status",
-      accessor: "status",
-      Cell: ({ row }) => (
-        <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-          {capitalize(row.original.status)}
-        </span>
-      ),
-    },
-    {
+  // Add action column if enabled
+  if (PageConfigReqList.enableActions) {
+    columns.push({
+      Header: "Action",
       accessor: "action",
-      Cell: ({ row }) => {
-        const { status } = row.original;
+      Cell: ({ row }) => (
+        <button className="text-blue-600 hover:text-blue-800">
+          <FiEye size={18} />
+        </button>
+      ),
+      width: "100px",
+    });
+  }
 
-        return (
-          <button>
-            <FiEye />
-          </button>
-        );
-      },
-    },
-  ];
-
-  useEffect(() => {
-    const fetchPurchaseRequests = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getPurchaseReqList({ currentPage });
-        const data = response.data;
-        setTotal(data?.total);
-        setPageSize(data?.per_page);
-        const approvedItems = data?.data.filter(
-          (item) => item.status === "approved"
-        );
-        setApprovedData(approvedItems);
-      } catch (error) {
-        console.error("Error fetching purchase requests:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPurchaseRequests();
-  }, [currentPage]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const fetchData = async (params = localState.params) => {
+    setIsLoading(true);
+    try {
+      const response = await getPurchaseReqList(params);
+      const data = response.data;
+      const approvedItems = data?.data.filter(
+        (item) => item.status === "approved"
+      );
+      setApprovedData(approvedItems);
+      setLocalState((prev) => ({
+        ...prev,
+        params: {
+          ...params,
+          total: data?.total,
+          per_page: data?.per_page,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching purchase requests:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  //   const handleDelete = async () => {
-  //     try {
-  //       setIsLoading(true);
-  //       const response = await deleteGoods(id);
-  //       const data = response.data;
-  //       setTotal(data?.total);
-  //       setPageSize(data?.per_page);
-  //       if (response.status === "success") {
-  //         console.log("success");
-  //         navigate("/master-data/barang-purchase");
-  //       } else {
-  //         <Alert
-  //           message="Failed to delete goods"
-  //           type="danger"
-  //           showIcon
-  //           className="mb-4"
-  //         />;
-  //         console.log(response.status);
-  //       }
-  //     } catch (err) {
-  //       console.log(err);
-  //     } finally {
-  //       setTimeout(() => {
-  //         setIsLoading(false);
-  //         setIsOpen(false);
-  //       }, 1000);
-  //     }
-  //   };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handlePaginationChange = (page) => {
+    fetchData({
+      ...localState.params,
+      page,
+    });
+  };
+
+  const handlePageSizeChange = (size) => {
+    fetchData({
+      ...localState.params,
+      per_page: size,
+      page: 1,
+    });
+  };
 
   return (
-    <div>
-      <TableHeader
-        onClickAdd={() =>
-          navigate("/master-data/barang-purchase/tambah-barang-purchase")
-        }
-        showBtnAdd={false}
+    <div className="space-y-4">
+      <Tools
+        localState={localState}
+        getData={fetchData}
+        deleteIds={selectedIds}
+        setIds={setSelectedIds}
+        pageConfig={PageConfigReqList}
       />
-      <CustomTable data={approvedData} columns={columns} />
-      <div className="flex justify-end mt-2">
-        <Pagination
-          total={total}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          onChange={handlePageChange}
-          displayTotal
-        />
-      </div>
-      {/* <ConfirmationCustom
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onConfirm={() => handleDelete(id)}
-        title="Delete Confirmation"
-        text="Anda yakin akan menghapus data ini?"
-        confirmText="Hapus"
-        isLoading={isLoading}
-      /> */}
+
+      <DataTable
+        columns={columns}
+        data={approvedData}
+        loading={isLoading}
+        pagingData={{
+          total: localState.params.total || 0,
+          pageIndex: localState.params.page,
+          pageSize: localState.params.per_page,
+        }}
+        onPaginationChange={handlePaginationChange}
+        onSelectChange={handlePageSizeChange}
+        selectable={PageConfigReqList.enableBulkDelete}
+        onCheckBoxChange={(checked, row) => {
+          if (checked) {
+            setSelectedIds((prev) => [...prev, row.id]);
+          } else {
+            setSelectedIds((prev) => prev.filter((id) => id !== row.id));
+          }
+        }}
+        onIndeterminateCheckBoxChange={(checked, rows) => {
+          if (checked) {
+            const ids = rows.map((row) => row.original.id);
+            setSelectedIds(ids);
+          } else {
+            setSelectedIds([]);
+          }
+        }}
+        showHeader={true}
+        showPagination={PageConfigReqList.enablePagination}
+        showLimitPerPage={PageConfigReqList.enableLimitPerPage}
+        borderlessRow={false}
+        wrapClass="mb-4"
+      />
     </div>
   );
 };

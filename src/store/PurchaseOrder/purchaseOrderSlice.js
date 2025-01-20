@@ -4,12 +4,16 @@ import { dataDetailPurchase } from "store/PurchaseRequest/purchaseSlice";
 export const purchaseOrderSlice = createSlice({
   name: "purchaseOrder",
   initialState: {
+    idPo: null,
     dataPurchaseOrder: [],
     dataPurchaseQueue: [],
     dataListPoNumber: [],
     dataDetailPurchaseOrder: [],
   },
   reducers: {
+    setIdPo: (state, action) => {
+      state.idPo = action.payload;
+    },
     setDataPurchaseOrder: (state, action) => {
       state.dataPurchaseOrder = action.payload;
     },
@@ -26,6 +30,7 @@ export const purchaseOrderSlice = createSlice({
 });
 
 export const {
+  idPo,
   dataPurchaseOrder,
   dataPurchaseQueue,
   dataListPoNumber,
@@ -34,5 +39,6 @@ export const {
   setDataPurchaseQueue,
   setDataListPoNumber,
   setDataDetailPurchaseOrder,
+  setIdPo,
 } = purchaseOrderSlice.actions;
 export default purchaseOrderSlice.reducer;

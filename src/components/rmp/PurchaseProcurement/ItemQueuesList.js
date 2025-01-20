@@ -30,9 +30,7 @@ const ItemQueuesList = ({ type }) => {
   const [isAdded, setIsAdded] = useState(false);
   const [itemName, setItemName] = useState("");
   const [idGoods, setIdGoods] = useState(null);
-  const idPurchaseItem = dataPurchaseQueue?.map(
-    (item) => item.purchase_request_item_id
-  );
+  const [idItemRequest, setIdItemRequest] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
 
   const columns = [
@@ -94,6 +92,7 @@ const ItemQueuesList = ({ type }) => {
                       row.original.goods_id
                     );
                     setDataPoAdded(po);
+                    setIdItemRequest(row.original.purchase_request_item_id);
                     setIsOpenConfirmation(true);
                   },
                 })) || [],
@@ -147,13 +146,14 @@ const ItemQueuesList = ({ type }) => {
   };
 
   const handleAddToPo = async () => {
-    if (!dataPoAdded || !idPurchaseItem) return;
+    if (!dataPoAdded || !idItemRequest) return;
     try {
       setIsLoadingCreate(true);
       const payload = {
         purchase_order_id: dataPoAdded.id,
-        request_item_id: idPurchaseItem,
+        request_item_id: idItemRequest,
       };
+
       const resp = await addToExistingPo(payload);
       if (resp.status === "success") {
         setIsAdded(true);

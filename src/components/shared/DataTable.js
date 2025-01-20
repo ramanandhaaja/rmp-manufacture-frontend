@@ -1,13 +1,13 @@
-import React, { useMemo } from "react"
-import PropTypes from "prop-types"
-import { Table, Pagination, Select } from "components/ui"
-import TableRowSkeleton from "./loaders/TableRowSkeleton"
-import Loading from "./Loading"
-import { useTable, usePagination, useSortBy, useRowSelect } from "react-table"
-import classNames from "classnames"
-import { NoDataSvg } from "assets/svg"
+import React, { useMemo } from "react";
+import PropTypes from "prop-types";
+import { Table, Pagination, Select } from "components/ui";
+import TableRowSkeleton from "./loaders/TableRowSkeleton";
+import Loading from "./Loading";
+import { useTable, usePagination, useSortBy, useRowSelect } from "react-table";
+import classNames from "classnames";
+import { NoDataSvg } from "assets/svg";
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+const { Tr, Th, Td, THead, TBody, Sorter } = Table;
 
 // const IndeterminateCheckbox = forwardRef((props, ref) => {
 //   const {
@@ -63,15 +63,15 @@ const DataTable = (props) => {
     showLimitPerPage,
     showHeader,
     rowClassName,
-  } = props
+  } = props;
 
-  const { pageSize, pageIndex, total } = pagingData
+  const { pageSize, pageIndex, total } = pagingData;
 
   const pageSizeOption = useMemo(
     () =>
       pageSizes.map((number) => ({ value: number, label: `${number} / page` })),
     [pageSizes]
-  )
+  );
 
   // const handleCheckBoxChange = (checked, row, is_loading) => {
   //   if (!is_loading) {
@@ -86,7 +86,7 @@ const DataTable = (props) => {
   // };
 
   const getStickyStyle = (column, index, allColumns, isHeader = false) => {
-    if (!column.sticky) return {}
+    if (!column.sticky) return {};
 
     const baseStyle = {
       position: "sticky",
@@ -95,19 +95,19 @@ const DataTable = (props) => {
         ? "rgba(245, 247, 250, 1)" // dark:bg-gray-700 : bg-gray-50
         : "rgb(255 255 255)", // dark:bg-gray-900 : white
       transition: "background-color 150ms ease-in-out",
-    }
+    };
 
     // Add hover styles
-    const hoverSelector = isHeader ? "" : "&:hover"
+    const hoverSelector = isHeader ? "" : "&:hover";
     baseStyle[hoverSelector] = {
       backgroundColor: "rgba(243, 244, 246, 0.5)", // bg-gray-100/50
-    }
+    };
 
     if (column.sticky === "right") {
-      let offset = 0
+      let offset = 0;
       for (let i = allColumns.length - 1; i > index; i--) {
         if (allColumns[i].sticky === "right") {
-          offset += parseInt(allColumns[i].width) || 100
+          offset += parseInt(allColumns[i].width) || 100;
         }
       }
 
@@ -115,14 +115,14 @@ const DataTable = (props) => {
         ...baseStyle,
         right: `${offset}px`,
         boxShadow: "-2px 0 4px -2px rgba(0, 0, 0, 0.15)",
-      }
+      };
     }
 
     if (column.sticky === "left") {
-      let offset = 0
+      let offset = 0;
       for (let i = 0; i < index; i++) {
         if (allColumns[i].sticky === "left") {
-          offset += parseInt(allColumns[i].width) || 100
+          offset += parseInt(allColumns[i].width) || 100;
         }
       }
 
@@ -130,11 +130,11 @@ const DataTable = (props) => {
         ...baseStyle,
         left: `${offset}px`,
         boxShadow: "2px 0 4px -2px rgba(0, 0, 0, 0.15)",
-      }
+      };
     }
 
-    return {}
-  }
+    return {};
+  };
 
   const { getTableProps, getTableBodyProps, headerGroups, prepareRow, page } =
     useTable(
@@ -188,31 +188,31 @@ const DataTable = (props) => {
             //   sortable: false,
             // },
             ...columns,
-          ])
+          ]);
         }
       }
-    )
+    );
 
   const handlePaginationChange = (page) => {
     if (!loading) {
-      onPaginationChange?.(page)
+      onPaginationChange?.(page);
     }
-  }
+  };
 
   const handleSelectChange = (value) => {
     if (!loading) {
-      onSelectChange?.(Number(value))
+      onSelectChange?.(Number(value));
     }
-  }
+  };
 
   const handleSort = (column) => {
     if (!loading) {
-      const { id, isSortedDesc, toggleSortBy, clearSortBy } = column
-      const sortOrder = isSortedDesc ? "desc" : "asc"
-      toggleSortBy(!isSortedDesc)
-      onSort?.({ order: sortOrder, key: id }, { id, clearSortBy })
+      const { id, isSortedDesc, toggleSortBy, clearSortBy } = column;
+      const sortOrder = isSortedDesc ? "desc" : "asc";
+      toggleSortBy(!isSortedDesc);
+      onSort?.({ order: sortOrder, key: id }, { id, clearSortBy });
     }
-  }
+  };
 
   return (
     <Loading loading={loading && data.length !== 0} type="cover">
@@ -245,7 +245,7 @@ const DataTable = (props) => {
                       (column.sortable ? (
                         <div
                           className={classNames(
-                            "cursor-pointer text-blue-999 text-sm font-bold leading-[21px] uppercase",
+                            "cursor-pointer text-blue-999 text-sm font-bold leading-[21px] ",
                             column.headerClassName
                           )}
                           onClick={() => handleSort(column)}
@@ -258,7 +258,7 @@ const DataTable = (props) => {
                       ) : (
                         <div
                           className={classNames(
-                            "text-blue-999 text-sm font-bold leading-[21px] uppercase",
+                            "text-blue-999 text-sm font-bold leading-[21px] ",
                             column.headerClassName
                           )}
                         >
@@ -299,7 +299,7 @@ const DataTable = (props) => {
               </Tr>
             ) : (
               page.map((row, i) => {
-                prepareRow(row)
+                prepareRow(row);
                 return (
                   <Tr
                     {...row.getRowProps()}
@@ -310,7 +310,7 @@ const DataTable = (props) => {
                         cell?.column?.Header === "Email" ||
                         cell?.column?.Header === "Description"
                           ? false
-                          : true
+                          : true;
                       return (
                         <Td
                           {...cell.getCellProps({
@@ -325,17 +325,17 @@ const DataTable = (props) => {
                           })}
                           className={classNames(
                             `${
-                              type && "uppercase"
+                              type && ""
                             } text-blue-999 border-b border-slate-300`,
                             "group-hover:bg-gray-100/50 dark:group-hover:bg-gray-700/40"
                           )}
                         >
                           {cell.render("Cell")}
                         </Td>
-                      )
+                      );
                     })}
                   </Tr>
-                )
+                );
               })
             )}
           </TBody>
@@ -369,8 +369,8 @@ const DataTable = (props) => {
         )}
       </div>
     </Loading>
-  )
-}
+  );
+};
 
 DataTable.propTypes = {
   columns: PropTypes.array,
@@ -397,7 +397,7 @@ DataTable.propTypes = {
   showLimitPerPage: PropTypes.bool,
   showHeader: PropTypes.bool,
   rowClassName: PropTypes.func,
-}
+};
 
 DataTable.defaultProps = {
   pageSizes: [10, 25, 50, 100, 300, 500, 1000],
@@ -417,6 +417,6 @@ DataTable.defaultProps = {
   showLimitPerPage: true,
   showHeader: true,
   rowClassName: () => "",
-}
+};
 
-export default DataTable
+export default DataTable;

@@ -13,26 +13,45 @@ const AddVendor = () => {
   const navigate = useNavigate();
 
   const handleFormData = async (form) => {
+    console.log(form);
     try {
       setIsLoading(true);
       const response = await createVendor(form);
       console.log(response);
       if (response.status === "success") {
-        setTimeout(() => {
-          toast.push(<Notification type="success" title={response.message} />, {
+        toast.push(
+          <Notification
+            type="success"
+            title="Vendor berhasil dibuat"
+            width={700}
+          />,
+          {
             placement: "top-center",
-          });
+          }
+        );
+        setTimeout(() => {
           navigate("/vendor-management/");
         }, 1000);
       } else {
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, Vendor gagal dibuat"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
         console.log(response.status);
       }
     } catch (err) {
       toast.push(
-        <Notification type="danger" title={"Error while creating vendor"} />,
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan, Vendor gagal dibuat"
+          width={700}
+        />,
         {
           placement: "top-center",
         }
