@@ -82,6 +82,7 @@ const AddGoodsCategory = () => {
           <FormGoodsCategory ref={formRef} setFormData={handleFormData} />
         </div>
         <ConfirmationCustom
+          icon
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           showCancelBtn

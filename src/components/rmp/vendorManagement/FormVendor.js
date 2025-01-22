@@ -136,7 +136,6 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
           id: values.id,
           name: values.name,
           goods_category: values.goods_category,
-          vendor_type: values.vendor_type,
           pic_name: values.pic_name,
           pic_phone: values.pic_phone,
           pic_email: values.pic_email,
@@ -337,19 +336,7 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
             >
               <Select
                 name="vendor_type"
-                options={vendorTypeOptions.map((type) => ({
-                  value: type.value,
-                  label: type.label,
-                }))}
-                value={
-                  values.vendor_type
-                    ? {
-                        value: values.vendor_type,
-                        label: capitalize(values.vendor_type),
-                      }
-                    : null
-                }
-                placeholder="Select Vendor Type"
+                options={[{ value: "non-material", label: "Non-Material" }]}
                 onChange={(options) => {
                   if (options) {
                     setFieldValue("vendor_type", options.value); // Set the selected value

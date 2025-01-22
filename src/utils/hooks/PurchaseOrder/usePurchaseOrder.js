@@ -29,16 +29,44 @@ function usePurchaseOrder() {
 
   const getPoList = async (queryParams) => {
     try {
-      const resp = await getPurchaseOrderApi(queryParams);
-      if (resp.data) {
-        dispatch(setDataPurchaseOrder(resp.data?.data));
-        return {
-          status: "success",
-          message: "",
-          data: resp?.data,
-        };
-      }
+      // First, make a request to get total number of items
+      const initialResponse = await getPurchaseOrderApi({ page: 1 });
+      const totalPages = initialResponse.data.last_page;
+
+      // Fetch all pages
+      const promises = Array.from({ length: totalPages }, (_, i) =>
+        getPurchaseOrderApi({ page: i + 1 })
+      );
+
+      const responses = await Promise.all(promises);
+
+      // Combine all data
+      const allData = responses.reduce((acc, response) => {
+        return [...acc, ...response.data.data];
+      }, []);
+
+      // Sort by creation date (assuming there's a created_at field)
+      const sortedData = allData.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
+      // Handle pagination on the client side
+      const totalItems = sortedData.length;
+      const perPage = initialResponse.data.per_page;
+
+      dispatch(setDataPurchaseOrder(sortedData));
+
+      return {
+        status: "success",
+        message: "",
+        data: {
+          data: sortedData,
+          total: totalItems,
+          per_page: perPage,
+        },
+      };
     } catch (errors) {
+      console.log(errors);
       return {
         status: "failed",
         message: errors?.response?.data?.message || errors.toString(),
@@ -155,7 +183,6 @@ function usePurchaseOrder() {
         return {
           status: "success",
           message: response.data.message,
-          data: response.data.data,
         };
       } else {
         return { status: "failed", message: response.data.message };

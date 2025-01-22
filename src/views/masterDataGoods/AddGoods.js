@@ -86,14 +86,12 @@ const AddGoods = () => {
           showSubmitBtn
           onConfirm={handleSubmit}
           confirmText="Konfirmasi"
-          title="Anda yakin ingin menambahkan vendor ini?"
+          title="Anda yakin ingin menambahkan barang ini?"
           titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
           text="Klik Konfirmasi untuk melanjutkan"
           textClass="text-slate-500 text-base"
-          icon={<></>}
           isLoading={isLoading}
           disableCancel={false}
-          buttonForm=""
           buttonType="button"
           width={500}
           contentClassName="p-5 rounded-2xl"

@@ -63,6 +63,7 @@ const GoodsCategoryList = () => {
               },
             },
           ]}
+          placement="center-end"
         />
       ),
     },
@@ -71,18 +72,22 @@ const GoodsCategoryList = () => {
   useEffect(() => {
     const fetchGoodsCategory = async () => {
       try {
-        const response = await getGoodsCategory({ page: currentPage });
+        const response = await getGoodsCategory();
         const data = response.data;
         setTotal(data.total);
         setPageSize(data.per_page);
       } catch (error) {
-        console.error("Error fetching purchase requests:", error);
-      } finally {
+        console.error("Error fetching goods category:", error);
       }
     };
-
     fetchGoodsCategory();
-  }, [currentPage]);
+  }, []);
+
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return dataGoodsCategory.slice(startIndex, endIndex);
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -131,7 +136,7 @@ const GoodsCategoryList = () => {
         }
         addBtnTitle={"Tambah Kategori Barang"}
       />
-      <CustomTable data={dataGoodsCategory?.data} columns={columns} />
+      <CustomTable data={getCurrentPageData()} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}

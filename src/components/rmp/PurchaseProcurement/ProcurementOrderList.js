@@ -84,6 +84,11 @@ const ProcurementOrderList = () => {
                 label: "Hapus PO",
                 onClick: () => handleDelete(row.original.id),
               },
+              {
+                label: "Detail PO",
+                onClick: () =>
+                  navigate(`/purchase/pengadaan/detail-po/${row.original.id}`),
+              },
             ]}
           />
         );
@@ -164,6 +169,8 @@ const ProcurementOrderList = () => {
       page: 1,
     });
   };
+
+  console.log(dataPurchaseOrder);
 
   return (
     <div className="space-y-4">

@@ -97,10 +97,12 @@ const ModernLayout = (props) => {
           <div className="flex mt-5">
             <SideNav />
           </div>
-          <div className="flex flex-1 bg-white">
+          <div className="flex flex-1 ">
             <ScrollBar>
-              <div className="flex flex-col flex-1 h-full ">
-                <View {...props} />
+              <div className="flex flex-col flex-1 h-full bg-gray-100">
+                <div className="py-4 ">
+                  <View {...props} />
+                </div>
               </div>
             </ScrollBar>
           </div>

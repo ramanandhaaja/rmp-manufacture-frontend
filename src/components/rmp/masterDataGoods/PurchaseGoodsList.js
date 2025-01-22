@@ -72,6 +72,7 @@ const PurchaseGoodsList = () => {
               },
             },
           ]}
+          placement="center-end"
         />
       ),
     },
@@ -80,7 +81,7 @@ const PurchaseGoodsList = () => {
   useEffect(() => {
     const fetchMasterGoods = async () => {
       try {
-        const response = await getGoods({ page: currentPage });
+        const response = await getGoods();
         const data = response.data;
         setTotal(data.total);
         setPageSize(data.per_page);
@@ -91,7 +92,13 @@ const PurchaseGoodsList = () => {
     };
 
     fetchMasterGoods();
-  }, [currentPage]);
+  }, []);
+
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return dataMasterGoods.slice(startIndex, endIndex);
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -134,7 +141,7 @@ const PurchaseGoodsList = () => {
         }
         addBtnTitle={"Tambah Barang"}
       />
-      <CustomTable data={dataMasterGoods} columns={columns} />
+      <CustomTable data={getCurrentPageData()} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}

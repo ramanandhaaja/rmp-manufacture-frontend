@@ -23,9 +23,9 @@ import ChooseVendorList from "components/rmp/PurchaseProcurement/ChooseVendorLis
 import { useDispatch } from "react-redux";
 import { setIdPo } from "store/PurchaseOrder/purchaseOrderSlice";
 import AddPoGoodsList from "components/rmp/PurchaseProcurement/AddPoGoodsList";
-import { set } from "lodash";
+import { clearVendorSelections } from "store/PurchaseOrder/purchaseOrderSlice";
 
-const DetailPurchaseOrder = () => {
+const ProcessPurchaseOrder = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -34,30 +34,38 @@ const DetailPurchaseOrder = () => {
     getPoQueueList,
     dataPurchaseQueue,
     addToExistingPo,
-    addVendorToPo,
-    confirmPo,
+    confirmPoVendors,
   } = usePurchaseOrder();
   const [isLoadingList, setIsLoadingList] = useState(false);
   const { id } = useParams();
   const { userRole, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingAdd, setIsLoadingAdd] = useState(false);
+
   const formikRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [itemRequestId, setItemRequestId] = useState(null);
+  const [itemRequestId, setItemRequestId] = useState([]);
   const [dataItemAdded, setDataItemAdded] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [isOpenConfirmation, setIsOpenConfirmation] = useState(false);
   const [isOpenConfirmationAdd, setIsOpenConfirmationAdd] = useState(false);
-  const [payloadVendor, setPayloadVendor] = useState(null);
   const [dataTableItems, setTableDataItems] = useState([]);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const dataItemPo = dataDetailPurchaseOrder?.items;
 
-  const handlePayloadVendorChange = (data) => {
-    setPayloadVendor(data);
+  const handleVendorSelected = (vendor) => {
+    setSelectedVendor(vendor);
+    console.log("Selected Vendor:", vendor);
   };
+
+  useEffect(() => {
+    if (dataItemPo.length > 0) {
+      setActiveTab(1);
+    }
+  }, [dataItemPo]);
 
   const columnsAddModal = [
     {
@@ -99,14 +107,12 @@ const DetailPurchaseOrder = () => {
     {
       accessor: "action",
       Cell: ({ row }) => {
-        console.log(row.original);
         return (
           <TableListDropdown
             dropdownItemList={[
               {
                 label: "Tambah Ke PO",
                 onClick: () => {
-                  const idRequest = row.original.purchase_request_item_id;
                   const data = {
                     po_name: dataDetailPurchaseOrder?.po_name,
                     po_number: dataDetailPurchaseOrder?.po_number,
@@ -116,12 +122,14 @@ const DetailPurchaseOrder = () => {
                     goods_category_name: row.original.goods_category,
                     quantity: row.original.quantity,
                     measurement: row.original.measurement,
+                    purchase_request_item_id:
+                      row.original.purchase_request_item_id,
                   };
-                  if (idRequest && data) {
+                  if (data) {
                     setDataItemAdded(data);
                     handleAddItem(data);
                   } else {
-                    console.log("Invalid ID:", idRequest);
+                    console.log("Invalid ID:");
                   }
                 },
               },
@@ -139,21 +147,31 @@ const DetailPurchaseOrder = () => {
     }
   }, [id]);
 
-  const handleAddToPo = async (itemRequestId) => {
+  const handleAddToPo = async () => {
     try {
       setIsLoadingAdd(true);
       const payload = {
         purchase_order_id: id,
         request_item_id: itemRequestId,
       };
-      console.log(payload);
-      return;
       const resp = await addToExistingPo(payload);
 
       if (resp.status === "success") {
+        toast.push(
+          <Notification
+            type="success"
+            title="Berhasil menambahkan Barang"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        await getPoDetail(id);
+
         setTimeout(() => {
+          setIsOpenConfirmationAdd(false);
           handleNextStep();
-          handleClose();
         }, 2000);
       } else {
         toast.push(
@@ -181,25 +199,68 @@ const DetailPurchaseOrder = () => {
       );
     } finally {
       setIsLoadingAdd(false);
-      handleClose();
+      setIsOpenConfirmationAdd(false);
     }
   };
 
-  useEffect(() => {
-    if (dataDetailPurchaseOrder.items) {
-      setTableDataItems(dataDetailPurchaseOrder.items);
+  const handleConfirmVendor = async () => {
+    try {
+      setIsLoadingAdd(true);
+
+      const resp = await confirmPoVendors(selectedVendor);
+
+      if (resp.status === "success") {
+        toast.push(
+          <Notification
+            type="success"
+            title="Berhasil menambahkan vendor PO"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        setTimeout(() => {
+          setIsOpenConfirmation(false);
+          dispatch(clearVendorSelections());
+          navigate("/purchase/pengadaan");
+        }, 2000);
+      } else {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, gagal menambahkan vendor PO"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.push(
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan, gagal menambahkan vendor PO"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+    } finally {
+      setIsLoadingAdd(false);
+      setIsOpenConfirmation(false);
     }
-  }, []);
+  };
 
   const handleAddItem = async (item) => {
     setTableDataItems([...dataTableItems, item]);
+    setItemRequestId([...itemRequestId, item.purchase_request_item_id]);
     setShowNotification(true);
-
-    setTimeout(() => {
-      handleClose();
-    }, 2000);
   };
-  console.log(dataTableItems);
+
   const handleDeleteItem = (id) => {
     setTableDataItems((prevData) => prevData.filter((item) => item.id !== id));
   };
@@ -333,7 +394,7 @@ const DetailPurchaseOrder = () => {
           />
         </Tabs.TabContent>
         <Tabs.TabContent value={1}>
-          <ChooseVendorList onPayloadVendorChange={handlePayloadVendorChange} />
+          <ChooseVendorList onPayloadVendorChange={handleVendorSelected} />
         </Tabs.TabContent>
       </Tabs>
       <div className="border-b border-gray-400 w-full mb-4 "></div>
@@ -344,13 +405,19 @@ const DetailPurchaseOrder = () => {
         {activeTab == 0 ? (
           <Button
             variant="solid"
-            onClick={handleAddToPo}
+            onClick={() => setIsOpenConfirmationAdd(true)}
             disabled={activeTab == 1}
+            loading={isLoadingAdd}
           >
             Selanjutnya
           </Button>
         ) : (
-          <Button variant="solid" onClick={() => setIsOpenConfirmation(true)}>
+          <Button
+            variant="solid"
+            // onClick={() => setIsOpenConfirmation(true)}
+            onClick={() => setIsOpenConfirmation(true)}
+            disabled={selectedVendor?.length < 3}
+          >
             Konfirmasi
           </Button>
         )}
@@ -358,16 +425,20 @@ const DetailPurchaseOrder = () => {
       <ConfirmationCustom
         isOpen={isOpenConfirmation}
         onClose={() => setIsOpenConfirmation(false)}
-        // onConfirm={handleConfirm}
-        title="Buat Purchase Order ? "
-        text="Pastikan data yang anda masukan sudah benar, PO ini akan dikirimkan ke direksi untuk ditinjau, silahkan pantau progress melalui halaman List Purchase Order"
+        onConfirm={handleConfirmVendor}
+        title="Konfirmasi pilihan vendor ? "
+        text={`${
+          selectedVendor?.needs_approval === "yes"
+            ? `Pastikan data yang anda masukan sudah benar, data ini akan dikirimkan ke direksi untuk ditinjau`
+            : `Pastikan data yang anda masukan sudah benar`
+        } `}
         confirmText="Konfirmasi"
         isLoading={isLoadingAdd}
       />
       <ConfirmationCustom
         isOpen={isOpenConfirmationAdd}
         onClose={() => setIsOpenConfirmationAdd(false)}
-        onConfirm={() => handleAddToPo(itemRequestId)}
+        onConfirm={handleAddToPo}
         title="Tambah Barang ke Purchase Order  "
         text="Anda yakin ingin menambahkan barang ke PO ini ?"
         confirmText="Konfirmasi"
@@ -382,6 +453,7 @@ const DetailPurchaseOrder = () => {
         category={dataDetailPurchaseOrder.category_name}
         type={dataDetailPurchaseOrder.po_type}
         loading={isLoadingAdd}
+        setShowNotification={setShowNotification}
         showNotification={showNotification}
         dataItemAdded={dataItemAdded}
       />
@@ -389,4 +461,4 @@ const DetailPurchaseOrder = () => {
   );
 };
 
-export default DetailPurchaseOrder;
+export default ProcessPurchaseOrder;

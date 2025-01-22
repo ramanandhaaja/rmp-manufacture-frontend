@@ -37,7 +37,6 @@ const FormMasterGoods = forwardRef(
       goods_category_id: null,
       description: "",
     };
-
     const handleSubmit = (values, { setSubmitting }) => {
       try {
         const formData = new FormData();
@@ -66,6 +65,9 @@ const FormMasterGoods = forwardRef(
       getGoodsCategory({ all: true });
     }, []);
 
+    const safeDataGoodsCategory = Array.isArray(dataGoodsCategory)
+      ? dataGoodsCategory
+      : [];
     return (
       <Formik
         innerRef={formikRef}
@@ -90,7 +92,7 @@ const FormMasterGoods = forwardRef(
                 <Field
                   type="text"
                   name="name"
-                  placeholder="Masukan nama vendor"
+                  placeholder="Masukan nama barang"
                   component={Input}
                   uppercase={false}
                 />
@@ -108,13 +110,10 @@ const FormMasterGoods = forwardRef(
               >
                 <Select
                   name="goods_category"
-                  options={
-                    dataGoodsCategory &&
-                    dataGoodsCategory.map((category) => ({
-                      value: category.id,
-                      label: category.name,
-                    }))
-                  }
+                  options={safeDataGoodsCategory?.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                  }))}
                   value={values.goods_category?.map((category) => ({
                     value: category.id,
                     label: category.name,

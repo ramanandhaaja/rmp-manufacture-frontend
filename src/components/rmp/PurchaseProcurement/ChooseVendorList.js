@@ -5,20 +5,27 @@ import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import { useEffect, useState, useMemo } from "react";
 import CustomTable from "components/custom/CustomTable";
 import capitalize from "components/ui/utils/capitalize";
-import { getStatusClassName } from "utils/helpers";
 import TableListDropdown from "components/template/TableListDropdown";
 import { useNavigate } from "react-router-dom";
 import Radio from "components/ui/Radio";
 import { useParams } from "react-router-dom";
 import { FiCheckCircle } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearVendorSelections,
+  setSelectedPoVendors,
+  updateVendorSubmitStatus,
+} from "store/PurchaseOrder/purchaseOrderSlice";
 
 const ChooseVendorList = ({ onPayloadVendorChange }) => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { selectedPoVendors } = useSelector((state) => state.purchaseOrder);
   const { getVendors, dataVendor } = useVendor();
   const { dataDetailPurchaseOrder, confirmPoVendors } = usePurchaseOrder();
   const navigate = useNavigate();
   const [selectedDataVendor, setSelectedDataVendor] = useState([]);
-  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [checkedVendor, setCheckedVendor] = useState(null);
   const [selectedInput, setSelectedInput] = useState([]);
   const [isApprovalNeeded, setIsApprovalNeeded] = useState(false);
   const [isLoadingAdd, setIsLoadingAdd] = useState(false);
@@ -28,6 +35,15 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
     notes: "",
     vendors: [],
   });
+  const goodsCategory = dataDetailPurchaseOrder?.category_name;
+  const filteredVendor = useMemo(() => {
+    return (
+      dataVendor?.filter((vendor) =>
+        vendor.goods_category.includes(goodsCategory)
+      ) || []
+    );
+  }, [dataVendor, goodsCategory]);
+
   useEffect(() => {
     getVendors({ all: true });
   }, []);
@@ -38,10 +54,11 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
       Cell: ({ row }) => {
         return (
           <Radio
+            disabled={isApprovalNeeded}
             value={row.original.vendor_id}
-            checked={selectedVendor === row.original.vendor_id}
+            checked={checkedVendor === row.original.vendor_id}
             onChange={() => {
-              setSelectedVendor(row.original.vendor_id);
+              setCheckedVendor(row.original.vendor_id);
             }}
           />
         );
@@ -110,8 +127,13 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
         <TableListDropdown
           dropdownItemList={[
             {
-              label: isLoadingAdd ? "Loading..." : "Input Penawaran",
-              onClick: () => handleAddVendor(row.original.vendor_id),
+              label: "Input Penawaran",
+              onClick: () => {
+                dispatch(updateVendorSubmitStatus(row.original.vendor_id));
+                navigate(
+                  `/purchase/pengadaan/penawaran-vendor/${row.original.vendor_id}`
+                );
+              },
             },
             {
               label: "Lihat Detail Vendor",
@@ -126,59 +148,61 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
     },
   ];
 
+  // useEffect(() => {
+  //   if (
+  //     dataDetailPurchaseOrder?.vendors &&
+  //     dataDetailPurchaseOrder.vendors.length > 0 &&
+  //     dataVendor?.length > 0
+  //   ) {
+  //     // Map existing vendors to select options format
+  //     const initialVendors = dataDetailPurchaseOrder.vendors.map((vendor) => ({
+  //       value: vendor.vendor_id,
+  //       label: vendor.name,
+  //     }));
+
+  //     setSelectedInput(initialVendors.map((vendor) => vendor.value));
+
+  //     // Keep the original structure from dataDetailPurchaseOrder.vendors
+  //     setSelectedDataVendor(dataDetailPurchaseOrder.vendors);
+
+  //     // Set selected vendor if there's an approved one
+  //     const approvedVendor = dataDetailPurchaseOrder.vendors.find(
+  //       (vendor) => vendor.status === "approved"
+  //     );
+  //     if (approvedVendor) {
+  //       setSelectedVendor(approvedVendor.vendor_id);
+  //     }
+  //   }
+  // }, [dataDetailPurchaseOrder, dataVendor]);
+
   useEffect(() => {
-    if (
-      dataDetailPurchaseOrder?.vendors &&
-      dataDetailPurchaseOrder.vendors.length > 0 &&
-      dataVendor?.length > 0
-    ) {
-      // Map existing vendors to select options format
-      const initialVendors = dataDetailPurchaseOrder.vendors.map((vendor) => ({
-        value: vendor.vendor_id,
-        label: vendor.name,
-      }));
-
-      setSelectedInput(initialVendors.map((vendor) => vendor.value));
-
-      // Keep the original structure from dataDetailPurchaseOrder.vendors
-      setSelectedDataVendor(dataDetailPurchaseOrder.vendors);
-
-      // Set selected vendor if there's an approved one
-      const approvedVendor = dataDetailPurchaseOrder.vendors.find(
-        (vendor) => vendor.status === "approved"
-      );
-      if (approvedVendor) {
-        setSelectedVendor(approvedVendor.vendor_id);
-      }
-    }
-  }, [dataDetailPurchaseOrder, dataVendor]);
-
-  useEffect(() => {
-    if (selectedDataVendor) {
-      const vendorsPayload = selectedDataVendor.map((vendor) => ({
+    if (selectedPoVendors) {
+      const vendorsPayload = selectedPoVendors.map((vendor) => ({
         vendor_id: vendor.vendor_id,
-        status: vendor.vendor_id === selectedVendor ? "approved" : "rejected",
+        status: vendor.vendor_id === checkedVendor ? "approved" : "rejected",
       }));
 
       setPayloadVendor((prevPayload) => ({
         ...prevPayload,
         vendors: vendorsPayload,
       }));
+      console.log(vendorsPayload);
     }
-  }, [selectedVendor, selectedDataVendor]);
+  }, [selectedPoVendors, checkedVendor]);
 
   // Handle multi-select changes
   const handleVendorChange = (selectedOptions) => {
     if (!selectedOptions) {
       setSelectedInput([]);
       setSelectedDataVendor([]);
+      dispatch(setSelectedPoVendors([]));
       return;
     }
 
     const selectedValues = selectedOptions.map((option) => option.value);
     setSelectedInput(selectedValues);
 
-    const selectedVendors = dataVendor
+    const selectedVendors = filteredVendor
       ?.filter((vendor) => selectedValues.includes(vendor.id))
       .map((vendor) => ({
         vendor_id: vendor.id,
@@ -186,12 +210,13 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
         pic_name: vendor.pic_name,
         pic_phone: vendor.pic_phone,
         pic_email: vendor.pic_email,
-        status: vendor.id === selectedVendor ? "approved" : "rejected",
+        status: vendor.id === selectedPoVendors ? "approved" : "rejected",
         priority: null,
         offer_id: null,
         is_submit_offer: false,
       }));
 
+    dispatch(setSelectedPoVendors(selectedVendors));
     setSelectedDataVendor(selectedVendors || []);
   };
 
@@ -203,50 +228,9 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
     });
   };
 
-  const handleAddVendor = async (vendor_id) => {
-    // Accept vendor_id as a parameter
-    if (!payloadVendor) return;
-    try {
-      setIsLoadingAdd(true);
-      if (vendor_id) {
-        const resp = await confirmPoVendors(payloadVendor);
-        if (resp.status === "success") {
-          setTimeout(() => {
-            navigate(`/purchase/pengadaan/penawaran-vendor/${vendor_id}`);
-          }, 1000);
-        } else {
-          console.log(resp);
-          // toast.push(
-          //   <Notification
-          //     type="danger"
-          //     title="Maaf terjadi kesalahan, gagal merilis PO"
-          //     width={700}
-          //   />,
-          //   {
-          //     placement: "top-center",
-          //   }
-          // );
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      // toast.push(
-      //   <Notification
-      //     type="danger"
-      //     title="Maaf terjadi kesalahan, gagal merilis PO"
-      //     width={700}
-      //   />,
-      //   {
-      //     placement: "top-center",
-      //   }
-      // );
-    } finally {
-      setIsLoadingAdd(false);
-    }
-  };
-  // useEffect(() => {
-  //   onPayloadVendorChange(payloadVendor);
-  // }, [payloadVendor]);
+  useEffect(() => {
+    onPayloadVendorChange(payloadVendor);
+  }, [payloadVendor]);
 
   return (
     <div className="mt-4">
@@ -272,9 +256,9 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
           placeholder="Pilih Vendor"
           value={selectedInput.map((id) => ({
             value: id,
-            label: dataVendor?.find((v) => v.id === id)?.name,
+            label: filteredVendor?.find((v) => v.id === id)?.name,
           }))}
-          options={dataVendor?.map((vendor) => ({
+          options={filteredVendor?.map((vendor) => ({
             value: vendor.id,
             label: vendor.name,
           }))}
@@ -282,7 +266,7 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
         />
       </div>
       <div>
-        <CustomTable data={selectedDataVendor} columns={columns} />
+        <CustomTable data={selectedPoVendors} columns={columns} />
       </div>
       <div className="block py-6">
         <h2 className="text-lg font-medium text-gray-800 mb-4">
