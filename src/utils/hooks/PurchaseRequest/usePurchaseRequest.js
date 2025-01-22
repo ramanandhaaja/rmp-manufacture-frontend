@@ -20,18 +20,51 @@ function usePurchaseReq() {
   const { dataPurchase, dataDetailPurchase, dataPurchaseHistory } = useSelector(
     (state) => state.purchase
   );
-  const getPurchaseReqList = async (queryParams) => {
+  const getPurchaseReqList = async (requestType) => {
     try {
-      const resp = await getPurchaseReqApi(queryParams);
-      if (resp.data) {
-        dispatch(setData(resp.data?.data));
-        return {
-          status: "success",
-          message: "",
-          data: resp?.data,
-        };
-      }
+      // First, make a request to get total number of items
+      const initialResponse = await getPurchaseReqApi({
+        page: 1,
+        request_type: requestType,
+      });
+      const totalPages = initialResponse.data.last_page;
+
+      // Fetch all pages
+      const promises = Array.from({ length: totalPages }, (_, i) =>
+        getPurchaseReqApi({
+          page: i + 1,
+          request_type: requestType,
+        })
+      );
+      const responses = await Promise.all(promises);
+
+      // Combine all data
+      const allData = responses.reduce((acc, response) => {
+        return [...acc, ...response.data.data];
+      }, []);
+
+      // Sort by creation date (assuming there's a created_at field)
+      const sortedData = allData.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
+      // Handle pagination on the client side
+      const totalItems = sortedData.length;
+      const perPage = initialResponse.data.per_page;
+
+      dispatch(setData(sortedData));
+
+      return {
+        status: "success",
+        message: "",
+        data: {
+          data: sortedData,
+          total: totalItems,
+          per_page: perPage,
+        },
+      };
     } catch (errors) {
+      console.log(errors);
       return {
         status: "failed",
         message: errors?.response?.data?.message || errors.toString(),

@@ -39,7 +39,6 @@ const PurchaseRequestList = () => {
   const ppicColumn = columnsPpic();
   const factoryManagerColumn = columnsFactoryManager();
   const { goodsType } = useSelector((state) => state.goodsType);
-  const [purchaseReqList, setPurchaseReqList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -50,11 +49,8 @@ const PurchaseRequestList = () => {
       try {
         const requestType =
           goodsType === "material" ? "material" : "non-material";
-        const response = await getPurchaseReqList({
-          request_type: requestType,
-        });
+        const response = await getPurchaseReqList(requestType);
 
-        setPurchaseReqList(response.data);
         setTotal(response.data?.total);
         setPageSize(response.data?.per_page);
       } catch (error) {
@@ -67,7 +63,7 @@ const PurchaseRequestList = () => {
     if (goodsType) {
       fetchPurchaseRequests();
     }
-  }, [goodsType, currentPage]);
+  }, []);
 
   const handleColumn = () => {
     if (userRole.includes("department")) {
@@ -80,6 +76,12 @@ const PurchaseRequestList = () => {
       return factoryManagerColumn;
     }
     return departemenColumn;
+  };
+
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return dataPurchase.slice(startIndex, endIndex);
   };
 
   const handlePageChange = (page) => {
@@ -156,7 +158,7 @@ const PurchaseRequestList = () => {
             : true
         }
       />
-      <CustomTable data={dataPurchase} columns={handleColumn()} />
+      <CustomTable data={getCurrentPageData()} columns={handleColumn()} />
       <div className="flex justify-end mt-2">
         <Pagination
           className="pagination-bar"

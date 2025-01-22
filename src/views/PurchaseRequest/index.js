@@ -19,7 +19,7 @@ const Page = () => {
   }, []);
 
   return (
-    <div className="px-2 py-2 ">
+    <div className="p-6 bg-white rounded-lg">
       <Tabs value={activeTab} onChange={handleTabChange} variant="underline">
         <div className="border-b border-gray-500 mb-4">
           <h1 className="text-2xl font-semibold text-indigo-900 mb-4">

@@ -204,6 +204,7 @@ const ItemQueuesList = ({ type }) => {
     );
   }, [dataPurchaseQueue, activeCategory]);
 
+  console.log("dataPurchaseQueue", filteredData);
   return (
     <div className="px-2 py-6">
       <div className="flex justify-center pb-3">

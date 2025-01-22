@@ -10,8 +10,12 @@ import useVendor from "utils/hooks/vendorManagement/useVendor";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import { useParams } from "react-router-dom";
 import { toast, Notification } from "components/ui";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearVendorSelections,
+  updateVendorSubmitStatus,
+} from "store/PurchaseOrder/purchaseOrderSlice";
 
 const validationSchema = Yup.object().shape({
   items: Yup.array().of(
@@ -55,6 +59,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const FormVendorOffer = () => {
+  const dispatch = useDispatch();
   const [documents, setDocuments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUangMukaChecked, setIsUangMukaChecked] = useState(false);
@@ -63,7 +68,7 @@ const FormVendorOffer = () => {
   const { dataDetailPurchaseOrder, submitVendorOffer } = usePurchaseOrder();
   const navigate = useNavigate();
   const [isLoadingItems, setIsLoadingItems] = useState(false);
-  const itemsTableData = dataDetailPurchaseOrder?.items?.map((item, index) => ({
+  const itemsTableData = dataDetailPurchaseOrder?.items.map((item, index) => ({
     ...item,
     index,
   }));
@@ -110,6 +115,8 @@ const FormVendorOffer = () => {
             placement: "top-center",
           }
         );
+        dispatch(updateVendorSubmitStatus(vendorId));
+
         setTimeout(() => {
           navigate("/purchase/pengadaan/proses-po/" + idPo);
         }, 2000);
@@ -173,7 +180,6 @@ const FormVendorOffer = () => {
       };
 
       console.log("FormData to be submitted:", payload); // Debugging log
-
       await submitOffer(payload);
     } catch (error) {
       console.error("Form submission error:", error);
@@ -306,12 +312,15 @@ const FormVendorOffer = () => {
                   {isUangMukaChecked && (
                     <FormItem
                       className="flex-1"
-                      invalid={errors.uang_muka && touched.uang_muka}
-                      errorMessage={errors.uang_muka}
+                      invalid={
+                        errors.payment?.down_payment_amount &&
+                        touched.payment?.down_payment_amount
+                      }
+                      errorMessage={errors.payment?.down_payment_amount}
                     >
                       <Field
                         type="number"
-                        name="uang_muka"
+                        name="payment.down_payment_amount"
                         placeholder="Nilai"
                         component={Input}
                         className="w-full"

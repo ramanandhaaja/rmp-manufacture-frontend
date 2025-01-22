@@ -85,7 +85,7 @@ const FormMasterGoodsCategory = forwardRef(
               <FormItem
                 label={
                   <span>
-                    Nama Barang <span>*</span>
+                    Nama Kategori Barang <span>*</span>
                   </span>
                 }
                 invalid={errors.name && touched.name}
@@ -94,7 +94,7 @@ const FormMasterGoodsCategory = forwardRef(
                 <Field
                   type="text"
                   name="name"
-                  placeholder="Masukan nama vendor"
+                  placeholder="Masukan nama kategori barang"
                   component={Input}
                   uppercase={false}
                 />

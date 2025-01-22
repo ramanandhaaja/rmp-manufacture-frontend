@@ -4,7 +4,10 @@ export async function getPurchaseReqApi(params) {
   return ApiService.fetchData({
     url: `purchase-requests`,
     method: "get",
-    params,
+    params: {
+      page: params.page,
+      request_type: params.request_type,
+    },
   });
 }
 

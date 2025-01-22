@@ -39,8 +39,12 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
         Header: "Status",
         accessor: "status",
         Cell: ({ row }) => (
-          <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-            {row.original.status}
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+              row.original.status
+            )}`}
+          >
+            {capitalize(row.original.status)}
           </span>
         ),
       },
@@ -68,6 +72,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
                 },
               },
             ]}
+            placement="center-end"
           />
         ),
       },
@@ -160,7 +165,12 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
             }
           };
 
-          return <TableListDropdown dropdownItemList={renderDropdown()} />;
+          return (
+            <TableListDropdown
+              dropdownItemList={renderDropdown()}
+              placement="center-end"
+            />
+          );
         },
       },
     ],
@@ -231,6 +241,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
                       navigate(`/purchase/request/detail/${row.original.id}`),
                   },
                 ]}
+                placement="center-end"
               />
             );
           }
@@ -250,6 +261,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
                     navigate(`/purchase/request/detail/${row.original.id}`),
                 },
               ]}
+              placement="center-end"
             />
           );
         },
@@ -300,6 +312,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
                 },
               },
             ]}
+            placement="center-end"
           />
         ),
       },

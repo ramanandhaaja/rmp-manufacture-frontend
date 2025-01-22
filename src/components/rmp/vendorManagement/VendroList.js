@@ -113,10 +113,17 @@ const VendorList = () => {
               },
             },
           ]}
+          placement="center-end"
         />
       ),
     },
   ];
+
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return dataVendor.slice(startIndex, endIndex);
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -163,7 +170,7 @@ const VendorList = () => {
         onClickAdd={() => navigate("/vendor-management/tambah-vendor")}
         addBtnTitle={"Tambah Vendor"}
       />
-      <CustomTable data={dataVendor?.data} columns={columns} />
+      <CustomTable data={getCurrentPageData()} columns={columns} />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}

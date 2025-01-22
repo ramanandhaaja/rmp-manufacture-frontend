@@ -53,7 +53,7 @@ const ApprovalCard = ({
   };
 
   return (
-    <div className="max-w-sm p-4 rounded-lg border border-gray-200 shadow-sm">
+    <div className="max-w-sm p-3 rounded-lg border border-gray-200 shadow-sm bg-white">
       <div className="flex items-center gap-2 text-gray-600 mb-3">
         <FiCalendar size={16} />
         <span className="text-sm">Pembaruan Terakhir : </span>
@@ -65,21 +65,24 @@ const ApprovalCard = ({
       </div>
 
       <Button
+        size="sm"
         onClick={() => handleButtonClick(buttonConfig.revision)}
         className={buttonConfig.revision.className}
       >
-        <FiRefreshCcw size={16} />
+        <FiRefreshCcw size={10} />
         <span>Ajukan Revisi</span>
       </Button>
 
-      <div className="flex gap-3">
+      <div className="flex gap-1">
         <Button
+          size="xs"
           onClick={() => handleButtonClick(buttonConfig.reject)}
           className={buttonConfig.reject.className}
         >
           {buttonConfig.reject.label}
         </Button>
         <Button
+          size="xs"
           variant="solid"
           onClick={() => handleButtonClick(buttonConfig.approve)}
           className={buttonConfig.approve.className}

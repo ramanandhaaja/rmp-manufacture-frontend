@@ -114,10 +114,10 @@ export const ROUTE_LIST = [
     authority: [],
   },
   {
-    key: "purchase.procurement.detail",
+    key: "purchase.procurement.process",
     path: "/purchase/pengadaan/proses-po/:id",
     component: React.lazy(() =>
-      import("views/PurchaseProcurement/DetailPurchaseProcurement")
+      import("views/PurchaseProcurement/ProcessPurchaseOrder")
     ),
     authority: [],
   },
@@ -126,6 +126,14 @@ export const ROUTE_LIST = [
     path: "/purchase/pengadaan/penawaran-vendor/:id",
     component: React.lazy(() =>
       import("views/PurchaseProcurement/VendorOffer")
+    ),
+    authority: [],
+  },
+  {
+    key: "purchase.procurement.detail",
+    path: "/purchase/pengadaan/detail-po/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseProcurement/DetailPurchaseOrder")
     ),
     authority: [],
   },

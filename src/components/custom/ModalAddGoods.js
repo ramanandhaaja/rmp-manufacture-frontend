@@ -12,6 +12,7 @@ const ModalAddGoods = ({ ...props }) => {
     column,
     category,
     type,
+    setShowNotification,
     showNotification,
     dataItemAdded,
   } = props;
@@ -37,8 +38,8 @@ const ModalAddGoods = ({ ...props }) => {
         <div className="flex justify-center pb-3">
           {showNotification && (
             <Notification
-              duration={5000}
-              //   onClose={showNotification}
+              duration={2000}
+              onClose={() => setShowNotification(false)}
               type="info"
               closable={true}
               width={780}

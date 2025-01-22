@@ -228,8 +228,21 @@ const DetailPurchaseReq = () => {
     );
   };
 
+  const Approval = () => {
+    return (
+      <div className="px-2 py-4">
+        <ApprovalCard
+          handleStatusUpdate={handleStatusUpdate}
+          isLoading={isLoading}
+          onOpenConfirmModal={handleOpenConfirmModal}
+          onOpenNoteModal={handleOpenNoteModal}
+        />
+      </div>
+    );
+  };
+
   return (
-    <LayoutRightSpace>
+    <LayoutRightSpace content={isApprovalShown && <Approval />}>
       <div className="flex justify-between">
         <div className="flex gap-2  ">
           <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
@@ -327,16 +340,6 @@ const DetailPurchaseReq = () => {
             </div>
           </div>
         </div>
-        {isApprovalShown && (
-          <div className="py-4">
-            <ApprovalCard
-              handleStatusUpdate={handleStatusUpdate}
-              isLoading={isLoading}
-              onOpenConfirmModal={handleOpenConfirmModal}
-              onOpenNoteModal={handleOpenNoteModal}
-            />
-          </div>
-        )}
       </div>
       <div>
         {isFollowUp && <FormBuyer />}
