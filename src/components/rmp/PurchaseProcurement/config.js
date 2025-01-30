@@ -172,7 +172,7 @@ export const PageConfigOrderList = {
       type: "date",
     },
     {
-      key: "status",
+      key: "po_status",
       label: "Status",
       sortable: false,
       width: "120px",

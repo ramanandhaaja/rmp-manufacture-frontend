@@ -7,6 +7,7 @@ import TableListDropdown from "components/template/TableListDropdown";
 import { Pagination, Alert } from "components/ui";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import TableHeader from "../TableHeader";
+import { Notification, toast } from "components/ui";
 
 const PurchaseGoodsList = () => {
   const navigate = useNavigate();
@@ -32,21 +33,21 @@ const PurchaseGoodsList = () => {
       Header: "Kategori Barang",
       accessor: "category.name",
       Cell: ({ row }) => {
-        return row.original.category.name;
+        return row.original.category.name || "-";
       },
     },
     {
       Header: "Measurement",
       accessor: "measurement",
       Cell: ({ row }) => {
-        return row.original.measurement;
+        return row.original.measurement || "-";
       },
     },
     {
       Header: "Deskripsi",
       accessor: "description",
       Cell: ({ row }) => {
-        return row.original.description;
+        return row.original.description || "-";
       },
     },
     {
@@ -112,16 +113,25 @@ const PurchaseGoodsList = () => {
       setTotal(data?.total);
       setPageSize(data?.per_page);
       if (response.status === "success") {
-        console.log("success");
-        navigate("/master-data/barang-purchase");
+        toast.push(
+          <Notification type="success" title={"Barang berhasil dihapus "} />,
+          {
+            placement: "top-center",
+          }
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        <Alert
-          message="Failed to delete goods"
-          type="danger"
-          showIcon
-          className="mb-4"
-        />;
-        console.log(response.status);
+        toast.push(
+          <Notification type="danger" title={"Barang berhasil dihapus "} />,
+          {
+            placement: "top-center",
+          }
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       console.log(err);

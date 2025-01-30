@@ -3,11 +3,13 @@ import {
   getPurchaseOrderItemQueuesApi,
   getListPurchaseOrderNumberApi,
   getPurchaseOrderDetailsApi,
+  getPoVendorOfferDetailsApi,
   postPurchaseOrderApi,
   postAddItemToPoApi,
   postPoVendorApi,
   postVendorOfferApi,
   patchItemToAnotherPoApi,
+  putVendorOfferApi,
 } from "services/ProcurementService";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,6 +18,7 @@ import {
   setDataPurchaseQueue,
   setDataListPoNumber,
   setDataDetailPurchaseOrder,
+  setDataOfferPoVendors,
 } from "../../../store/PurchaseOrder/purchaseOrderSlice";
 
 function usePurchaseOrder() {
@@ -25,6 +28,7 @@ function usePurchaseOrder() {
     dataPurchaseQueue,
     dataListPoNumber,
     dataDetailPurchaseOrder,
+    dataOfferPoVendors,
   } = useSelector((state) => state.purchaseOrder);
 
   const getPoList = async (queryParams) => {
@@ -130,6 +134,28 @@ function usePurchaseOrder() {
       };
     }
   };
+  const getDetailVendorOffer = async (id) => {
+    try {
+      const response = await getPoVendorOfferDetailsApi(id);
+      if (response.data) {
+        dispatch(setDataOfferPoVendors(response.data.offer_details));
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.offer_details,
+        };
+      } else {
+        console.log(response);
+        return { status: "failed", message: "" };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
 
   const createPurchaseOrder = async (purchaseData) => {
     try {
@@ -218,6 +244,28 @@ function usePurchaseOrder() {
     }
   };
 
+  const editVendorOffer = async (id, data) => {
+    try {
+      const response = await putVendorOfferApi(id, data);
+      console.log(response);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   const movePurchaseOrder = async (data) => {
     try {
       const response = await patchItemToAnotherPoApi(data);
@@ -240,6 +288,7 @@ function usePurchaseOrder() {
     getPoQueueList,
     getListExistingPo,
     getPoDetail,
+    getDetailVendorOffer,
     createPurchaseOrder,
     confirmPoVendors,
     addToExistingPo,
@@ -249,6 +298,8 @@ function usePurchaseOrder() {
     dataPurchaseOrder,
     dataListPoNumber,
     dataDetailPurchaseOrder,
+    dataOfferPoVendors,
+    editVendorOffer,
   };
 }
 

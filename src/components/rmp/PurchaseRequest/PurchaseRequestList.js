@@ -33,7 +33,6 @@ const PurchaseRequestList = () => {
     null,
     setId
   );
-
   const { user, userRole } = useUser();
   const departemenColumn = columnsDepartment();
   const ppicColumn = columnsPpic();

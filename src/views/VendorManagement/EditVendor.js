@@ -80,7 +80,7 @@ const EditVendor = () => {
   };
 
   return (
-    <div>
+    <div className="p-6 bg-white rounded-lg">
       <div className="flex justify-between p-2">
         <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
           Edit Vendor

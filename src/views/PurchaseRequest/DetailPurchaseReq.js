@@ -64,7 +64,7 @@ const DetailPurchaseReq = () => {
   const columns = [
     {
       Header: "Kode",
-      accessor: "id",
+      accessor: "goods_id",
     },
     {
       Header: "Barang",
@@ -119,21 +119,47 @@ const DetailPurchaseReq = () => {
       const response = await updatePurchaseReqStatus(id, payload);
 
       if (response.status === "failed") {
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="danger"
+            title={"Maaf terjadi kesalahan, Status gagal diubah"}
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
         throw new Error("Failed to update status");
       }
 
       console.log(`Status updated successfully to: ${status}`);
-      toast.push(<Notification type="success" title={response.message} />, {
-        placement: "top-center",
-      });
-
+      toast.push(
+        <Notification
+          type="success"
+          title={"Status berhasil diubah"}
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+      setTimeout(() => {
+        navigate("/purchase/request");
+      }, 1000);
       setConfirmModalProps((prev) => ({ ...prev, isOpen: false }));
       setNoteModalProps((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
       console.error("Error updating status:", error);
+      toast.push(
+        <Notification
+          type="danger"
+          title={"Maaf terjadi kesalahan, Status gagal diubah"}
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -171,13 +197,16 @@ const DetailPurchaseReq = () => {
           toast.push(
             <Notification
               type="success"
-              title={response.message}
+              title="Follow Up berhasil diinputkan"
               width={400}
             />,
             {
               placement: "top-center",
             }
           );
+          setTimeout(() => {
+            navigate("/purchase/request");
+          }, 1000);
         } else {
           toast.push(<Notification type="danger" title={response.message} />, {
             placement: "top-center",

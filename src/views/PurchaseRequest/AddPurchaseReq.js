@@ -23,16 +23,29 @@ const AddPurchaseReq = () => {
       setIsLoading(true);
       const response = await createPurchaseReq(form);
       if (response.status === "success") {
-        console.log("success");
-        navigate("/purchase/request");
-        toast.push(<Notification type="success" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="success"
+            title="Permintaan pembelian berhasil dibuat"
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        setTimeout(() => {
+          navigate("/purchase/request");
+        }, 1000);
       } else {
         console.log(response.status);
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, Permintaan pembelian gagal dibuat"
+          />,
+          {
+            placement: "top-center",
+          }
+        );
       }
     } catch (err) {
       console.log(err);

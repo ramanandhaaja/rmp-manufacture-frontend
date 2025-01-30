@@ -2,6 +2,7 @@ import React, {
   useState,
   useEffect,
   forwardRef,
+  useRef,
   useImperativeHandle,
 } from "react";
 import { Formik, Form, Field } from "formik";
@@ -24,11 +25,12 @@ const InputModal = forwardRef(
       dataMasterGoods,
       measurementUnits,
       onSave,
+      isEdit,
     },
     ref
   ) => {
     const [filteredGoods, setFilteredGoods] = useState([]);
-
+    const formikRef = useRef(null);
     useEffect(() => {
       // Set initial filtered goods to all goods
       setFilteredGoods(dataMasterGoods);
@@ -37,6 +39,13 @@ const InputModal = forwardRef(
     const handleSubmit = (values, { resetForm }) => {
       onSave(values);
       resetForm();
+    };
+
+    const handleClose = () => {
+      if (formikRef.current) {
+        formikRef.current.resetForm();
+      }
+      onClose();
     };
 
     // Dynamically generate validation schema based on inputFields
@@ -73,17 +82,105 @@ const InputModal = forwardRef(
     // Generate initial values from inputFields and defaultValues
     const generateInitialValues = () => {
       const initialValues = {};
+
+      // Early return with empty values if defaultValues is null
+      if (!defaultValues) {
+        inputFields.forEach((field) => {
+          initialValues[field.name] = field.type === "select" ? null : "";
+        });
+        return initialValues;
+      }
+
       inputFields.forEach((field) => {
         if (field.type === "text") {
-          // Initialize text fields with empty string instead of null
-          initialValues[field.name] = defaultValues[field.name] || "";
+          // Handle quantity field with null check
+          if (field.name === "quantity") {
+            initialValues[field.name] =
+              defaultValues?.quantity?.toString() || "";
+          } else {
+            initialValues[field.name] = defaultValues[field.name] || "";
+          }
         } else if (field.type === "select") {
-          // Keep select fields as null initially
-          initialValues[field.name] = defaultValues[field.name] || null;
+          try {
+            if (field.name === "goods_category") {
+              // Set goods_category from goods_category_name with null check
+              if (defaultValues?.goods_category_name) {
+                const category = dataGoodsCategory?.find(
+                  (cat) => cat.name === defaultValues.goods_category_name
+                );
+                initialValues[field.name] = category
+                  ? {
+                      value: category.id,
+                      label: defaultValues.goods_category_name,
+                    }
+                  : null;
+              } else {
+                initialValues[field.name] = null;
+              }
+            } else if (field.name === "goods") {
+              // Set goods from goods_name with null check
+              if (defaultValues?.goods_name && defaultValues?.id) {
+                initialValues[field.name] = {
+                  value: defaultValues.id,
+                  label: defaultValues.goods_name,
+                };
+              } else {
+                initialValues[field.name] = null;
+              }
+            } else if (field.name === "measurement") {
+              // Set measurement from measurement data with null check
+              if (defaultValues?.measurement && defaultValues?.measurement_id) {
+                initialValues[field.name] = {
+                  value: defaultValues.measurement_id,
+                  label: defaultValues.measurement,
+                };
+              } else {
+                initialValues[field.name] = null;
+              }
+            } else {
+              initialValues[field.name] = null;
+            }
+          } catch (error) {
+            console.error(
+              `Error setting initial value for ${field.name}:`,
+              error
+            );
+            initialValues[field.name] = null;
+          }
         }
       });
+
       return initialValues;
     };
+
+    useEffect(() => {
+      try {
+        if (
+          defaultValues?.goods_category_name &&
+          dataGoodsCategory?.length > 0
+        ) {
+          const category = dataGoodsCategory.find(
+            (cat) => cat.name === defaultValues.goods_category_name
+          );
+          if (category && dataMasterGoods) {
+            const filtered = dataMasterGoods.filter(
+              (goods) => goods.goods_category_id === category.id
+            );
+            setFilteredGoods(filtered);
+          }
+        } else {
+          // If no category is selected, show all goods or empty array
+          setFilteredGoods(dataMasterGoods || []);
+        }
+      } catch (error) {
+        console.error("Error in filtering goods:", error);
+        setFilteredGoods([]);
+      }
+    }, [
+      defaultValues?.goods_category_name,
+      dataGoodsCategory,
+      dataMasterGoods,
+    ]);
 
     useImperativeHandle(ref, () => ({
       submit: (formikProps) => {
@@ -114,6 +211,7 @@ const InputModal = forwardRef(
             initialValues={generateInitialValues()}
             validationSchema={generateValidationSchema()}
             onSubmit={handleSubmit || onConfirm}
+            enableReinitialize={true}
           >
             {(formikProps) => (
               <Form className="w-full">
@@ -150,12 +248,12 @@ const InputModal = forwardRef(
                           formikProps.setFieldValue(field.name, option);
                           if (field.name === "goods_category") {
                             // Filter barang options based on selected goods_category_id
-                            const filtered = dataMasterGoods.filter(
+                            const filtered = dataMasterGoods?.filter(
                               (goods) =>
                                 goods.goods_category_id === option.value
                             );
                             setFilteredGoods(filtered);
-                            formikProps.setFieldValue("barang", null); // Reset barang field
+                            formikProps.setFieldValue("goods", null);
                           }
                         }}
                         onBlur={() =>
@@ -192,7 +290,7 @@ const InputModal = forwardRef(
                 <div className="flex gap-4">
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="w-[186px] py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                   >
                     Batal

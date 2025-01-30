@@ -14,7 +14,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import useMasterGoods from "utils/hooks/useMasterGoods";
+import useMeasurement from "utils/hooks/useMeasurement";
 
 const FormMasterGoods = forwardRef(
   ({ setFormData, initialData, isEdit }, ref) => {
@@ -22,6 +22,7 @@ const FormMasterGoods = forwardRef(
     const navigate = useNavigate();
     const formikRef = useRef(null);
     const { getGoodsCategory, dataGoodsCategory } = useGoodsCategory();
+    const { measurementUnits, getMeasurementUnits } = useMeasurement();
 
     const validationSchema = Yup.object().shape({
       name: Yup.string().required("Please enter the goods name"),
@@ -64,10 +65,14 @@ const FormMasterGoods = forwardRef(
     useEffect(() => {
       getGoodsCategory({ all: true });
     }, []);
+    useEffect(() => {
+      getMeasurementUnits();
+    }, []);
 
     const safeDataGoodsCategory = Array.isArray(dataGoodsCategory)
       ? dataGoodsCategory
       : [];
+
     return (
       <Formik
         innerRef={formikRef}
@@ -132,18 +137,30 @@ const FormMasterGoods = forwardRef(
               <FormItem
                 label={
                   <span>
-                    Measurement<span>*</span>
+                    Measurement <span>*</span>
                   </span>
                 }
                 invalid={errors.measurement && touched.measurement}
                 errorMessage={errors.measurement}
               >
-                <Field
-                  type="text"
+                <Select
                   name="measurement"
-                  placeholder="Masukan measurement barang"
-                  component={Input}
-                  uppercase={false}
+                  options={measurementUnits?.map((unit) => ({
+                    value: unit.name,
+                    label: unit.name,
+                  }))}
+                  // value={values.measurement?.map((measurement) => ({
+                  //   value: measurement.id,
+                  //   label: measurement.abbreviation,
+                  // }))}
+                  placeholder="Pilih measurement barang"
+                  onChange={(option) => {
+                    if (option) {
+                      setFieldValue("measurement", option.value);
+                    } else {
+                      setFieldValue("measurement", null);
+                    }
+                  }}
                 />
               </FormItem>
 

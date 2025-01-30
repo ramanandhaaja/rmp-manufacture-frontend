@@ -5,7 +5,7 @@ import { IoMdClose } from "react-icons/io";
 import dayjs from "dayjs";
 import FileSvg from "assets/svg/FileSvg";
 import { TrashIcon } from "@radix-ui/react-icons";
-import { RMPSTATUSCOLOR } from "constants/status.constant";
+import { RMPSTATUSCOLOR, PO_STATUS_STYLES } from "constants/status.constant";
 // export const resizeFile = (file) =>
 //   new Promise((resolve) => {
 //     Resizer.imageFileResizer(
@@ -413,6 +413,10 @@ export function getStatusClassName(status) {
   return RMPSTATUSCOLOR[status] || "bg-gray-500 text-white";
 }
 
+export function getPoStatusClassName(status) {
+  return PO_STATUS_STYLES[status] || "bg-gray-500 text-white";
+}
+
 export function getCapitalizeType(type) {
   if (type === "material") {
     return "Material";
@@ -420,5 +424,25 @@ export function getCapitalizeType(type) {
     return "Non Material";
   } else {
     return "-";
+  }
+}
+export function formatNumber(num) {
+  // Handle null or undefined
+  if (num == null) return "-";
+
+  // Convert to number if it's a string
+  const numValue = typeof num === "string" ? Number(num) : num;
+
+  // Check if it's a valid number
+  if (isNaN(numValue)) {
+    console.error("Invalid number:", num);
+    return "-";
+  }
+
+  try {
+    return new Intl.NumberFormat("id-ID").format(numValue);
+  } catch (error) {
+    console.error("Error formatting number:", error);
+    return numValue.toString();
   }
 }

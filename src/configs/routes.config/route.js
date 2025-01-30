@@ -122,10 +122,18 @@ export const ROUTE_LIST = [
     authority: [],
   },
   {
-    key: "purchase.procurement.detail.vendorOffer",
-    path: "/purchase/pengadaan/penawaran-vendor/:id",
+    key: "purchase.procurement.detail.vendorOffer.add",
+    path: "/purchase/pengadaan/tambah-penawaran-vendor/:id",
     component: React.lazy(() =>
       import("views/PurchaseProcurement/VendorOffer")
+    ),
+    authority: [],
+  },
+  {
+    key: "purchase.procurement.detail.vendorOffer.edit",
+    path: "/purchase/pengadaan/edit-penawaran-vendor/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseProcurement/EditVendorOffer")
     ),
     authority: [],
   },
@@ -134,6 +142,14 @@ export const ROUTE_LIST = [
     path: "/purchase/pengadaan/detail-po/:id",
     component: React.lazy(() =>
       import("views/PurchaseProcurement/DetailPurchaseOrder")
+    ),
+    authority: [],
+  },
+  {
+    key: "purchase.procurement.detailPenawaran",
+    path: "/purchase/pengadaan/detail-penawaran-vendor/:id",
+    component: React.lazy(() =>
+      import("views/PurchaseProcurement/DetailVendorOffer")
     ),
     authority: [],
   },

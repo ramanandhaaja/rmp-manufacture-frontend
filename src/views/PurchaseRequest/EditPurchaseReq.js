@@ -28,16 +28,28 @@ const EditPurchaseReq = () => {
       const response = await updatePurchaseReq(id, form);
       if (response.status === "success") {
         console.log("success");
-        toast.push(<Notification type="success" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="success"
+            title="Permintaan pembelian berhasil diubah"
+          />,
+          {
+            placement: "top-center",
+          }
+        );
         setTimeout(() => {
           window.history.back();
         }, 1000);
       } else {
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, Permintaan pembelian gagal diubah"
+          />,
+          {
+            placement: "top-center",
+          }
+        );
         console.log(response.status);
       }
     } catch (err) {
@@ -57,7 +69,7 @@ const EditPurchaseReq = () => {
   };
 
   return (
-    <div>
+    <div className="p-6 bg-white rounded-lg">
       <div className="flex justify-between p-2">
         <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
           Edit Permintaan Pembelian

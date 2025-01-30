@@ -1,11 +1,15 @@
 import CustomTable from "components/custom/CustomTable";
 import { useEffect, useState } from "react";
-import { formatDate, getCapitalizeType } from "utils/helpers";
+import {
+  formatDate,
+  getCapitalizeType,
+  findDepartement,
+  getPoStatusClassName,
+} from "utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Pagination, Notification, toast } from "components/ui";
 import CreatePOModal from "components/custom/ModalCreatePo";
 import TableHeader from "../TableHeader";
-import { findDepartement } from "utils/helpers";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import capitalize from "components/ui/utils/capitalize";
 import TableListDropdown from "components/template/TableListDropdown";
@@ -48,10 +52,14 @@ const ProcurementOrderList = () => {
             return getCapitalizeType(value);
           case "po_date":
             return formatDate(value);
-          case "status":
+          case "po_status":
             return (
-              <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                Belum Diproses
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${getPoStatusClassName(
+                  value
+                )}`}
+              >
+                {value}
               </span>
             );
           default:
@@ -169,8 +177,6 @@ const ProcurementOrderList = () => {
       page: 1,
     });
   };
-
-  console.log(dataPurchaseOrder);
 
   return (
     <div className="space-y-4">
