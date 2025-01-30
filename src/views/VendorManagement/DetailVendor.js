@@ -169,6 +169,11 @@ const DetailVendor = () => {
                   <h2 className="text-lg font-medium mb-4">
                     Dokumen Pendukung
                   </h2>
+                  {dataDetailVendor.documents?.length === 0 && (
+                    <p className="text-sm text-gray-700">
+                      Belum ada dokumen pendukung
+                    </p>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {dataDetailVendor.documents?.map((doc, index) => (
                       <div

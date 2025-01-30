@@ -21,23 +21,23 @@ const AddGoodsCategory = () => {
       console.log(response);
       if (response.status === "success") {
         console.log("success");
+        toast.push(
+          <Notification
+            type="success"
+            title={"Kategori barang berhasil ditambahkan"}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
         setTimeout(() => {
-          toast.push(
-            <Notification
-              type="success"
-              title={"Barang berhasil ditambahkan"}
-            />,
-            {
-              placement: "top-center",
-            }
-          );
+          navigate("/master-data/kategori-barang");
         }, 1000);
-        navigate("/master-data/kategori-barang");
       } else {
         toast.push(
           <Notification
             type="danger"
-            title={"Terjadi kesalahan. Barang gagal ditambahkan"}
+            title={"Terjadi kesalahan. Kategori Barang gagal ditambahkan"}
           />,
           {
             placement: "top-center",
@@ -62,7 +62,7 @@ const AddGoodsCategory = () => {
   };
   return (
     <>
-      <div>
+      <div className="p-6 bg-white rounded-lg">
         <div className="flex justify-between p-2">
           <div>
             <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
@@ -82,7 +82,6 @@ const AddGoodsCategory = () => {
           <FormGoodsCategory ref={formRef} setFormData={handleFormData} />
         </div>
         <ConfirmationCustom
-          icon
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           showCancelBtn

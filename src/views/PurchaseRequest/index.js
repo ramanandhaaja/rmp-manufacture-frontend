@@ -14,9 +14,7 @@ const Page = () => {
     setActiveTab(value);
   };
 
-  useEffect(() => {
-    dispatch(setGoodsType("material"));
-  }, []);
+  console.log(goodsType);
 
   return (
     <div className="p-6 bg-white rounded-lg">

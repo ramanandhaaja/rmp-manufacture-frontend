@@ -24,7 +24,6 @@ import ConfirmationCustom from "components/custom/ConfirmationCustom";
 
 const FormPurchaseReq = forwardRef(
   ({ setFormData, initialData, isEdit }, ref) => {
-    const navigate = useNavigate();
     const formikRef = useRef(null);
     const { getGoodsCategory, dataGoodsCategory } = useGoodsCategory();
     const { getGoods, dataMasterGoods } = useMasterGoods();
@@ -34,11 +33,13 @@ const FormPurchaseReq = forwardRef(
     const [id, setId] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const { user, userRole } = useUser();
+    const [editingItem, setEditingItem] = useState(null);
     const { columnsItemPurchase } = useColumns(
-      null,
+      setIsOpen,
       null,
       setIsOpenDelete,
-      setId
+      setId,
+      setEditingItem
     );
     const userName = user.name;
     const { measurementUnits, getMeasurementUnits } = useMeasurement();
@@ -156,18 +157,50 @@ const FormPurchaseReq = forwardRef(
       }
     }, [initialData, isEdit]);
 
+    // Function for adding new item
     const handleAddItem = (item) => {
       const transformedItem = {
-        id: item.goods.value,
+        goods_id: item.goods.value,
         goods_name: item.goods.label,
         goods_category_name: item.goods_category.label,
         quantity: item.quantity,
-        measurement: item.measurement,
+        measurement: item.measurement.label,
         measurement_id: item.measurement.value,
       };
 
       setTableData([...tableData, transformedItem]);
       setIsOpen(false);
+    };
+
+    // Function for editing existing item
+    const handleEditItem = (item) => {
+      console.log(item);
+      const transformedItem = {
+        goods_id: item.goods.value,
+        goods_name: item.goods.label,
+        goods_category_name: item.goods_category.label,
+        quantity: item.quantity,
+        measurement: item.measurement.label,
+        measurement_id: item.measurement.value,
+      };
+
+      setTableData((prevData) =>
+        prevData.map((tableItem) =>
+          tableItem.goods_id === editingItem.goods_id
+            ? transformedItem
+            : tableItem
+        )
+      );
+      setEditingItem(null);
+      setIsOpen(false);
+    };
+
+    const handleSave = (item) => {
+      if (editingItem) {
+        handleEditItem(item);
+      } else {
+        handleAddItem(item);
+      }
     };
 
     const handleDeleteItem = (id) => {
@@ -176,10 +209,24 @@ const FormPurchaseReq = forwardRef(
       setIsLoading(false);
     };
 
+    const initialValuesItem = () => {
+      if (editingItem) {
+        return {
+          goods_category_name: editingItem.goods_category_name,
+          goods_name: editingItem.goods_name,
+          id: editingItem.goods_id,
+          measurement: editingItem.measurement,
+          measurement_id: editingItem.measurement_id,
+          quantity: editingItem.quantity,
+        };
+      }
+      return null;
+    };
+
     const handleSubmit = (values, { setSubmitting }) => {
       try {
         const mappedItems = tableData.map((item) => ({
-          goods_id: item.id,
+          goods_id: item.goods_id,
           quantity: Number(item.quantity),
           measurement_id: item.measurement_id,
         }));
@@ -241,7 +288,6 @@ const FormPurchaseReq = forwardRef(
           >
             {({ errors, touched, setFieldValue, isSubmitting, values }) => (
               <Form>
-                {/* One FormContainer for the top form items */}
                 <FormContainer>
                   {isPpic && (
                     <>
@@ -360,14 +406,19 @@ const FormPurchaseReq = forwardRef(
             )}
           </Formik>
           <InputModal
-            title={"Tambah Barang"}
+            title={editingItem ? "Edit Barang" : "Tambah Barang"}
             inputFields={inputFields}
             isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
+            onClose={() => {
+              setIsOpen(false);
+              setEditingItem(null);
+            }}
             dataGoodsCategory={dataGoodsCategory}
             dataMasterGoods={dataMasterGoods}
             measurementUnits={measurementUnits}
-            onSave={handleAddItem}
+            onSave={handleSave}
+            defaultValues={initialValuesItem()}
+            isEdit={isEdit}
           />
           <ConfirmationCustom
             isOpen={isOpenDelete}

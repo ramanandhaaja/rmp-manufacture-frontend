@@ -21,7 +21,6 @@ function useMasterGoods() {
     try {
       // First, make a request to get total number of items
       const initialResponse = await getGoodsListApi({ page: 1 });
-      console.log(initialResponse);
       const totalPages = initialResponse.data.data.last_page;
 
       // Fetch all pages

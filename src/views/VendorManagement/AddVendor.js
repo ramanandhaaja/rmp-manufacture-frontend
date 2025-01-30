@@ -101,10 +101,8 @@ const AddVendor = () => {
           titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
           text="Klik Konfirmasi untuk melanjutkan"
           textClass="text-slate-500 text-base"
-          icon={<></>}
           isLoading={isLoading}
           disableCancel={false}
-          buttonForm=""
           buttonType="button"
           width={500}
           contentClassName="p-5 rounded-2xl"

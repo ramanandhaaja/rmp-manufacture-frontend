@@ -18,6 +18,7 @@ const CreatePOModal = ({
   onClose,
   setSubmitted = () => {},
   setSubmittedData = () => {},
+  goodsCategory = "",
 }) => {
   const validationSchema = Yup.object().shape({
     po_name: Yup.string().required("Nama PO harus diisi"),
@@ -26,17 +27,22 @@ const CreatePOModal = ({
     note: Yup.string(),
   });
   const { getGoodsCategory, dataGoodsCategory } = useGoodsCategory();
-  const { createPurchaseOrder } = usePurchaseOrder();
+  const { createPurchaseOrder, getPoList } = usePurchaseOrder();
   const initialValues = {
     po_name: "",
-    goods_category_id: null,
-    po_type: "",
+    goods_category_id: goodsCategory.id ? goodsCategory.id : null,
+    po_type: goodsCategory?.po_type || "",
     note: "",
   };
 
   useEffect(() => {
     getGoodsCategory({ all: true });
   }, []);
+
+  const PO_TYPE_OPTIONS = [
+    { value: "material", label: "Material" },
+    { value: "non-material", label: "Non-Material" },
+  ];
 
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
@@ -47,6 +53,7 @@ const CreatePOModal = ({
         onClose();
         setSubmitted(true);
         setSubmittedData(resp.data);
+        await getPoList();
       } else {
         toast.push(
           <Notification
@@ -123,83 +130,108 @@ const CreatePOModal = ({
                     } rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500`}
                   />
                 </FormItem>
-
-                <FormItem
-                  label={
-                    <span>
-                      Kategori Barang <span>*</span>
-                    </span>
-                  }
-                  invalid={
-                    errors.goods_category_id && touched.goods_category_id
-                  }
-                  errorMessage={errors.goods_category_id}
-                >
-                  <Select
-                    name="goods_category"
-                    options={dataGoodsCategory.map((category) => ({
-                      value: category.id,
-                      label: category.name,
-                    }))}
-                    value={values.goods_category?.map((category) => ({
-                      value: category,
-                      label: category,
-                    }))}
-                    placeholder="Pilih kategori barang"
-                    onChange={(options) => {
-                      const selectedCategory = dataGoodsCategory.find(
-                        (category) => category.id === options?.value
-                      );
-                      setFieldValue("goods_category_id", options?.value);
-                      if (selectedCategory) {
-                        setFieldValue("po_type", selectedCategory.goods_type);
-                      } else {
-                        setFieldValue("po_type", "");
-                      }
-                    }}
-                  />
-                </FormItem>
-
-                <FormItem
-                  label={
-                    <span>
-                      Tipe <span>*</span>
-                    </span>
-                  }
-                >
-                  <Select
-                    isDisabled={true}
-                    name="tipe"
-                    options={[
-                      { value: "material", label: "Material" },
-                      { value: "non-material", label: "Non-Material" },
-                    ]}
-                    value={
-                      values.po_type
-                        ? {
-                            value: values.po_type,
-                            label:
-                              values.po_type === "material"
-                                ? "Material"
-                                : "Non-Material",
-                          }
-                        : null
+                {!goodsCategory && (
+                  <FormItem
+                    label={
+                      <span>
+                        Kategori Barang <span>*</span>
+                      </span>
                     }
-                    onChange={(options) => {
-                      if (options) {
-                        setFieldValue("po_type", options.value); // Set the selected value
-                      } else {
-                        setFieldValue("po_type", ""); // Reset if no option is selected
-                      }
-                    }}
-                    placeholder="Pilih kategori barang dahulu"
-                  />
-                  {errors.po_type && touched.po_type && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.po_type}
-                    </p>
-                  )}
-                </FormItem>
+                    invalid={
+                      errors.goods_category_id && touched.goods_category_id
+                    }
+                    errorMessage={errors.goods_category_id}
+                  >
+                    <Select
+                      name="goods_category"
+                      options={dataGoodsCategory.map((category) => ({
+                        value: category.id,
+                        label: category.name,
+                      }))}
+                      value={values.goods_category?.map((category) => ({
+                        value: category,
+                        label: category,
+                      }))}
+                      placeholder="Pilih kategori barang"
+                      onChange={(options) => {
+                        const selectedCategory = dataGoodsCategory.find(
+                          (category) => category.id === options?.value
+                        );
+                        setFieldValue("goods_category_id", options?.value);
+                        if (selectedCategory) {
+                          setFieldValue("po_type", selectedCategory.goods_type);
+                        } else {
+                          setFieldValue("po_type", "");
+                        }
+                      }}
+                    />
+                  </FormItem>
+                )}
+                {!goodsCategory ? (
+                  <FormItem
+                    label={
+                      <span>
+                        Tipe <span>*</span>
+                      </span>
+                    }
+                  >
+                    <Select
+                      isDisabled={true}
+                      name="po_type"
+                      options={[
+                        { value: "material", label: "Material" },
+                        { value: "non-material", label: "Non-Material" },
+                      ]}
+                      value={[
+                        { value: "material", label: "Material" },
+                        { value: "non-material", label: "Non-Material" },
+                      ].find((option) => option.value === values.po_type)}
+                      onChange={(option) => {
+                        if (option) {
+                          setFieldValue("po_type", option.value);
+                        } else {
+                          setFieldValue("po_type", "");
+                        }
+                      }}
+                      placeholder="Pilih kategori barang dahulu"
+                    />
+                    {errors.po_type && touched.po_type && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.po_type}
+                      </p>
+                    )}
+                  </FormItem>
+                ) : (
+                  <FormItem
+                    label={
+                      <span>
+                        Tipe <span>*</span>
+                      </span>
+                    }
+                  >
+                    <Select
+                      isDisabled={true}
+                      name="po_type"
+                      options={PO_TYPE_OPTIONS}
+                      value={PO_TYPE_OPTIONS.find(
+                        (option) => option.value === values.po_type
+                      )}
+                      onChange={(option) => {
+                        if (option) {
+                          setFieldValue("po_type", option.value);
+                        } else {
+                          setFieldValue("po_type", "");
+                        }
+                      }}
+                      placeholder="Pilih kategori barang dahulu"
+                    />
+                    {errors.po_type && touched.po_type && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.po_type}
+                      </p>
+                    )}
+                  </FormItem>
+                )}
 
                 <FormItem>
                   <label className="block text-sm font-medium text-gray-700 mb-1">

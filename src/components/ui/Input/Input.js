@@ -1,13 +1,34 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
-import classNames from "classnames"
-import PropTypes from "prop-types"
-import { useConfig } from "../ConfigProvider"
-import { useForm } from "../Form/context"
-import { useInputGroup } from "../InputGroup/context"
-import { CONTROL_SIZES, SIZES } from "../utils/constant"
-import isEmpty from "lodash/isEmpty"
-import isNil from "lodash/isNil"
-import get from "lodash/get"
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
+import classNames from "classnames";
+import PropTypes from "prop-types";
+import { useConfig } from "../ConfigProvider";
+import { useForm } from "../Form/context";
+import { useInputGroup } from "../InputGroup/context";
+import { CONTROL_SIZES, SIZES } from "../utils/constant";
+import isEmpty from "lodash/isEmpty";
+import isNil from "lodash/isNil";
+import get from "lodash/get";
+
+// Helper function to format number as price
+const formatPrice = (value) => {
+  if (!value) return "";
+  // Remove any non-digit characters
+  const numbers = value.toString().replace(/\D/g, "");
+  // Convert to number and format with thousands separator
+  return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+// Helper function to unformat price for actual value
+const unformatPrice = (value) => {
+  if (!value) return "";
+  return value.toString().replace(/\./g, "");
+};
 
 const Input = React.forwardRef((props, ref) => {
   const {
@@ -29,49 +50,78 @@ const Input = React.forwardRef((props, ref) => {
     formik = true,
     uppercase = true,
     ...rest
-  } = props
+  } = props;
 
-  const [prefixGutter, setPrefixGutter] = useState(0)
-  const [suffixGutter, setSuffixGutter] = useState(0)
+  const [prefixGutter, setPrefixGutter] = useState(0);
+  const [suffixGutter, setSuffixGutter] = useState(0);
+  const [displayValue, setDisplayValue] = useState("");
 
-  const { themeColor, controlSize, primaryColorLevel, direction } = useConfig()
-  const formControlSize = useForm()?.size
-  const inputGroupSize = useInputGroup()?.size
+  const { themeColor, controlSize, primaryColorLevel, direction } = useConfig();
+  const formControlSize = useForm()?.size;
+  const inputGroupSize = useInputGroup()?.size;
 
-  const inputSize = size || inputGroupSize || formControlSize || controlSize
+  const inputSize = size || inputGroupSize || formControlSize || controlSize;
 
-  const fixControlledValue = (val) => {
-    if (typeof val === "undefined" || val === null) {
-      return ""
+  // Initialize display value when component mounts or value changes
+  useEffect(() => {
+    if (type === "price" && field?.value) {
+      setDisplayValue(formatPrice(field.value));
     }
-    return val
-  }
+  }, [type, field?.value]);
 
-  if ("value" in props) {
-    rest.value = fixControlledValue(props.value)
-    delete rest.defaultValue
-  }
+  const handleChange = useCallback(
+    (event) => {
+      let newValue = event.target.value;
+
+      if (type === "price") {
+        // Format the display value
+        const formattedValue = formatPrice(newValue);
+        setDisplayValue(formattedValue);
+
+        // Set the actual unformatted value in Formik
+        const unformattedValue = unformatPrice(newValue);
+        if (field?.name && form?.setFieldValue) {
+          form.setFieldValue(field.name, unformattedValue);
+        }
+      } else if (uppercase) {
+        // Handle regular uppercase transformation
+        newValue = valueToUpperCase(newValue);
+        if (field?.onChange) {
+          field.onChange(event);
+        }
+      } else {
+        // Handle regular input
+        if (field?.onChange) {
+          field.onChange(event);
+        }
+      }
+    },
+    [type, field, form, uppercase]
+  );
 
   const isInvalid = useMemo(() => {
-    let validate = false
+    let validate = false;
     if (!isEmpty(form)) {
-      const { touched, errors } = form
-      const touchedField = get(touched, field.name)
-      const errorField = get(errors, field.name)
-      validate = touchedField && errorField
+      const { touched, errors } = form;
+      const touchedField = get(touched, field?.name);
+      const errorField = get(errors, field?.name);
+      validate = touchedField && errorField;
     }
     if (typeof invalid === "boolean") {
-      validate = invalid
+      validate = invalid;
     }
-    return validate
-  }, [form, invalid, field])
-  const fieldStyleDefault = search || textArea
+    return validate;
+  }, [form, invalid, field]);
+
+  const fieldStyleDefault = search || textArea;
   const inputDefaultClass = `input ${
     !fieldStyleDefault && "bg-slate-50 border-none"
-  } text-main-100 !h-max-[40px]`
-  const inputSizeClass = `input-${inputSize} h-${CONTROL_SIZES[inputSize]}`
-  const inputFocusClass = `focus:ring-${themeColor}-${primaryColorLevel} focus-within:ring-${themeColor}-${primaryColorLevel} focus-within:border-${themeColor}-${primaryColorLevel} focus:border-${themeColor}-${primaryColorLevel}`
-  const inputWrapperClass = `input-wrapper ${prefix || suffix ? className : ""}`
+  } text-main-100 !h-max-[40px]`;
+  const inputSizeClass = `input-${inputSize} h-${CONTROL_SIZES[inputSize]}`;
+  const inputFocusClass = `focus:ring-${themeColor}-${primaryColorLevel} focus-within:ring-${themeColor}-${primaryColorLevel} focus-within:border-${themeColor}-${primaryColorLevel} focus:border-${themeColor}-${primaryColorLevel}`;
+  const inputWrapperClass = `input-wrapper ${
+    prefix || suffix ? className : ""
+  }`;
   const inputClass = classNames(
     inputDefaultClass,
     !textArea && inputSizeClass,
@@ -81,30 +131,30 @@ const Input = React.forwardRef((props, ref) => {
     isInvalid && "input-invalid",
     textArea && "input-textarea bg-slate-50 border-none",
     time && "timeInputWithoutIcon"
-  )
+  );
 
-  const prefixNode = useRef()
-  const suffixNode = useRef()
+  const prefixNode = useRef();
+  const suffixNode = useRef();
 
   const getAffixSize = () => {
     if (!prefixNode.current && !suffixNode.current) {
-      return
+      return;
     }
-    const prefixNodeWidth = prefixNode?.current?.offsetWidth
-    const suffixNodeWidth = suffixNode?.current?.offsetWidth
+    const prefixNodeWidth = prefixNode?.current?.offsetWidth;
+    const suffixNodeWidth = suffixNode?.current?.offsetWidth;
 
     if (isNil(prefixNodeWidth) && isNil(suffixNodeWidth)) {
-      return
+      return;
     }
 
     if (prefixNodeWidth) {
-      setPrefixGutter(prefixNodeWidth)
+      setPrefixGutter(prefixNodeWidth);
     }
 
     if (suffixNodeWidth) {
-      setSuffixGutter(suffixNodeWidth)
+      setSuffixGutter(suffixNodeWidth);
     }
-  }
+  };
 
   const valueToUpperCase = (val) => {
     if (
@@ -128,92 +178,75 @@ const Input = React.forwardRef((props, ref) => {
       field?.name !== "portofolio_link" &&
       val !== ""
     ) {
-      return val.toUpperCase()
+      return val.toUpperCase();
     }
-
-    return val
-  }
-  const handleChange = useCallback(
-    (event) => {
-      if (form && field?.name) {
-        const { value } = event.target
-        const transformedValue = valueToUpperCase(value)
-        form.setFieldValue(field?.name, transformedValue)
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, field?.name] // Add necessary dependencies
-  )
+    return val;
+  };
 
   useEffect(() => {
-    getAffixSize()
-  }, [prefix, suffix])
+    getAffixSize();
+  }, [prefix, suffix]);
 
-  const remToPxConvertion = (pixel) => 0.0625 * pixel
+  const remToPxConvertion = (pixel) => 0.0625 * pixel;
 
   const affixGutterStyle = () => {
-    const leftGutter = `${remToPxConvertion(prefixGutter) + 1}rem`
-    const rightGutter = `${remToPxConvertion(suffixGutter) + 1}rem`
-    let gutterStyle = {}
+    const leftGutter = `${remToPxConvertion(prefixGutter) + 1}rem`;
+    const rightGutter = `${remToPxConvertion(suffixGutter) + 1}rem`;
+    let gutterStyle = {};
 
     if (direction === "ltr") {
       if (prefix) {
-        gutterStyle.paddingLeft = leftGutter
+        gutterStyle.paddingLeft = leftGutter;
       }
 
       if (suffix) {
-        gutterStyle.paddingRight = rightGutter
+        gutterStyle.paddingRight = rightGutter;
       }
     }
 
     if (direction === "rtl") {
       if (prefix) {
-        gutterStyle.paddingRight = leftGutter
+        gutterStyle.paddingRight = leftGutter;
       }
 
       if (suffix) {
-        gutterStyle.paddingLeft = rightGutter
+        gutterStyle.paddingLeft = rightGutter;
       }
     }
 
-    return gutterStyle
-  }
+    return gutterStyle;
+  };
 
-  const no_dates =
-    type === "dates"
-      ? {}
-      : { value: valueToUpperCase(field?.value || rest?.value) }
+  const inputValue = type === "price" ? displayValue : field?.value;
 
   const newInputProps = {
     className: !unstyle ? inputClass : "",
     disabled,
-    type,
+    type: type === "price" ? "text" : type,
     ref,
     ...field,
+    value: inputValue,
+    onChange: handleChange,
     ...rest,
-    ...no_dates,
-  }
+  };
 
   const inputProps = {
     className: !unstyle ? inputClass : "",
     disabled,
-    type,
+    type: type === "price" ? "text" : type,
     ref,
-    ...field,
+    value: inputValue,
+    onChange: handleChange,
     ...rest,
-  }
+  };
 
-  const renderTextArea = <textarea style={style} {...newInputProps}></textarea>
+  const renderTextArea = <textarea style={style} {...newInputProps}></textarea>;
 
   const renderInput = formik ? (
-    <Component
-      style={{ ...affixGutterStyle(), ...style }}
-      {...newInputProps}
-      onChange={props.onChange || handleChange}
-    />
+    <Component style={{ ...affixGutterStyle(), ...style }} {...newInputProps} />
   ) : (
     <Component style={{ ...affixGutterStyle(), ...style }} {...inputProps} />
-  )
+  );
 
   const renderAffixInput = (
     <span className={inputWrapperClass}>
@@ -222,8 +255,7 @@ const Input = React.forwardRef((props, ref) => {
           className="input-suffix-start"
           ref={(node) => (prefixNode.current = node)}
         >
-          {" "}
-          {prefix}{" "}
+          {prefix}
         </div>
       ) : null}
       {renderInput}
@@ -236,22 +268,22 @@ const Input = React.forwardRef((props, ref) => {
         </div>
       ) : null}
     </span>
-  )
+  );
 
   const renderChildren = () => {
     if (textArea) {
-      return renderTextArea
+      return renderTextArea;
     }
 
     if (prefix || suffix) {
-      return renderAffixInput
+      return renderAffixInput;
     } else {
-      return renderInput
+      return renderInput;
     }
-  }
+  };
 
-  return renderChildren()
-})
+  return renderChildren();
+});
 
 Input.propTypes = {
   asElement: PropTypes.string,
@@ -264,13 +296,13 @@ Input.propTypes = {
   suffix: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   unstyle: PropTypes.bool,
-}
+};
 
 Input.defaultProps = {
   type: "text",
   asElement: "input",
   className: "",
   unstyle: false,
-}
+};
 
-export default Input
+export default Input;

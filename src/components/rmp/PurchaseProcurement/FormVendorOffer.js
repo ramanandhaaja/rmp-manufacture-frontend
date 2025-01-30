@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Input, Button, FormItem, FormContainer } from "components/ui";
@@ -16,6 +16,8 @@ import {
   clearVendorSelections,
   updateVendorSubmitStatus,
 } from "store/PurchaseOrder/purchaseOrderSlice";
+import ConfirmationCustom from "components/custom/ConfirmationCustom";
+import FormNumericInput from "components/shared/FormNumericInput";
 
 const validationSchema = Yup.object().shape({
   items: Yup.array().of(
@@ -25,7 +27,6 @@ const validationSchema = Yup.object().shape({
         .min(0, "Price must be non-negative"),
     })
   ),
-  payment_method: Yup.string().required("Payment method is required"),
   delivery_address: Yup.string().required("Delivery address is required"),
   delivery_cost: Yup.number()
     .required("Delivery cost is required")
@@ -37,6 +38,7 @@ const validationSchema = Yup.object().shape({
     })
   ),
   payment: Yup.object().shape({
+    payment_method: Yup.string().required("Payment method is required"),
     amount: Yup.number().required("Total amount is required"),
     down_payment_amount: Yup.number().when("payment_method", {
       is: "Bayar Sebagian",
@@ -58,40 +60,96 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const FormVendorOffer = () => {
+const FormVendorOffer = ({ isEdit }) => {
   const dispatch = useDispatch();
   const [documents, setDocuments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isUangMukaChecked, setIsUangMukaChecked] = useState(false);
-  const { getVendorDetail, dataDetailVendor } = useVendor();
   const { id: vendorId } = useParams();
-  const { dataDetailPurchaseOrder, submitVendorOffer } = usePurchaseOrder();
+  const { getVendorDetail, dataDetailVendor } = useVendor();
+
+  const {
+    getDetailVendorOffer,
+    dataDetailPurchaseOrder,
+    submitVendorOffer,
+    dataOfferPoVendors,
+    editVendorOffer,
+  } = usePurchaseOrder();
   const navigate = useNavigate();
-  const [isLoadingItems, setIsLoadingItems] = useState(false);
+  const [isLoadingOffer, setIsLoadingOffer] = useState(false);
   const itemsTableData = dataDetailPurchaseOrder?.items.map((item, index) => ({
     ...item,
     index,
   }));
-  const { idPo } = useSelector((state) => state.purchaseOrder);
+  const { vendorOfferId } = useSelector((state) => state.purchaseOrder);
+  const idPo = dataOfferPoVendors?.purchase_order_id || null;
+  const detailVendor = dataOfferPoVendors?.vendor_detail;
 
-  const initialValues = {
-    purchase_order_id: idPo,
-    vendor_id: vendorId,
-    items:
-      dataDetailPurchaseOrder?.items?.map((item) => ({
-        po_item_id: item.id,
-        offered_price: 0,
-      })) || [],
-    payment_method: "",
-    delivery_address: "",
-    delivery_cost: 0,
-    costs: [{ cost_name: "", cost_value: 0 }],
-    payment: {
-      amount: 0,
-      down_payment_amount: 0,
-      records: [{ amount_paid: 0 }],
-    },
+  const PAYMENT_METHOD_MAPPING = {
+    pay_in_part: "Bayar Sebagian",
+    pay_in_full: "Bayar Lunas Dimuka",
+    pay_in_full: "Bayar Lunas Diakhir",
   };
+
+  const PAYMENT_METHOD_MAPPING_REVERSE = {
+    "Bayar Sebagian": "pay_in_part",
+    "Bayar Lunas Dimuka": "pay_in_full",
+    "Bayar Lunas Diakhir": "pay_in_full",
+  };
+
+  const initialValues = useMemo(() => {
+    if (isEdit && dataOfferPoVendors) {
+      // Transform the fetched data to match form structure
+      const paymentData = dataOfferPoVendors.payments[0];
+      return {
+        purchase_order_id: dataOfferPoVendors.purchase_order_id,
+        vendor_id: dataOfferPoVendors.vendor_id,
+        items: dataOfferPoVendors.items.map((item) => ({
+          po_item_id: item.po_item_id,
+          offered_price: item.offered_price || 0,
+        })),
+        delivery_address: dataOfferPoVendors.delivery_address,
+        delivery_cost: dataOfferPoVendors.delivery_cost,
+        costs: dataOfferPoVendors.costs || [{ cost_name: "", cost_value: 0 }],
+        payment: {
+          payment_method:
+            PAYMENT_METHOD_MAPPING[paymentData.payment_method] || "",
+          amount: paymentData.amount || 0,
+          down_payment_amount: paymentData.down_payment_amount || 0,
+          records: paymentData.payment_records.map((record) => ({
+            amount_paid: record.amount_paid || 0,
+            remarks: record.remarks || "",
+          })),
+        },
+      };
+    }
+
+    return {
+      purchase_order_id: idPo,
+      vendor_id: vendorId,
+      items:
+        dataDetailPurchaseOrder?.items?.map((item) => ({
+          po_item_id: item.id,
+          offered_price: 0,
+        })) || [],
+      payment_method: "",
+      delivery_address: "",
+      delivery_cost: 0,
+      costs: [{ cost_name: "", cost_value: 0 }],
+      payment: {
+        amount: 0,
+        down_payment_amount: 0,
+        records: [{ amount_paid: 0 }],
+      },
+    };
+  }, [isEdit, dataOfferPoVendors, idPo, vendorId, dataDetailPurchaseOrder]);
+
+  useEffect(() => {
+    if (vendorOfferId) {
+      getDetailVendorOffer(vendorOfferId);
+    }
+  }, [vendorOfferId]);
 
   useEffect(() => {
     if (vendorId) {
@@ -99,32 +157,56 @@ const FormVendorOffer = () => {
     }
   }, [vendorId]);
 
+  useEffect(() => {
+    if (isEdit && dataOfferPoVendors?.offering_document) {
+      setDocuments(dataOfferPoVendors.offering_document);
+    }
+  }, [isEdit, dataOfferPoVendors]);
+
+  useEffect(() => {
+    if (isEdit && dataOfferPoVendors?.payments?.[0]?.down_payment_amount > 0) {
+      setIsUangMukaChecked(true);
+    }
+  }, [isEdit, dataOfferPoVendors]);
+
   const submitOffer = async (payload) => {
-    console.log(payload);
     try {
-      const response = await submitVendorOffer(payload);
-      console.log(response);
+      let response;
+      if (isEdit) {
+        response = await editVendorOffer(vendorOfferId, payload);
+      } else {
+        response = await submitVendorOffer(payload);
+      }
+
       if (response.status === "success") {
         toast.push(
           <Notification
             type="success"
-            title="Penawaran berhasil dibuat"
+            title={`Penawaran berhasil ${isEdit ? "diperbarui" : "dibuat"}`}
             width={700}
           />,
           {
             placement: "top-center",
           }
         );
+        console.log("About to dispatch with vendorId:", vendorId);
         dispatch(updateVendorSubmitStatus(vendorId));
-
-        setTimeout(() => {
-          navigate("/purchase/pengadaan/proses-po/" + idPo);
-        }, 2000);
+        if (isEdit) {
+          setTimeout(() => {
+            navigate("/purchase/pengadaan/detail-po/" + idPo);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            navigate("/purchase/pengadaan/proses-po/" + idPo);
+          }, 2000);
+        }
       } else {
         toast.push(
           <Notification
             type="danger"
-            title="Maaf terjadi kesalahan, Penawaran gagal dibuat"
+            title={`Maaf terjadi kesalahan, Penawaran gagal ${
+              isEdit ? "diperbarui" : "dibuat"
+            }`}
             width={700}
           />,
           {
@@ -133,24 +215,25 @@ const FormVendorOffer = () => {
         );
       }
     } catch (err) {
+      console.log(err);
       toast.push(
         <Notification
           type="danger"
-          title="Maaf terjadi kesalahan, Penawaran gagal dibuat"
+          title={`Maaf terjadi kesalahan, Penawaran gagal ${
+            isEdit ? "diperbarui" : "dibuat"
+          }`}
           width={700}
         />,
         {
           placement: "top-center",
         }
       );
-      console.log(err);
     }
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       setIsSubmitting(true);
-      //   const formData = new FormData();
 
       const totalItemsAmount = values.items.reduce(
         (sum, item) => sum + (Number(item.offered_price) || 0),
@@ -179,7 +262,7 @@ const FormVendorOffer = () => {
         documents: documents,
       };
 
-      console.log("FormData to be submitted:", payload); // Debugging log
+      dispatch(updateVendorSubmitStatus(Number(vendorId)));
       await submitOffer(payload);
     } catch (error) {
       console.error("Form submission error:", error);
@@ -187,17 +270,6 @@ const FormVendorOffer = () => {
       setIsSubmitting(false);
       setSubmitting(false);
     }
-  };
-
-  const handleAddTermin = (values, setFieldValue) => {
-    if (values.termins.length < 4) {
-      setFieldValue("termins", [...values.termins, { jumlah_bayar: "" }]);
-    }
-  };
-
-  const handleRemoveTermin = (index, values, setFieldValue) => {
-    const newTermins = values.termins.filter((_, i) => i !== index);
-    setFieldValue("termins", newTermins);
   };
 
   const handleFileUpload = (event) => {
@@ -219,25 +291,25 @@ const FormVendorOffer = () => {
               <div className="flex items-center gap-10">
                 <p className="text-sm text-gray-500 w-32">Vendor</p>
                 <p className="text-sm text-gray-700">
-                  {dataDetailVendor.name || "-"}
+                  {dataDetailVendor?.name || "-"}
                 </p>
               </div>
               <div className="flex items-center gap-10">
                 <p className="text-sm text-gray-500 w-32">PIC </p>
                 <p className="text-sm text-gray-700">
-                  {dataDetailVendor.pic_name || "-"}
+                  {dataDetailVendor?.pic_name || "-"}
                 </p>
               </div>
               <div className="flex items-center gap-10">
                 <p className="text-sm text-gray-500 w-32">No Telp</p>
                 <p className="text-sm text-gray-700">
-                  {dataDetailVendor.pic_phone || "-"}
+                  {dataDetailVendor?.pic_phone || "-"}
                 </p>
               </div>
               <div className="flex items-center gap-10">
                 <p className="text-sm text-gray-500 w-32">Alamat</p>
                 <p className="text-sm text-gray-700">
-                  {dataDetailVendor.address || "-"}
+                  {dataDetailVendor?.pic_address || "-"}
                 </p>
               </div>
             </div>
@@ -248,8 +320,9 @@ const FormVendorOffer = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize={true}
       >
-        {({ values, errors, touched, setFieldValue, isValid }) => (
+        {({ values, errors, touched, setFieldValue, isValid, submitForm }) => (
           <Form className="space-y-6">
             <FormContainer>
               {/* Items Table */}
@@ -262,34 +335,40 @@ const FormVendorOffer = () => {
               {/* Payment Method */}
               <FormItem
                 label="Metode Pembayaran"
-                invalid={errors.payment_method && touched.payment_method}
-                errorMessage={errors.payment_method}
+                invalid={
+                  errors.payment?.payment_method &&
+                  touched.payment?.payment_method
+                }
+                errorMessage={errors.payment?.payment_method}
               >
                 <Select
-                  name="payment_method"
+                  name="payment.payment_method"
                   options={[
                     {
-                      value: "Bayar Lunas Dimuka ",
+                      value: "Bayar Lunas Dimuka",
                       label: "Bayar Lunas Dimuka",
                     },
-                    { value: "Bayar Sebagian", label: "Bayar Sebagian" },
+                    {
+                      value: "Bayar Sebagian",
+                      label: "Bayar Sebagian",
+                    },
                     {
                       value: "Bayar Lunas Diakhir",
                       label: "Bayar Lunas Diakhir",
                     },
                   ]}
                   value={
-                    values.payment_method
+                    values.payment?.payment_method
                       ? {
-                          value: values.payment_method,
-                          label: values.payment_method,
+                          value: values.payment.payment_method,
+                          label: values.payment.payment_method,
                         }
                       : null
                   }
                   onChange={(selectedOption) => {
                     setFieldValue(
-                      "payment_method",
-                      selectedOption ? selectedOption.label : ""
+                      "payment.payment_method",
+                      selectedOption ? selectedOption.value : ""
                     );
                   }}
                   placeholder="Pilih "
@@ -298,10 +377,10 @@ const FormVendorOffer = () => {
 
               <div className="space-y-4">
                 <div className="flex gap-1">
-                  {values.payment_method !== "Bayar Lunas Dimuka" && (
+                  {values.payment?.payment_method !== "Bayar Lunas Dimuka" && (
                     <Checkbox
                       className="py-2 "
-                      defaultChecked={false}
+                      defaultChecked={isUangMukaChecked}
                       onChange={() => {
                         setIsUangMukaChecked(!isUangMukaChecked);
                       }}
@@ -319,7 +398,7 @@ const FormVendorOffer = () => {
                       errorMessage={errors.payment?.down_payment_amount}
                     >
                       <Field
-                        type="number"
+                        type="price"
                         name="payment.down_payment_amount"
                         placeholder="Nilai"
                         component={Input}
@@ -328,14 +407,13 @@ const FormVendorOffer = () => {
                     </FormItem>
                   )}
                 </div>
-                {values.payment_method === "Bayar Sebagian" && (
+                {values.payment.payment_method === "Bayar Sebagian" && (
                   <div className="space-y-4 ">
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-medium">Termin Pembayaran</h3>
 
                       <Button
                         type="button"
-                        variant="outline"
                         onClick={() =>
                           setFieldValue("payment.records", [
                             ...values.payment.records,
@@ -357,7 +435,6 @@ const FormVendorOffer = () => {
                           <h4 className="font-medium">Termin {index + 1}</h4>
                           <Button
                             type="button"
-                            variant="danger"
                             onClick={() =>
                               setFieldValue(
                                 "payment.records",
@@ -384,7 +461,7 @@ const FormVendorOffer = () => {
                           }
                         >
                           <Field
-                            type="number"
+                            type="price"
                             name={`payment.records.${index}.amount_paid`}
                             placeholder="Nilai"
                             component={Input}
@@ -450,7 +527,7 @@ const FormVendorOffer = () => {
                 errorMessage={errors.delivery_cost}
               >
                 <Field
-                  type="number"
+                  type="price"
                   name="delivery_cost"
                   placeholder="Masukkan biaya pengiriman"
                   component={Input}
@@ -505,7 +582,7 @@ const FormVendorOffer = () => {
                         <Field
                           name={`costs.${index}.cost_value`}
                           placeholder="Nilai"
-                          type="number"
+                          type="price"
                           component={Input}
                         />
                       </FormItem>
@@ -572,15 +649,36 @@ const FormVendorOffer = () => {
               {/* Submit Button */}
               <div className="flex justify-end pt-6">
                 <Button
-                  type="submit"
+                  type="button"
                   variant="solid"
                   loading={isSubmitting}
                   className="w-32"
+                  onClick={() => setIsOpen(true)}
                 >
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
               </div>
             </FormContainer>
+            <ConfirmationCustom
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              showCancelBtn
+              showSubmitBtn
+              onConfirm={() => {
+                submitForm();
+                setIsOpen(false);
+              }}
+              confirmText="Konfirmasi"
+              title={`${isEdit ? "Ubah" : "Tambah"} penawaran vendor?`}
+              titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
+              text="Pastikan data yang anda masukan sudah benar"
+              textClass="text-slate-500 text-base"
+              isLoading={isSubmitting}
+              disableCancel={false}
+              buttonType="button"
+              width={500}
+              contentClassName="p-5 rounded-2xl"
+            />
           </Form>
         )}
       </Formik>
@@ -615,7 +713,7 @@ const ItemsTable = ({ items, errors, touched }) => (
               errorMessage={errors?.items?.[row.original.index]?.offered_price}
             >
               <Field
-                type="number"
+                type="price"
                 name={`items.${row.original.index}.offered_price`}
                 placeholder="Nilai"
                 component={Input}

@@ -65,7 +65,7 @@ const ProcessPurchaseOrder = () => {
     if (dataItemPo.length > 0) {
       setActiveTab(1);
     }
-  }, [dataItemPo]);
+  }, [dataDetailPurchaseOrder]);
 
   const columnsAddModal = [
     {
@@ -324,6 +324,23 @@ const ProcessPurchaseOrder = () => {
     setActiveTab(value);
   };
 
+  const isAnyVendorApproved = (data) => {
+    if (!data?.vendors?.length) {
+      return false;
+    }
+    return data.vendors.some((vendor) => vendor.status === "approved");
+  };
+
+  const handleDisableBtn = () => {
+    if (!isAnyVendorApproved(selectedVendor)) {
+      return true;
+    }
+    if (selectedVendor?.vendors?.length < 3) {
+      return true;
+    }
+    return false;
+  };
+
   const StepComponent = () => {
     return (
       <div className="p-4">
@@ -416,7 +433,7 @@ const ProcessPurchaseOrder = () => {
             variant="solid"
             // onClick={() => setIsOpenConfirmation(true)}
             onClick={() => setIsOpenConfirmation(true)}
-            disabled={selectedVendor?.length < 3}
+            disabled={handleDisableBtn()}
           >
             Konfirmasi
           </Button>

@@ -6,7 +6,13 @@ import capitalize from "components/ui/utils/capitalize";
 import { findDepartement } from "utils/helpers";
 import { getStatusClassName } from "utils/helpers";
 
-const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
+const useColumns = (
+  setIsOpen,
+  setIsOpenStatus,
+  setIsOpenDelete,
+  setId,
+  setEditingItem
+) => {
   const navigate = useNavigate();
 
   const columnsDepartment = useCallback(
@@ -153,6 +159,13 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
                   onClick: () =>
                     navigate(`/purchase/request/detail/${row.original.id}`),
                 },
+                {
+                  label: "Delete",
+                  onClick: () => {
+                    setIsOpen(true);
+                    setId(row.original.id);
+                  },
+                },
               ];
             } else {
               return [
@@ -160,6 +173,13 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
                   label: "Lihat Detail",
                   onClick: () =>
                     navigate(`/purchase/request/detail/${row.original.id}`),
+                },
+                {
+                  label: "Delete",
+                  onClick: () => {
+                    setIsOpen(true);
+                    setId(row.original.id);
+                  },
                 },
               ];
             }
@@ -275,7 +295,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
       {
         Header: "Kode",
         accessor: "id",
-        Cell: ({ row }) => row.original.id,
+        Cell: ({ row }) => row.original.goods_id,
       },
       {
         Header: "Barang",
@@ -305,6 +325,13 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
           <TableListDropdown
             dropdownItemList={[
               {
+                label: "Edit",
+                onClick: () => {
+                  setIsOpen(true);
+                  setEditingItem(row.original);
+                },
+              },
+              {
                 label: "Delete",
                 onClick: () => {
                   setIsOpenDelete(true);
@@ -317,7 +344,7 @@ const useColumns = (setIsOpen, setIsOpenStatus, setIsOpenDelete, setId) => {
         ),
       },
     ],
-    [setIsOpenDelete, setId]
+    [setIsOpen, setIsOpenDelete, setId, setEditingItem]
   );
 
   return {

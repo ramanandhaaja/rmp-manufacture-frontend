@@ -33,6 +33,10 @@ const ItemQueuesList = ({ type }) => {
   const [idItemRequest, setIdItemRequest] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [showNotificationItem, setShowNotificationAddItem] = useState(false);
+  const [itemCategory, setItemCategory] = useState({
+    id: null,
+    po_type: " ",
+  });
 
   const columns = [
     {
@@ -80,7 +84,13 @@ const ItemQueuesList = ({ type }) => {
           dropdownItemList={[
             {
               label: "Buat PO Baru",
-              onClick: () => setIsOpen(true),
+              onClick: () => {
+                setIsOpen(true);
+                setItemCategory({
+                  id: row.original.goods_category_id,
+                  po_type: type,
+                });
+              },
             },
             {
               label: "Tambah Ke PO",
@@ -204,7 +214,14 @@ const ItemQueuesList = ({ type }) => {
     );
   }, [dataPurchaseQueue, activeCategory]);
 
-  console.log("dataPurchaseQueue", filteredData);
+  const handleModalClose = () => {
+    setIsOpen(false);
+    setItemCategory({
+      id: null,
+      type: "",
+    });
+  };
+
   return (
     <div className="px-2 py-6">
       <div className="flex justify-center pb-3">
@@ -260,8 +277,9 @@ const ItemQueuesList = ({ type }) => {
         </div>
       )}
       <CreatePOModal
+        goodsCategory={itemCategory}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={handleModalClose}
         setSubmitted={setShowNotification}
         setSubmittedData={setDataPoCreated}
       />

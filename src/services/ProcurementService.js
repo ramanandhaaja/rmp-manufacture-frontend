@@ -31,6 +31,13 @@ export async function getPurchaseOrderDetailsApi(id) {
   });
 }
 
+export async function getPoVendorOfferDetailsApi(id) {
+  return ApiService.fetchData({
+    url: `purchase-order/fetch-vendor-offer-details/${id}`,
+    method: "get",
+  });
+}
+
 export async function getListPurchaseOrderNumberApi() {
   return ApiService.fetchData({
     url: `purchase-order/list-po`,
@@ -78,6 +85,15 @@ export async function postVendorOfferApi(data) {
     url: `purchase-order/submit-vendor-offers`,
     method: "post",
 
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function putVendorOfferApi(id, data) {
+  return ApiService.fetchData({
+    url: `purchase-order/update-vendor-offers/${id}`,
+    method: "put",
     data,
     withCredentials: true,
   });

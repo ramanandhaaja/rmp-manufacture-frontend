@@ -559,3 +559,19 @@ export const RMPSTATUSCOLOR = {
   revised: "bg-amber-400 text-white",
   waiting: "bg-yellow-500 text-white",
 };
+export const RMPPOSTATUSCOLOR = {
+  approved: "bg-emerald-600 text-white",
+  verified: "bg-blue-600 text-white",
+  rejected: "bg-red-500 text-white",
+  revised: "bg-amber-400 text-white",
+  waiting: "bg-yellow-500 text-white",
+};
+
+export const PO_STATUS_STYLES = {
+  "Belum Diproses": "bg-gray-500 text-white",
+  "Menunggu Persetujuan": "bg-yellow-500 text-white",
+  Disetujui: "bg-emerald-600 text-white",
+  Pengiriman: "bg-blue-600 text-white",
+  "PO Selesai": "bg-emerald-600 text-white",
+  "PO Rilis": "bg-blue-600 text-white",
+};

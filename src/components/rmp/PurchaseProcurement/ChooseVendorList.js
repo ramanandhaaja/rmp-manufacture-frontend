@@ -54,7 +54,6 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
       Cell: ({ row }) => {
         return (
           <Radio
-            disabled={isApprovalNeeded}
             value={row.original.vendor_id}
             checked={checkedVendor === row.original.vendor_id}
             onChange={() => {
@@ -129,9 +128,8 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
             {
               label: "Input Penawaran",
               onClick: () => {
-                dispatch(updateVendorSubmitStatus(row.original.vendor_id));
                 navigate(
-                  `/purchase/pengadaan/penawaran-vendor/${row.original.vendor_id}`
+                  `/purchase/pengadaan/tambah-penawaran-vendor/${row.original.vendor_id}`
                 );
               },
             },
@@ -174,6 +172,7 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
   //     }
   //   }
   // }, [dataDetailPurchaseOrder, dataVendor]);
+  console.log(selectedPoVendors);
 
   useEffect(() => {
     if (selectedPoVendors) {
@@ -186,7 +185,6 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
         ...prevPayload,
         vendors: vendorsPayload,
       }));
-      console.log(vendorsPayload);
     }
   }, [selectedPoVendors, checkedVendor]);
 

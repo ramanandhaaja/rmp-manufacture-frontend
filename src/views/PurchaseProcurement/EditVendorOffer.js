@@ -1,6 +1,6 @@
 import FormVendorOffer from "components/rmp/PurchaseProcurement/FormVendorOffer";
 
-const VendorOffer = () => {
+const EditVendorOffer = () => {
   return (
     <>
       <div className="p-6 bg-white rounded-lg">
@@ -11,10 +11,10 @@ const VendorOffer = () => {
         </div>
         <div className="border-b border-gray-400 my-2"></div>
         <div className="p-4">
-          <FormVendorOffer />
+          <FormVendorOffer isEdit={true} />
         </div>
       </div>
     </>
   );
 };
-export default VendorOffer;
+export default EditVendorOffer;

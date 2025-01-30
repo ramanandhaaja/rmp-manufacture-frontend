@@ -4,15 +4,20 @@ export const purchaseOrderSlice = createSlice({
   name: "purchaseOrder",
   initialState: {
     idPo: null,
+    vendorOfferId: null,
     dataPurchaseOrder: [],
     dataPurchaseQueue: [],
     dataListPoNumber: [],
     dataDetailPurchaseOrder: [],
     selectedPoVendors: [],
+    dataOfferPoVendors: [],
   },
   reducers: {
     setIdPo: (state, action) => {
       state.idPo = action.payload;
+    },
+    setVendorOfferId: (state, action) => {
+      state.vendorOfferId = action.payload;
     },
     setDataPurchaseOrder: (state, action) => {
       state.dataPurchaseOrder = action.payload;
@@ -22,6 +27,9 @@ export const purchaseOrderSlice = createSlice({
     },
     setDataListPoNumber: (state, action) => {
       state.dataListPoNumber = action.payload;
+    },
+    setDataOfferPoVendors: (state, action) => {
+      state.dataOfferPoVendors = action.payload;
     },
     setDataDetailPurchaseOrder: (state, action) => {
       state.dataDetailPurchaseOrder = action.payload;
@@ -48,12 +56,6 @@ export const purchaseOrderSlice = createSlice({
     updateVendorSubmitStatus: (state, action) => {
       if (Array.isArray(state.selectedPoVendors)) {
         state.selectedPoVendors = state.selectedPoVendors.map((vendor) => {
-          console.log(
-            "Checking vendor:",
-            vendor.vendor_id,
-            "against:",
-            action.payload
-          );
           if (vendor.vendor_id === action.payload) {
             return { ...vendor, is_submit_offer: true };
           }
@@ -69,16 +71,20 @@ export const purchaseOrderSlice = createSlice({
 
 export const {
   idPo,
+  vendorOfferId,
   dataPurchaseOrder,
   dataPurchaseQueue,
   dataListPoNumber,
   dataDetailPurchaseOrder,
+  dataOfferPoVendors,
+  setDataOfferPoVendors,
   selectedPoVendors,
   setDataPurchaseOrder,
   setDataPurchaseQueue,
   setDataListPoNumber,
   setDataDetailPurchaseOrder,
   setSelectedPoVendors,
+  setVendorOfferId,
   setIdPo,
   clearVendorSelections,
   updateVendorSubmitStatus,
