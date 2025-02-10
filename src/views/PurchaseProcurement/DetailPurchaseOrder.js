@@ -16,6 +16,7 @@ import TableListDropdown from "components/template/TableListDropdown";
 import Tabs from "components/ui/Tabs";
 import TextBlockSkeleton from "components/shared/loaders/TextBlockSkeleton";
 import { FiCheckCircle } from "react-icons/fi";
+import ModalNoteInput from "components/custom/ModalNoteInput";
 
 const DetailPurchaseOrder = () => {
   const navigate = useNavigate();
@@ -33,7 +34,8 @@ const DetailPurchaseOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [status, setStatus] = useState("");
-  console.log(dataDetailPurchaseOrder);
+  const [activeModal, setActiveModal] = useState(null);
+
   const columns = [
     {
       Header: "ID Pembelian",
@@ -168,13 +170,9 @@ const DetailPurchaseOrder = () => {
   const ButtonDireksi = () => {
     return (
       <>
+        <Button onClick={() => setActiveModal("adjust")}>Adjustment</Button>
         <Button
-        // onClick={() => navigate(`/purchase/request/detail/informasi-pembelian/${id}`)}
-        >
-          Adjustment
-        </Button>
-        <Button
-          //   onClick={() => formikRef.current.handleSubmit()}
+          onClick={() => setActiveModal("approve")}
           variant="solid"
           className="text-white"
         >
@@ -303,8 +301,8 @@ const DetailPurchaseOrder = () => {
                         Tanggal Request PO
                       </p>
                       <p className="text-sm text-gray-700">
-                        {dataDetailPurchaseOrder.request_date
-                          ? formatDate(dataDetailPurchaseOrder.request_date)
+                        {dataDetailPurchaseOrder.po_date
+                          ? formatDate(dataDetailPurchaseOrder.po_date)
                           : "-"}
                       </p>
                     </div>
@@ -405,6 +403,17 @@ const DetailPurchaseOrder = () => {
       <div className="border-b border-gray-400 my-2"></div>
       {userRole.includes("bod") && <DetailPoDireksi />}
       {!userRole.includes("bod") && <DetailPoGeneral />}
+      <ModalNoteInput
+        title={activeModal === "adjust" ? "Adjustment" : "Setujui PO"}
+        subtitle={
+          activeModal === "adjust"
+            ? "Silahkan tuliskan catatan Anda tentang penyesuaian Purchase Order"
+            : "Silahkan tuliskan catatan Anda tentang penyesuaian Purchase Order"
+        }
+        isOpen={activeModal !== null}
+        onClose={() => setActiveModal(null)}
+        status={activeModal === "adjust" ? "revised" : "approved"}
+      />
     </LayoutRightSpace>
   );
 };

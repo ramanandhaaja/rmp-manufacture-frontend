@@ -66,7 +66,12 @@ const ProcurementReqList = () => {
       Header: "Action",
       accessor: "action",
       Cell: ({ row }) => (
-        <button className="text-blue-600 hover:text-blue-800">
+        <button
+          className="text-blue-600 hover:text-blue-800"
+          onClick={() =>
+            navigate(`/purchase/request/detail/${row.original.id}`)
+          }
+        >
           <FiEye size={18} />
         </button>
       ),
@@ -87,7 +92,7 @@ const ProcurementReqList = () => {
         ...prev,
         params: {
           ...params,
-          total: data?.total,
+          total: approvedItems.length,
           per_page: data?.per_page,
         },
       }));

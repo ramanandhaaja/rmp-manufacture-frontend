@@ -18,6 +18,7 @@ const authRoute = [
     component: React.lazy(() => import("views/auth/SignUp")),
     authority: [],
   },
+
   {
     key: "forgotPassword",
     path: `/forgot-password`,

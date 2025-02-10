@@ -1,2 +1,8 @@
-export const ADMIN = "admin";
-export const USER = "user";
+export const ROLES = {
+  ADMIN: "ADMIN",
+  Department: "department",
+  Ppic: "ppic",
+  Factory_Manager: "factory-manager",
+  Procurement: "procurement",
+  Bod: "bod",
+};

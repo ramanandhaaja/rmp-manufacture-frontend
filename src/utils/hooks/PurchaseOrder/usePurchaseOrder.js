@@ -10,6 +10,7 @@ import {
   postVendorOfferApi,
   patchItemToAnotherPoApi,
   putVendorOfferApi,
+  getProcurementLogsApi,
 } from "services/ProcurementService";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -74,6 +75,24 @@ function usePurchaseOrder() {
       return {
         status: "failed",
         message: errors?.response?.data?.message || errors.toString(),
+      };
+    }
+  };
+
+  const getProcurementLog = async (params) => {
+    try {
+      const response = await getProcurementLogsApi(params);
+      if (response.data) {
+        return { status: "success", message: "", data: response.data };
+      } else {
+        console.log(response);
+        return { status: "failed", message: "" };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
       };
     }
   };
@@ -300,6 +319,7 @@ function usePurchaseOrder() {
     dataDetailPurchaseOrder,
     dataOfferPoVendors,
     editVendorOffer,
+    getProcurementLog,
   };
 }
 

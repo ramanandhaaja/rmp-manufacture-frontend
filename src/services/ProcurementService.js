@@ -16,6 +16,14 @@ export async function getCategoryTotalItemsReqApi(params) {
   });
 }
 
+export async function getProcurementLogsApi(params) {
+  return ApiService.fetchData({
+    url: `procurement-logs`,
+    method: "get",
+    params,
+  });
+}
+
 export async function getPurchaseOrderItemQueuesApi(params) {
   return ApiService.fetchData({
     url: `purchase-order/item-queues`,

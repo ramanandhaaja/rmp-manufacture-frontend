@@ -1,10 +1,17 @@
 import React from "react";
+import { ROLES } from "constants/roles.constant";
 
 export const ROUTE_LIST = [
   {
     key: "base.users",
     path: "/base/users",
     component: React.lazy(() => import("views/BaseUsers")),
+    authority: [],
+  },
+  {
+    key: "accessDenied",
+    path: `/access-denied`,
+    component: React.lazy(() => import("views/auth/access/denied")),
     authority: [],
   },
   {
@@ -61,7 +68,7 @@ export const ROUTE_LIST = [
     key: "purchase.request",
     path: "/purchase/request",
     component: React.lazy(() => import("views/PurchaseRequest")),
-    authority: [],
+    // authority: [!ROLES.Procurement, !ROLES.Bod],
   },
   {
     key: "purchase.request.add",
@@ -111,7 +118,7 @@ export const ROUTE_LIST = [
     key: "purchase.procurement",
     path: "/purchase/pengadaan",
     component: React.lazy(() => import("views/PurchaseProcurement")),
-    authority: [],
+    authority: [ROLES.Procurement, ROLES.Bod],
   },
   {
     key: "purchase.procurement.process",
@@ -119,7 +126,7 @@ export const ROUTE_LIST = [
     component: React.lazy(() =>
       import("views/PurchaseProcurement/ProcessPurchaseOrder")
     ),
-    authority: [],
+    authority: [ROLES.Procurement],
   },
   {
     key: "purchase.procurement.detail.vendorOffer.add",
@@ -127,7 +134,7 @@ export const ROUTE_LIST = [
     component: React.lazy(() =>
       import("views/PurchaseProcurement/VendorOffer")
     ),
-    authority: [],
+    authority: [ROLES.Procurement],
   },
   {
     key: "purchase.procurement.detail.vendorOffer.edit",
@@ -135,7 +142,7 @@ export const ROUTE_LIST = [
     component: React.lazy(() =>
       import("views/PurchaseProcurement/EditVendorOffer")
     ),
-    authority: [],
+    authority: [ROLES.Procurement],
   },
   {
     key: "purchase.procurement.detail",
@@ -143,7 +150,7 @@ export const ROUTE_LIST = [
     component: React.lazy(() =>
       import("views/PurchaseProcurement/DetailPurchaseOrder")
     ),
-    authority: [],
+    authority: [ROLES.Procurement, ROLES.Bod],
   },
   {
     key: "purchase.procurement.detailPenawaran",
@@ -151,6 +158,19 @@ export const ROUTE_LIST = [
     component: React.lazy(() =>
       import("views/PurchaseProcurement/DetailVendorOffer")
     ),
-    authority: [],
+    authority: [ROLES.Procurement, ROLES.Bod],
+  },
+  {
+    key: "purchase.payment",
+    path: "/purchase/pembayaran",
+    component: React.lazy(() => import("views/Payment")),
+    authority: [ROLES.Procurement],
+  },
+
+  {
+    key: "purchase.payment.detail",
+    path: "/purchase/pembayaran/detail-pembayaran/:id",
+    component: React.lazy(() => import("views/Payment/DetailPayment")),
+    authority: [ROLES.Procurement],
   },
 ];

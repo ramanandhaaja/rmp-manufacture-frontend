@@ -2,9 +2,8 @@ import { useCallback } from "react";
 import { formatDate } from "utils/helpers";
 import TableListDropdown from "components/template/TableListDropdown";
 import { useNavigate } from "react-router-dom";
-import capitalize from "components/ui/utils/capitalize";
 import { findDepartement } from "utils/helpers";
-import { getStatusClassName } from "utils/helpers";
+import { getStatusClassName, getStatusName } from "utils/helpers";
 
 const useColumns = (
   setIsOpen,
@@ -50,7 +49,7 @@ const useColumns = (
               row.original.status
             )}`}
           >
-            {capitalize(row.original.status)}
+            {getStatusName(row.original.status)}
           </span>
         ),
       },
@@ -78,7 +77,7 @@ const useColumns = (
                 },
               },
             ]}
-            placement="center-end"
+            placement="bottom-center"
           />
         ),
       },
@@ -139,7 +138,7 @@ const useColumns = (
               row.original.status
             )}`}
           >
-            {capitalize(row.original.status)}
+            {getStatusName(row.original.status)}
           </span>
         ),
       },
@@ -188,7 +187,7 @@ const useColumns = (
           return (
             <TableListDropdown
               dropdownItemList={renderDropdown()}
-              placement="center-end"
+              placement="bottom-center"
             />
           );
         },
@@ -243,7 +242,7 @@ const useColumns = (
               row.original.status
             )}`}
           >
-            {capitalize(row.original.status)}
+            {getStatusName(row.original.status)}
           </span>
         ),
       },
@@ -261,7 +260,7 @@ const useColumns = (
                       navigate(`/purchase/request/detail/${row.original.id}`),
                   },
                 ]}
-                placement="center-end"
+                placement="bottom-center"
               />
             );
           }
@@ -281,13 +280,89 @@ const useColumns = (
                     navigate(`/purchase/request/detail/${row.original.id}`),
                 },
               ]}
-              placement="center-end"
+              placement="bottom-center"
             />
           );
         },
       },
     ],
     [navigate, setIsOpen, setId]
+  );
+
+  const columnsViewOnly = useCallback(
+    () => [
+      {
+        Header: "ID",
+        accessor: "id",
+        Cell: ({ row }) => row.original.id,
+      },
+      {
+        Header: "Item Permintaan",
+        accessor: "total_items",
+        Cell: ({ row }) => row.original.total_items,
+      },
+
+      {
+        Header: "Departemen",
+        accessor: "department_id",
+        Cell: ({ row }) => findDepartement(row.original.department_id) || "-",
+      },
+      {
+        Header: "HOD",
+        accessor: "hod",
+        Cell: ({ row }) => row.original.hod || "-",
+      },
+      {
+        Header: "Tanggal Permintaan",
+        accessor: "request_date",
+        Cell: ({ row }) => {
+          return formatDate(row.original.request_date);
+        },
+      },
+      {
+        Header: "Tanggal Persetujuan",
+        accessor: "approval_date",
+        Cell: ({ row }) => {
+          return formatDate(row.original.approval_date);
+        },
+      },
+      {
+        Header: "Dibeli Oleh",
+        accessor: "buyer",
+        Cell: ({ row }) => {
+          return row.original.buyer || "-";
+        },
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: ({ row }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+              row.original.status
+            )}`}
+          >
+            {getStatusName(row.original.status)}
+          </span>
+        ),
+      },
+      {
+        accessor: "action",
+        Cell: ({ row }) => (
+          <TableListDropdown
+            dropdownItemList={[
+              {
+                label: "Lihat Detail",
+                onClick: () =>
+                  navigate(`/purchase/request/detail/${row.original.id}`),
+              },
+            ]}
+            placement="bottom-center"
+          />
+        ),
+      },
+    ],
+    [navigate]
   );
 
   const columnsItemPurchase = useCallback(
@@ -339,7 +414,7 @@ const useColumns = (
                 },
               },
             ]}
-            placement="center-end"
+            placement="bottom-center"
           />
         ),
       },
@@ -350,6 +425,7 @@ const useColumns = (
   return {
     columnsDepartment,
     columnsPpic,
+    columnsViewOnly,
     columnsItemPurchase,
     columnsFactoryManager,
   };

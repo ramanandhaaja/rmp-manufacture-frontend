@@ -7,6 +7,12 @@ export async function getGoodsCategoryApi(params) {
     params,
   });
 }
+export async function getGoodsCategoryByIdApi(id) {
+  return ApiService.fetchData({
+    url: `goods-category/${id}`,
+    method: "get",
+  });
+}
 
 export async function postGoodsCategoryApi(data) {
   return ApiService.fetchData({

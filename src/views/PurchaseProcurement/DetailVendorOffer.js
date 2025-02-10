@@ -10,7 +10,7 @@ import { formatNumber } from "utils/helpers";
 
 const DetailVendorOffer = () => {
   const { id } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { getDetailVendorOffer, dataOfferPoVendors, dataDetailPurchaseOrder } =
     usePurchaseOrder(id);
   const vendorDetail = dataOfferPoVendors?.vendor_detail;

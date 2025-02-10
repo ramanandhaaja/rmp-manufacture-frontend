@@ -172,7 +172,6 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
   //     }
   //   }
   // }, [dataDetailPurchaseOrder, dataVendor]);
-  console.log(selectedPoVendors);
 
   useEffect(() => {
     if (selectedPoVendors) {

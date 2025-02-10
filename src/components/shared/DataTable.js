@@ -250,7 +250,7 @@ const DataTable = (props) => {
                           )}
                           onClick={() => handleSort(column)}
                         >
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
                             {column.render("Header")}{" "}
                             <Sorter sort={column.isSortedDesc} />
                           </div>

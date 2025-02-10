@@ -528,7 +528,7 @@ const navigationConfig = [
       },
       {
         key: "purchase.payment",
-        path: "/purchase/payment",
+        path: "/purchase/pembayaran",
         title: "Pembayaran",
         icon: "",
         translateKey: "nav.purchase.payment",

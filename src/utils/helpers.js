@@ -413,6 +413,19 @@ export function getStatusClassName(status) {
   return RMPSTATUSCOLOR[status] || "bg-gray-500 text-white";
 }
 
+export function getStatusName(status) {
+  switch (status) {
+    case "approved":
+      return "Disetujui";
+    case "rejected":
+      return "Ditolak";
+    case "waiting":
+      return "Menunggu Persetujuan";
+    default:
+      return "-";
+  }
+}
+
 export function getPoStatusClassName(status) {
   return PO_STATUS_STYLES[status] || "bg-gray-500 text-white";
 }

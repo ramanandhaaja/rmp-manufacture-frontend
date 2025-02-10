@@ -1,56 +1,53 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import TimelineCustom from "components/custom/TimelineCustom";
-
-//dummy data timeline
-const steps = [
-  {
-    date: "2024-05-19",
-    title: "PO [PO0001] ATK Kantor - Bermasalah",
-    description: "Lorem Ipsum",
-    completed: true,
-  },
-  {
-    date: "2024-04-14",
-    title: "PO [PO0002] ATK Kantor - Bermasalah",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-14",
-    title: "PO [PO0003] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-14",
-    title: "PO [PO0004] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-13",
-    title: "PO [PO0005] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-12",
-    title: "PO [PO0006] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-];
+import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
+import { useParams } from "react-router-dom";
+import { NoDataSvg } from "assets/svg";
 
 const InformasiPembelian = () => {
+  const { getProcurementLog } = usePurchaseOrder();
+  const [logData, setLogData] = useState([]);
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getProcurementLog({ purchase_request_id: id });
+      console.log(response.data);
+      setLogData(response.data);
+    };
+    fetchData();
+  }, []);
+
+  const transformLogsToTimelineData = (logs) => {
+    return logs.map((log) => ({
+      date: log.created_at,
+      title: log.log_name,
+      description: log.log_description,
+      completed: true,
+    }));
+  };
+
   return (
     <>
-      <div className="p-6 bg-white rounded-lg">
+      <div className="p-6 bg-white rounded-lg min-h-full">
         <div className="border-b border-gray-500 mb-4">
           <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
             Informasi Pembelian
           </h1>
         </div>
-        <TimelineCustom />
+        {logData.length === 0 && (
+          <div className="flex  flex-col justify-center items-center ">
+            <NoDataSvg />
+
+            <div className="flex flex-col gap-1 items-center mt-[21px]">
+              <p className="text-blue-999 text-lg font-bold">Belum Ada Data</p>
+              <p className="text-blue-999">
+                Data informasi pembelian belum tersedia
+              </p>
+            </div>
+          </div>
+        )}
+        <TimelineCustom steps={transformLogsToTimelineData(logData)} />
       </div>
     </>
   );
