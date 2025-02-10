@@ -7,6 +7,7 @@ const ApprovalCard = ({
   isLoading = false,
   onOpenConfirmModal,
   onOpenNoteModal,
+  data,
 }) => {
   const buttonConfig = {
     revision: {
@@ -75,14 +76,14 @@ const ApprovalCard = ({
 
       <div className="flex gap-1">
         <Button
-          size="xs"
+          size="sm"
           onClick={() => handleButtonClick(buttonConfig.reject)}
           className={buttonConfig.reject.className}
         >
           {buttonConfig.reject.label}
         </Button>
         <Button
-          size="xs"
+          size="sm"
           variant="solid"
           onClick={() => handleButtonClick(buttonConfig.approve)}
           className={buttonConfig.approve.className}

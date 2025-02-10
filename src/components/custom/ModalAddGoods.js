@@ -45,8 +45,8 @@ const ModalAddGoods = ({ ...props }) => {
               width={780}
               className="text-gray-700 text-base"
             >
-              {dataItemAdded.goods_id}-{dataItemAdded.goods_name} berhasil
-              ditambahkan ke {dataItemAdded.po_number}-{dataItemAdded.po_name}
+              {dataItemAdded.goods_id} - {dataItemAdded.goods_name} berhasil
+              ditambahkan ke {dataItemAdded.po_number} - {dataItemAdded.po_name}
             </Notification>
           )}
         </div>

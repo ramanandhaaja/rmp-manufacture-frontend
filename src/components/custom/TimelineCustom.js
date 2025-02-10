@@ -1,52 +1,13 @@
 import React from "react";
 import { formatDate } from "utils/helpers";
-// dummy data step
-const steps = [
-  {
-    date: "2024-05-19",
-    title: "PO [PO0001] ATK Kantor - Bermasalah",
-    description: "Lorem Ipsum",
-    completed: true,
-  },
-  {
-    date: "2024-04-14",
-    title: "PO [PO0002] ATK Kantor - Bermasalah",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-14",
-    title: "PO [PO0003] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-14",
-    title: "PO [PO0004] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-13",
-    title: "PO [PO0005] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-  {
-    date: "2024-04-12",
-    title: "PO [PO0006] ATK Kantor - Baik",
-    description: "Lorem Ipsum",
-    completed: false,
-  },
-];
 
-const Timeline = () => {
+const Timeline = ({ steps }) => {
   return (
-    <div className="relative right-[40%]">
+    <div className="relative right-[32%]">
       {steps?.map((step, index) => (
         <div key={index} className="mb-8 flex items-start">
           {/* Vertical line */}
-          {index !== steps.length - 1 && (
+          {index !== steps?.length - 1 && (
             <div className="absolute left-[50%] top-0 h-full w-0.5 bg-gray-200" />
           )}
 
@@ -54,8 +15,17 @@ const Timeline = () => {
           <div className="flex items-center w-full">
             {/* Date on the left */}
             <div className="flex-1 text-right pr-4">
-              <div className="text-sm text-gray-500">
-                {formatDate(step.date)}
+              <div className="inline-flex items-center space-x-2">
+                <div className="text-sm text-gray-500">
+                  {formatDate(step.date)}
+                </div>
+                {step.additionalInfo && (
+                  <div
+                    className={`text-sm ${step.additionalInfoColor} px-2 py-1 text-white rounded w-[100px] text-center`}
+                  >
+                    {step.additionalInfo}
+                  </div>
+                )}
               </div>
             </div>
 

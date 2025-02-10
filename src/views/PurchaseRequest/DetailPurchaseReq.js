@@ -57,9 +57,7 @@ const DetailPurchaseReq = () => {
     onSave: null,
   });
 
-  const isApprovalShown =
-    userRole?.includes("factory-manager") &&
-    dataDetailPurchase.status === "waiting";
+  const isApprovalShown = userRole?.includes("factory-manager");
 
   const columns = [
     {
@@ -143,9 +141,8 @@ const DetailPurchaseReq = () => {
           placement: "top-center",
         }
       );
-      setTimeout(() => {
-        navigate("/purchase/request");
-      }, 1000);
+      await getDetailPurchaseReq(id);
+
       setConfirmModalProps((prev) => ({ ...prev, isOpen: false }));
       setNoteModalProps((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
@@ -205,7 +202,7 @@ const DetailPurchaseReq = () => {
             }
           );
           setTimeout(() => {
-            navigate("/purchase/request");
+            window.location.reload();
           }, 1000);
         } else {
           toast.push(<Notification type="danger" title={response.message} />, {
@@ -261,6 +258,7 @@ const DetailPurchaseReq = () => {
     return (
       <div className="px-2 py-4">
         <ApprovalCard
+          data={dataDetailPurchase}
           handleStatusUpdate={handleStatusUpdate}
           isLoading={isLoading}
           onOpenConfirmModal={handleOpenConfirmModal}
@@ -279,17 +277,17 @@ const DetailPurchaseReq = () => {
           </h1>
 
           {dataDetailPurchase.status === "approved" && (
-            <div className="bg-blue-200 text-blue-800 h-8 px-3 py-1 rounded-lg text-sm">
+            <div className="bg-emerald-600 text-white h-8 px-3 py-1 rounded-lg text-sm">
               Disetujui
             </div>
           )}
           {dataDetailPurchase.status === "rejected" && (
-            <div className="bg-red-200 text-gray-700 h-8 px-3 py-1 rounded-lg text-sm">
+            <div className="bg-red-500 text-white h-8 px-3 py-1 rounded-lg text-sm">
               Ditolak
             </div>
           )}
           {dataDetailPurchase.status === "waiting" && (
-            <div className="bg-gray-200 text-gray-700 h-8 px-3 py-1 rounded-lg text-sm">
+            <div className="bg-yellow-500 text-white h-8 px-3 py-1 rounded-lg text-sm">
               Menunggu Persetujuan
             </div>
           )}

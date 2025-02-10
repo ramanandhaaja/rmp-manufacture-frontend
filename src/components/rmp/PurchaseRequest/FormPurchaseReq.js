@@ -19,13 +19,18 @@ import SearchBar from "components/custom/SearchBar";
 import useUser from "utils/hooks/useUser";
 import useColumns from "utils/hooks/PurchaseRequest/useColumn";
 import useMeasurement from "utils/hooks/useMeasurement";
-import { useSelector } from "react-redux";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
+import TableListDropdown from "components/template/TableListDropdown";
 
 const FormPurchaseReq = forwardRef(
   ({ setFormData, initialData, isEdit }, ref) => {
     const formikRef = useRef(null);
-    const { getGoodsCategory, dataGoodsCategory } = useGoodsCategory();
+    const {
+      getGoodsCategory,
+      dataGoodsCategory,
+      getGoodsCategoryDetail,
+      detailGoodsCategory,
+    } = useGoodsCategory();
     const { getGoods, dataMasterGoods } = useMasterGoods();
     const [tableData, setTableData] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
@@ -34,17 +39,10 @@ const FormPurchaseReq = forwardRef(
     const [isLoading, setIsLoading] = useState(false);
     const { user, userRole } = useUser();
     const [editingItem, setEditingItem] = useState(null);
-    const { columnsItemPurchase } = useColumns(
-      setIsOpen,
-      null,
-      setIsOpenDelete,
-      setId,
-      setEditingItem
-    );
     const userName = user.name;
     const { measurementUnits, getMeasurementUnits } = useMeasurement();
-    const { goodsType } = useSelector((state) => state.goodsType);
     const isPpic = userRole.includes("ppic");
+    const [goodsCategoryId, setGoodsCategoryId] = useState(null);
     const initialValues = {
       request_date: "",
       buyer: "",
@@ -125,6 +123,60 @@ const FormPurchaseReq = forwardRef(
       },
     ];
 
+    const columns = [
+      {
+        Header: "Kode",
+        accessor: "id",
+        Cell: ({ row }) => row.original.goods_id,
+      },
+      {
+        Header: "Barang",
+        accessor: "goods",
+        Cell: ({ row }) => row.original.goods_name,
+      },
+      {
+        Header: "Kategori Barang",
+        accessor: "goods_category",
+        Cell: ({ row }) => row.original.goods_category_name,
+      },
+      {
+        Header: "Quantity",
+        accessor: "quantity",
+        Cell: ({ row }) => row.original.quantity,
+      },
+      {
+        Header: "UOM",
+        accessor: "measurement",
+        Cell: ({ row }) =>
+          row.original.measurement.label || row.original.measurement,
+      },
+
+      {
+        accessor: "action",
+        Cell: ({ row }) => (
+          <TableListDropdown
+            dropdownItemList={[
+              {
+                label: "Edit",
+                onClick: () => {
+                  setIsOpen(true);
+                  setEditingItem(row.original);
+                },
+              },
+              {
+                label: "Delete",
+                onClick: () => {
+                  setIsOpenDelete(true);
+                  setId(row.original.id);
+                },
+              },
+            ]}
+            placement="bottom-center"
+          />
+        ),
+      },
+    ];
+
     const buyerOptions = [
       { value: "Ppic", label: "Ppic" },
       { value: "Head Office", label: "Head Office" },
@@ -139,12 +191,19 @@ const FormPurchaseReq = forwardRef(
     useEffect(() => {
       getGoodsCategory({ all: true });
     }, []);
+
     useEffect(() => {
       getGoods({ all: true });
     }, []);
     useEffect(() => {
       getMeasurementUnits();
     }, []);
+
+    useEffect(() => {
+      if (goodsCategoryId) {
+        getGoodsCategoryDetail(goodsCategoryId);
+      }
+    }, [goodsCategoryId]);
 
     useEffect(() => {
       if (isEdit) {
@@ -160,6 +219,7 @@ const FormPurchaseReq = forwardRef(
     // Function for adding new item
     const handleAddItem = (item) => {
       const transformedItem = {
+        goods_category_id: item.goods_category.value,
         goods_id: item.goods.value,
         goods_name: item.goods.label,
         goods_category_name: item.goods_category.label,
@@ -169,12 +229,12 @@ const FormPurchaseReq = forwardRef(
       };
 
       setTableData([...tableData, transformedItem]);
+      setGoodsCategoryId(transformedItem.goods_category_id);
       setIsOpen(false);
     };
 
     // Function for editing existing item
     const handleEditItem = (item) => {
-      console.log(item);
       const transformedItem = {
         goods_id: item.goods.value,
         goods_name: item.goods.label,
@@ -235,7 +295,7 @@ const FormPurchaseReq = forwardRef(
           buyer: values.buyer,
           purchase_reason: values.purchase_reason,
           purchase_reason_detail: values.purchase_reason_detail,
-          request_type: goodsType,
+          request_type: detailGoodsCategory?.goods_type,
           notes: values.notes,
           created_by: userName,
           items: mappedItems,
@@ -244,7 +304,7 @@ const FormPurchaseReq = forwardRef(
           buyer: values.buyer,
           purchase_reason: values.purchase_reason,
           purchase_reason_detail: values.purchase_reason_detail,
-          request_type: goodsType,
+          request_type: detailGoodsCategory?.goods_type,
           notes: values.notes,
           updated_by: userName,
           items: mappedItems,
@@ -266,6 +326,7 @@ const FormPurchaseReq = forwardRef(
         setSubmitting(false);
       }
     };
+
     useImperativeHandle(ref, () => ({
       handleSubmit: () => {
         if (formikRef.current) {
@@ -380,10 +441,7 @@ const FormPurchaseReq = forwardRef(
                         </span>
                       </Button>
                     </div>
-                    <CustomTable
-                      data={tableData}
-                      columns={columnsItemPurchase()}
-                    />
+                    <CustomTable data={tableData} columns={columns} />
                   </div>
 
                   <FormItem

@@ -84,7 +84,7 @@ const ModalMock = forwardRef(
                   {formikProps.touched[fieldName] &&
                     formikProps.errors[fieldName] && (
                       <p className="mt-1 text-sm text-red-600">
-                        {formikProps.errors[fieldName]}
+                        status harus dipilih{" "}
                       </p>
                     )}
                 </div>

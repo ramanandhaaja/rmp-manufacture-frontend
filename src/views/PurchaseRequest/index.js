@@ -7,14 +7,16 @@ import { setGoodsType } from "store/goodsTypeSlice";
 const Page = () => {
   const [activeTab, setActiveTab] = useState("material");
   const dispatch = useDispatch();
-  const { goodsType } = useSelector((state) => state.goodsType);
 
   const handleTabChange = (value) => {
     dispatch(setGoodsType(value));
     setActiveTab(value);
   };
 
-  console.log(goodsType);
+  useEffect(() => {
+    setActiveTab("material");
+    dispatch(setGoodsType("material"));
+  }, []);
 
   return (
     <div className="p-6 bg-white rounded-lg">

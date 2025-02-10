@@ -1,5 +1,6 @@
 import {
   getGoodsCategoryApi,
+  getGoodsCategoryByIdApi,
   postGoodsCategoryApi,
   deleteGoodsCategoryApi,
   putGoodsCategoryApi,
@@ -54,6 +55,26 @@ function useGoodsCategory() {
           per_page: perPage,
         },
       };
+    } catch (errors) {
+      console.log(errors);
+      return {
+        status: "failed",
+        message: errors?.response?.data?.message || errors.toString(),
+      };
+    }
+  };
+
+  const getGoodsCategoryDetail = async (id) => {
+    try {
+      const response = await getGoodsCategoryByIdApi(id);
+      if (response.data) {
+        dispatch(setDataDetailGoodsCategory(response.data));
+        return {
+          status: "success",
+          message: "",
+          data: response.data,
+        };
+      }
     } catch (errors) {
       console.log(errors);
       return {
@@ -137,6 +158,7 @@ function useGoodsCategory() {
 
   return {
     getGoodsCategory,
+    getGoodsCategoryDetail,
     dataGoodsCategory,
     detailGoodsCategory,
     createGoodsCategory,

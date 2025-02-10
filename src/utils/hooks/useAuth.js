@@ -28,16 +28,15 @@ function useAuth() {
   const signIn = async (values) => {
     try {
       const resp = await apiSignInCurrent(values);
+      console.log(resp);
       if (resp.data) {
         dispatch(
           onSignInSuccess({
-            access_token: resp.data?.data?.token || "",
-            access_token_expires_at:
-              resp.data?.data?.access_token_expires_at || "",
-            refresh_token: resp.data?.data?.refresh_token || "",
-            refresh_token_expires_at:
-              resp.data?.data?.refresh_token_expires_at || "",
-            session_id: resp.data?.data?.session_id || "",
+            access_token: resp.data?.data.token || "",
+            access_token_expires_at: resp.data?.access_token_expires_at || "",
+            refresh_token: resp.data?.refresh_token || "",
+            refresh_token_expires_at: resp.data?.refresh_token_expires_at || "",
+            session_id: resp.data?.session_id || "",
           })
         );
 
@@ -52,7 +51,7 @@ function useAuth() {
               }
             )
           );
-          localStorage.setItem("user", JSON.stringify(resp.data.data.user));
+          localStorage.setItem("user", JSON.stringify(resp.data?.data.user));
         }
         const redirectUrl = query.get(REDIRECT_URL_KEY);
         navigate(redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath);
@@ -123,7 +122,7 @@ function useAuth() {
     dispatch(setUser(initialState));
     dispatch(setUserRole([]));
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem("admin");
     navigate(appConfig.unAuthenticatedEntryPath);
   };
 

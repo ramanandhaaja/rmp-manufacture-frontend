@@ -12,5 +12,5 @@ export const goodsTypeSlice = createSlice({
   },
 });
 
-export const { goodsType, setGoodsType } = goodsTypeSlice.actions;
+export const { setGoodsType } = goodsTypeSlice.actions;
 export default goodsTypeSlice.reducer;

@@ -24,6 +24,8 @@ import { useDispatch } from "react-redux";
 import { setIdPo } from "store/PurchaseOrder/purchaseOrderSlice";
 import AddPoGoodsList from "components/rmp/PurchaseProcurement/AddPoGoodsList";
 import { clearVendorSelections } from "store/PurchaseOrder/purchaseOrderSlice";
+import { MdNavigateNext } from "react-icons/md";
+import { Loading } from "components/shared";
 
 const ProcessPurchaseOrder = () => {
   const navigate = useNavigate();
@@ -41,8 +43,6 @@ const ProcessPurchaseOrder = () => {
   const { userRole, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingAdd, setIsLoadingAdd] = useState(false);
-
-  const formikRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -52,9 +52,9 @@ const ProcessPurchaseOrder = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isOpenConfirmation, setIsOpenConfirmation] = useState(false);
   const [isOpenConfirmationAdd, setIsOpenConfirmationAdd] = useState(false);
-  const [dataTableItems, setTableDataItems] = useState([]);
-  const [selectedVendor, setSelectedVendor] = useState(null);
   const dataItemPo = dataDetailPurchaseOrder?.items;
+  const [dataTableItems, setTableDataItems] = useState();
+  const [selectedVendor, setSelectedVendor] = useState(null);
 
   const handleVendorSelected = (vendor) => {
     setSelectedVendor(vendor);
@@ -62,10 +62,13 @@ const ProcessPurchaseOrder = () => {
   };
 
   useEffect(() => {
-    if (dataItemPo.length > 0) {
+    setTableDataItems(dataItemPo);
+    if (dataItemPo?.length == 0) {
+      setActiveTab(0);
+    } else {
       setActiveTab(1);
     }
-  }, [dataDetailPurchaseOrder]);
+  }, [dataItemPo]);
 
   const columnsAddModal = [
     {
@@ -139,13 +142,6 @@ const ProcessPurchaseOrder = () => {
       },
     },
   ];
-
-  useEffect(() => {
-    if (id) {
-      getPoDetail(id);
-      getPoQueueList(id);
-    }
-  }, [id]);
 
   const handleAddToPo = async () => {
     try {
@@ -351,7 +347,7 @@ const ProcessPurchaseOrder = () => {
           <Steps.Item
             title="Daftar Barang"
             description="Langkah 1"
-            status="in-progress"
+            status={dataItemPo?.length > 0 ? "complete" : "in-progress"}
           />
           <Steps.Item
             title="Daftar Vendor"
@@ -389,11 +385,19 @@ const ProcessPurchaseOrder = () => {
           )}
         </div>
       </div>
+
       <Tabs value={activeTab} onChange={handleStepChange} variant="underline">
         <Tabs.TabList>
-          <Tabs.TabNav value={0} className="flex-col" disabled>
-            <span className="text-base">Daftar Barang</span>
-            <span className="text-sm text-gray-500">Langkah 1</span>
+          <Tabs.TabNav value={0} disabled>
+            <div className="flex items-center">
+              <div className=" flex flex-col">
+                <span className="text-base ">Daftar Barang</span>
+                <span className="text-sm text-gray-500 ">Langkah 1 </span>
+              </div>
+              <div className="ml-2">
+                <MdNavigateNext size={24} />
+              </div>
+            </div>
           </Tabs.TabNav>
           <Tabs.TabNav value={1} className="flex-col" disabled>
             <span className="text-base">Daftar Vendor</span>
@@ -414,6 +418,7 @@ const ProcessPurchaseOrder = () => {
           <ChooseVendorList onPayloadVendorChange={handleVendorSelected} />
         </Tabs.TabContent>
       </Tabs>
+
       <div className="border-b border-gray-400 w-full mb-4 "></div>
       <div className="flex justify-end gap-2 py-4">
         <Button onClick={handleBackStep} disabled={activeTab == 0}>
@@ -422,8 +427,12 @@ const ProcessPurchaseOrder = () => {
         {activeTab == 0 ? (
           <Button
             variant="solid"
-            onClick={() => setIsOpenConfirmationAdd(true)}
-            disabled={activeTab == 1}
+            onClick={() =>
+              dataItemPo.length > 0
+                ? handleNextStep()
+                : setIsOpenConfirmationAdd(true)
+            }
+            disabled={dataTableItems?.length == 0}
             loading={isLoadingAdd}
           >
             Selanjutnya
@@ -467,8 +476,8 @@ const ProcessPurchaseOrder = () => {
         onClose={handleClose}
         data={dataPurchaseQueue}
         column={columnsAddModal}
-        category={dataDetailPurchaseOrder.category_name}
-        type={dataDetailPurchaseOrder.po_type}
+        category={dataDetailPurchaseOrder?.category_name}
+        type={dataDetailPurchaseOrder?.po_type}
         loading={isLoadingAdd}
         setShowNotification={setShowNotification}
         showNotification={showNotification}

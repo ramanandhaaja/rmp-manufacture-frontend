@@ -95,7 +95,7 @@ const AddPurchaseReq = () => {
         textClass="text-slate-500 text-base"
         isLoading={isLoading}
         disableCancel={false}
-        buttonType="button"
+        buttonType="submit"
         width={500}
         contentClassName="p-5 rounded-2xl"
       />

@@ -1,141 +1,354 @@
-import CustomTable from "components/custom/CustomTable";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Pagination, Alert } from "components/ui";
-import ConfirmationCustom from "components/custom/ConfirmationCustom";
-import TableHeader from "../TableHeader";
-import { formatDate } from "utils/helpers";
-import TableListDropdown from "components/template/TableListDropdown";
-import useColumns from "utils/hooks/PurchaseRequest/useColumn";
-import useUser from "utils/hooks/useUser";
+import { Alert, Notification, toast } from "components/ui";
+import DataTable from "components/shared/DataTable";
+import { Tools } from "./Tools";
 import usePurchaseRequest from "utils/hooks/PurchaseRequest/usePurchaseRequest";
-import { Notification, toast } from "components/ui";
 import { useSelector } from "react-redux";
+import useColumns from "utils/hooks/PurchaseRequest/useColumn";
+import TableListDropdown from "components/template/TableListDropdown";
+import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import ModalStatusInput from "components/custom/ModalStatusInput";
+import { PageConfig, getColumnConfig } from "./config";
+import useUser from "utils/hooks/useUser";
+import { findDepartement, getStatusClassName, formatDate } from "utils/helpers";
+import capitalize from "components/ui/utils/capitalize";
 
 const PurchaseRequestList = () => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenStatus, setIsOpenStatus] = useState(false);
-
+  const [localState, setLocalState] = useState({
+    params: {
+      page: 1,
+      per_page: 10,
+      q: "",
+      options: {},
+    },
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingList, setIsLoadingList] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [id, setId] = useState(null);
-  const {
-    dataPurchase,
-    getPurchaseReqList,
-    deletePurchaseReq,
-    updatePurchaseReqStatus,
-  } = usePurchaseRequest();
-  const { columnsDepartment, columnsPpic, columnsFactoryManager } = useColumns(
-    setIsOpen,
-    setIsOpenStatus,
-    null,
-    setId
-  );
-  const { user, userRole } = useUser();
-  const departemenColumn = columnsDepartment();
-  const ppicColumn = columnsPpic();
-  const factoryManagerColumn = columnsFactoryManager();
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenStatus, setIsOpenStatus] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const { getPurchaseReqList, deletePurchaseReq, updatePurchaseReqStatus } =
+    usePurchaseRequest();
   const { goodsType } = useSelector((state) => state.goodsType);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const { userRole } = useUser();
+  const pageConfig = PageConfig(userRole);
+
+  const getActionColumn = () => {
+    if (userRole.includes("department")) {
+      return {
+        Header: "Action",
+        accessor: "action",
+        Cell: ({ row }) => (
+          <TableListDropdown
+            dropdownItemList={[
+              {
+                label: "Lihat Detail",
+                onClick: () =>
+                  navigate(`/purchase/request/detail/${row.original.id}`),
+              },
+              {
+                label: "Edit",
+                // onClick: () =>
+                //   navigate(`/vendor-management/edit-vendor/${row.original.id}`),
+              },
+              {
+                label: "Delete",
+                onClick: () => {
+                  setIsOpen(true);
+                  setId(row.original.id);
+                },
+              },
+            ]}
+            placement={
+              localState.params.data.length > 1 && row.index < 1
+                ? "bottom-end"
+                : "top-end"
+            }
+          />
+        ),
+      };
+    }
+
+    if (userRole.includes("ppic")) {
+      return {
+        Header: "Action",
+        accessor: "action",
+        Cell: ({ row }) => {
+          const renderDropdown = () => {
+            if (row.original.buyer === null) {
+              return [
+                {
+                  label: "Follow-up Permintaan",
+                  onClick: () =>
+                    navigate(
+                      `/purchase/request/detail/follow-up/${row.original.id}`
+                    ),
+                },
+                {
+                  label: "Lihat Detail",
+                  onClick: () =>
+                    navigate(`/purchase/request/detail/${row.original.id}`),
+                },
+                {
+                  label: "Delete",
+                  onClick: () => {
+                    setIsOpen(true);
+                    setId(row.original.id);
+                  },
+                },
+              ];
+            } else {
+              return [
+                {
+                  label: "Lihat Detail",
+                  onClick: () =>
+                    navigate(`/purchase/request/detail/${row.original.id}`),
+                },
+                {
+                  label: "Delete",
+                  onClick: () => {
+                    setIsOpen(true);
+                    setId(row.original.id);
+                  },
+                },
+              ];
+            }
+          };
+
+          return (
+            <TableListDropdown
+              dropdownItemList={renderDropdown()}
+              placement={
+                localState.params.data.length > 1 && row.index < 1
+                  ? "bottom-end"
+                  : "top-end"
+              }
+            />
+          );
+        },
+      };
+    }
+
+    if (userRole.includes("factoryManager")) {
+      return {
+        Header: "Action",
+        accessor: "action",
+        Cell: ({ row }) => {
+          const { status } = row.original;
+          if (status === "approved") {
+            return (
+              <TableListDropdown
+                dropdownItemList={[
+                  {
+                    label: "Lihat Detail",
+                    onClick: () =>
+                      navigate(`/purchase/request/detail/${row.original.id}`),
+                  },
+                ]}
+                placement={
+                  localState.params.data.length > 1 && row.index < 1
+                    ? "bottom-end"
+                    : "top-end"
+                }
+              />
+            );
+          }
+          return (
+            <TableListDropdown
+              dropdownItemList={[
+                {
+                  label: "Konfirmasi Permintaan",
+                  onClick: () => {
+                    setIsOpenStatus(true);
+                    setId(row.original.id);
+                  },
+                },
+                {
+                  label: "Lihat Detail",
+                  onClick: () =>
+                    navigate(`/purchase/request/detail/${row.original.id}`),
+                },
+              ]}
+              placement={
+                localState.params.data.length > 1 && row.index < 1
+                  ? "bottom-end"
+                  : "top-end"
+              }
+            />
+          );
+        },
+      };
+    }
+
+    if (userRole.includes("viewOnly")) {
+      return {
+        Header: "Action",
+        accessor: "action",
+        Cell: ({ row }) => (
+          <TableListDropdown
+            dropdownItemList={[
+              {
+                label: "Lihat Detail",
+                onClick: () =>
+                  navigate(`/purchase/request/detail/${row.original.id}`),
+              },
+            ]}
+            placement={
+              localState.params.data.length > 1 && row.index < 1
+                ? "bottom-end"
+                : "top-end"
+            }
+          />
+        ),
+      };
+    }
+
+    return {
+      Header: "Action",
+      accessor: "action",
+      Cell: ({ row }) => (
+        <TableListDropdown
+          placement={
+            localState.params.data.length > 1 && row.index < 1
+              ? "bottom-end"
+              : "top-end"
+          }
+          dropdownItemList={[
+            {
+              label: "Lihat Detail",
+              onClick: () =>
+                navigate(`/purchase/request/detail/${row.original.id}`),
+            },
+          ]}
+        />
+      ),
+    };
+  };
+
+  const getColumns = (userRole) => {
+    const columnConfig = getColumnConfig(userRole);
+
+    const columns = columnConfig.map((field) => ({
+      Header: field.label,
+      accessor: field.key,
+      sortable: field.sortable,
+      width: field.width,
+      Cell: ({ row }) => {
+        const value = row.original[field.key];
+        switch (field.key) {
+          case "department_id":
+            return findDepartement(value);
+          case "request_date":
+          case "approval_date":
+            return formatDate(value);
+          case "buyer":
+            return value || "-";
+          case "hod":
+            return value || "-";
+          case "status":
+            return (
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+                  value
+                )}`}
+              >
+                {capitalize(value)}
+              </span>
+            );
+          default:
+            return value;
+        }
+      },
+    }));
+
+    if (pageConfig.enableActions) {
+      columns.push(getActionColumn());
+    }
+
+    return columns;
+  };
+
+  const fetchData = async (params = localState.params) => {
+    setIsLoading(true);
+    try {
+      const response = await getPurchaseReqList(goodsType);
+
+      setLocalState((prev) => ({
+        ...prev,
+        params: {
+          ...params,
+          total: response.data?.total,
+          per_page: response.data?.per_page,
+          data: response.data?.data,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching purchase requests:", error);
+      toast.push(
+        <Notification type="danger" title="Gagal memuat data permintaan" />,
+        {
+          placement: "top-center",
+        }
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPurchaseRequests = async () => {
-      setIsLoadingList(true);
-      try {
-        const requestType =
-          goodsType === "material" ? "material" : "non-material";
-        const response = await getPurchaseReqList(requestType);
+    fetchData();
+  }, [goodsType]);
 
-        setTotal(response.data?.total);
-        setPageSize(response.data?.per_page);
-      } catch (error) {
-        console.error("Error fetching purchase requests:", error);
-      } finally {
-        setIsLoadingList(false);
-      }
-    };
-
-    if (goodsType) {
-      fetchPurchaseRequests();
-    }
-  }, []);
-
-  const handleColumn = () => {
-    if (userRole.includes("department")) {
-      return departemenColumn;
-    }
-    if (userRole.includes("ppic")) {
-      return ppicColumn;
-    }
-    if (userRole.includes("factory-manager")) {
-      return factoryManagerColumn;
-    }
-    return departemenColumn;
+  const handlePaginationChange = (page) => {
+    fetchData({
+      ...localState.params,
+      page,
+    });
   };
 
-  const getCurrentPageData = () => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return dataPurchase.slice(startIndex, endIndex);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const handlePageSizeChange = (size) => {
+    fetchData({
+      ...localState.params,
+      per_page: size,
+      page: 1,
+    });
   };
 
   const handleDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await deletePurchaseReq(id);
-      console.log(response);
+      const response = await deletePurchaseReq(selectedId);
+
       if (response.status === "success") {
-        console.log("success");
         toast.push(<Notification type="success" title={response.message} />, {
           placement: "top-center",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      } else {
-        console.log(response.status);
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        fetchData();
       }
-    } catch (err) {
-      console.log(err);
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-        setIsOpen(false);
-      }, 1000);
+      setIsLoading(false);
+      setIsOpenDelete(false);
     }
   };
 
   const handleStatusUpdate = async (values) => {
     try {
       setIsLoading(true);
-      const response = await updatePurchaseReqStatus(id, {
+      const response = await updatePurchaseReqStatus(selectedId, {
         status: values.status.value,
       });
+
       if (response.status === "success") {
         toast.push(<Notification type="success" title={response.message} />, {
           placement: "top-center",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      } else {
-        toast.push(<Notification type="danger" title={response.message} />, {
-          placement: "top-center",
-        });
+        fetchData();
       }
-    } catch (err) {
-      console.log(err);
     } finally {
       setIsLoading(false);
       setIsOpenStatus(false);
@@ -143,49 +356,56 @@ const PurchaseRequestList = () => {
   };
 
   return (
-    <div>
-      <TableHeader
-        onClickAdd={() => navigate("/purchase/request/tambah")}
-        addBtnTitle={
-          Array.isArray(userRole) && userRole.includes("procurement")
-            ? "Proses Antrian Barang"
-            : "Tambah Permintaan Pembelian"
-        }
-        showBtnAdd={
-          Array.isArray(userRole) && userRole?.includes("factory-manager")
-            ? false
-            : true
-        }
+    <div className="space-y-4">
+      <Tools
+        localState={localState}
+        getData={fetchData}
+        deleteIds={selectedIds}
+        setIds={setSelectedIds}
+        pageConfig={pageConfig}
+        onAddNew={() => navigate("/purchase/request/tambah")}
+        addBtnTitle="Permintaan Pembelian Baru"
       />
-      <CustomTable data={getCurrentPageData()} columns={handleColumn()} />
-      <div className="flex justify-end mt-2">
-        <Pagination
-          className="pagination-bar"
-          total={total}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          onChange={handlePageChange}
-          displayTotal
-        />
-      </div>
+
+      <DataTable
+        columns={getColumns(userRole)}
+        data={localState.params.data || []}
+        loading={isLoading}
+        pagingData={{
+          total: localState.params.total || 0,
+          pageIndex: localState.params.page,
+          pageSize: localState.params.per_page,
+        }}
+        onPaginationChange={handlePaginationChange}
+        onSelectChange={handlePageSizeChange}
+        selectable={pageConfig.enableBulkDelete}
+        onCheckBoxChange={(checked, row) => {
+          setSelectedIds((prev) =>
+            checked ? [...prev, row.id] : prev.filter((id) => id !== row.id)
+          );
+        }}
+        showPagination={pageConfig.enablePagination}
+        showLimitPerPage={pageConfig.enableLimitPerPage}
+      />
+
       <ConfirmationCustom
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onConfirm={() => handleDelete(id)}
-        title="Delete Confirmation"
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+        onConfirm={handleDelete}
+        title="Konfirmasi Hapus"
         text="Anda yakin akan menghapus data ini?"
         confirmText="Hapus"
         isLoading={isLoading}
       />
+
       <ModalStatusInput
         isOpen={isOpenStatus}
         onClose={() => setIsOpenStatus(false)}
-        // onConfirm={() => handleStatus(id)}
-        title="Konfirmasi Status"
-        text="Anda yakin akan mengubah status data ini?"
-        confirmText="Ubah Status"
-        isLoading={isLoading}
         onSave={handleStatusUpdate}
+        title="Konfirmasi Status"
+        text="Pilih status baru untuk permintaan ini"
+        confirmText="Simpan Perubahan"
+        isLoading={isLoading}
       />
     </div>
   );

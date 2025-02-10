@@ -232,16 +232,23 @@ const InputModal = forwardRef(
                                 label: category.name,
                               }))
                             : field.name === "goods"
-                            ? filteredGoods.map((goods) => ({
-                                value: goods.id,
-                                label: goods.name,
-                              }))
+                            ? formikProps.values.goods_category // Check if goods_category is selected
+                              ? filteredGoods.map((goods) => ({
+                                  value: goods.id,
+                                  label: goods.name,
+                                }))
+                              : [] // Return empty array if no category selected
                             : measurementUnits?.map((unit) => ({
                                 value: unit.id,
                                 label: unit.name,
                               }))
                         }
-                        placeholder={field.placeholder}
+                        placeholder={
+                          field.name === "goods" &&
+                          !formikProps.values.goods_category
+                            ? "Silakan pilih kategori barang terlebih dahulu"
+                            : field.placeholder
+                        }
                         className="w-full"
                         value={formikProps.values[field.name]}
                         onChange={(option) => {
@@ -259,7 +266,12 @@ const InputModal = forwardRef(
                         onBlur={() =>
                           formikProps.setFieldTouched(field.name, true)
                         }
-                        isDisabled={field.disabled}
+                        isDisabled={
+                          field.name === "goods" &&
+                          !formikProps.values.goods_category
+                            ? true
+                            : field.disabled
+                        }
                         getOptionValue={(option) => option.value}
                         getOptionLabel={(option) => option.label}
                       />
@@ -286,7 +298,6 @@ const InputModal = forwardRef(
                       )}
                   </div>
                 ))}
-
                 <div className="flex gap-4">
                   <button
                     type="button"
