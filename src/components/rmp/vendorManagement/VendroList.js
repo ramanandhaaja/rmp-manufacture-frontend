@@ -9,6 +9,7 @@ import { useState } from "react";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import capitalize from "components/ui/utils/capitalize";
 import { getStatusClassName } from "utils/helpers";
+import useUser from "utils/hooks/useUser";
 
 const VendorList = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const VendorList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const { userRole } = useUser();
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -35,6 +37,48 @@ const VendorList = () => {
 
     fetchVendors();
   }, [currentPage]);
+
+  const renderDropdown = (row) => {
+    if (userRole.includes("procurement") || userRole.includes("department")) {
+      return (
+        <TableListDropdown
+          dropdownItemList={[
+            {
+              label: "Lihat Detail",
+              onClick: () =>
+                navigate(`/vendor-management/detail-vendor/${row.original.id}`),
+            },
+            {
+              label: "Edit",
+              onClick: () =>
+                navigate(`/vendor-management/edit-vendor/${row.original.id}`),
+            },
+            {
+              label: "Delete",
+              onClick: () => {
+                setIsOpen(true);
+                setVendorId(row.original.id);
+              },
+            },
+          ]}
+          placement="center-end"
+        />
+      );
+    } else {
+      return (
+        <TableListDropdown
+          dropdownItemList={[
+            {
+              label: "Lihat Detail",
+              onClick: () =>
+                navigate(`/vendor-management/detail-vendor/${row.original.id}`),
+            },
+          ]}
+          placement="center-end"
+        />
+      );
+    }
+  };
 
   const columns = [
     {
@@ -82,7 +126,7 @@ const VendorList = () => {
       accessor: "status",
       Cell: ({ row }) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+          className={`px-2 py-1 rounded text-xs ${getStatusClassName(
             row.original.verification_status
           )}`}
         >
@@ -92,30 +136,9 @@ const VendorList = () => {
     },
     {
       accessor: "action",
-      Cell: ({ row }) => (
-        <TableListDropdown
-          dropdownItemList={[
-            {
-              label: "Lihat Detail",
-              onClick: () =>
-                navigate(`/vendor-management/detail-vendor/${row.original.id}`),
-            },
-            {
-              label: "Edit",
-              onClick: () =>
-                navigate(`/vendor-management/edit-vendor/${row.original.id}`),
-            },
-            {
-              label: "Delete",
-              onClick: () => {
-                setIsOpen(true);
-                setVendorId(row.original.id);
-              },
-            },
-          ]}
-          placement="center-end"
-        />
-      ),
+      Cell: ({ row }) => {
+        return renderDropdown(row);
+      },
     },
   ];
 
@@ -163,12 +186,14 @@ const VendorList = () => {
       }, 1000);
     }
   };
-
   return (
     <div>
       <TableHeader
         onClickAdd={() => navigate("/vendor-management/tambah-vendor")}
         addBtnTitle={"Tambah Vendor"}
+        showBtnAdd={
+          userRole.includes("procurement") || userRole.includes("department")
+        }
       />
       <CustomTable data={getCurrentPageData()} columns={columns} />
       <div className="flex justify-end mt-2">

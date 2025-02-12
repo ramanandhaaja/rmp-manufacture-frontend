@@ -88,7 +88,7 @@ const AddPurchaseReq = () => {
         showCancelBtn
         showSubmitBtn
         onConfirm={handleSubmit}
-        confirmText="Konfirmasi"
+        confirmText={isLoading ? "Loading..." : "Konfirmasi"}
         title="Anda yakin ingin membuat permintaan pembelian ini?"
         titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
         text="Klik Konfirmasi untuk melanjutkan"

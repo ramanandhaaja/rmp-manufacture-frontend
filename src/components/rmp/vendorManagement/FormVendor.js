@@ -15,9 +15,9 @@ import capitalize from "components/ui/utils/capitalize";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Please enter the vendor name"),
-  vendor_type: Yup.string()
-    .min(1, "Please select at least one vendor type")
-    .required("Please select a vendor type"),
+  // vendor_type: Yup.string()
+  //   .min(1, "Please select at least one vendor type")
+  //   .required("Please select a vendor type"),
   pic_name: Yup.string().required("Please enter the PIC name"),
   pic_phone: Yup.string()
     .matches(/^[0-9]+$/, "Phone number must contain only digits")
@@ -33,7 +33,7 @@ const validationSchema = Yup.object().shape({
 
 const INITIAL_VALUES = {
   name: "",
-  vendor_type: "",
+  // vendor_type: "",
   pic_name: "",
   pic_phone: "",
   pic_email: "",
@@ -325,7 +325,7 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
             </FormItem>
 
             {/* Vendor Type */}
-            <FormItem
+            {/* <FormItem
               label={
                 <span>
                   Tipe Barang Vendor <span>*</span>
@@ -345,7 +345,7 @@ const FormVendor = forwardRef(({ setFormData, initialData, isEdit }, ref) => {
                   }
                 }}
               />
-            </FormItem>
+            </FormItem> */}
 
             {/* PIC */}
             <FormItem

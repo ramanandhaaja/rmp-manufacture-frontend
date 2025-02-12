@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import TextBlockSkeleton from "components/shared/loaders/TextBlockSkeleton";
 import { Notification, toast } from "components/ui";
 import CustomTable from "components/custom/CustomTable";
-import DetailOfferPayment from "views/PurchaseProcurement/DetailOfferPayment";
+import DetailOfferPayment from "components/rmp/PurchaseProcurement/DetailOfferPayment";
 import { formatNumber } from "utils/helpers";
 
 const DetailVendorOffer = () => {
@@ -16,7 +16,8 @@ const DetailVendorOffer = () => {
   const vendorDetail = dataOfferPoVendors?.vendor_detail;
   const vendorItems = dataOfferPoVendors?.items;
   const deliveryCost = dataOfferPoVendors?.delivery_cost;
-  const totalOfferedPrice = vendorItems.reduce(
+  const tax = 120000;
+  const totalOfferedPrice = vendorItems?.reduce(
     (sum, item) => sum + item.offered_price,
     0
   );
@@ -24,7 +25,8 @@ const DetailVendorOffer = () => {
     (sum, item) => sum + item.cost_value,
     0
   );
-  const grandTotal = totalOfferedPrice + totalAdditionalCost + deliveryCost;
+  const grandTotal =
+    totalOfferedPrice + totalAdditionalCost + deliveryCost + tax;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,19 +134,19 @@ const DetailVendorOffer = () => {
                   <div className="flex items-center gap-10">
                     <p className="text-sm text-gray-500 w-32">PIC</p>
                     <p className="text-sm text-gray-700">
-                      {vendorDetail.vendor_pic_name || "-"}
+                      {vendorDetail?.vendor_pic_name || "-"}
                     </p>
                   </div>
                   <div className="flex items-center gap-10">
                     <p className="text-sm text-gray-500 w-32">Kontak PIC</p>
                     <p className="text-sm text-gray-700">
-                      {vendorDetail.vendor_pic_phone || "-"}
+                      {vendorDetail?.vendor_pic_phone || "-"}
                     </p>
                   </div>
                   <div className="flex items-center gap-10">
                     <p className="text-sm text-gray-500 w-32">Email PIC</p>
                     <p className="text-sm text-gray-700">
-                      {vendorDetail.vendor_pic_email || "-"}
+                      {vendorDetail?.vendor_pic_email || "-"}
                     </p>
                   </div>
                   <div className="flex items-center gap-10">
@@ -156,7 +158,7 @@ const DetailVendorOffer = () => {
                   <div className="flex items-center gap-10">
                     <p className="text-sm text-gray-500 w-32">Alamat</p>
                     <p className="text-sm text-gray-700">
-                      {vendorDetail.vendor_address || "-"}
+                      {vendorDetail?.vendor_address || "-"}
                     </p>
                   </div>
                 </div>

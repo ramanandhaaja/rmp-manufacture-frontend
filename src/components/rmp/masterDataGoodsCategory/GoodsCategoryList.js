@@ -41,7 +41,17 @@ const GoodsCategoryList = () => {
       Header: "Status Barang",
       accessor: "status",
       Cell: ({ row }) => {
-        return capitalize(row.original.status);
+        return (
+          <span
+            className={`px-2 py-1 text-xs rounded ${
+              row.original.status === "active"
+                ? "bg-blue-600 text-white"
+                : "bg-red-600 text-white"
+            }`}
+          >
+            {capitalize(row.original.status) || "-"}
+          </span>
+        );
       },
     },
 

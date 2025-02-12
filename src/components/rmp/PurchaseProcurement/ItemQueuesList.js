@@ -1,9 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import MaterialFilterSidebar from "components/custom/MaterialFilterSideBar";
 import CustomTable from "components/custom/CustomTable";
-import capitalize from "components/ui/utils/capitalize";
 import { formatDate } from "utils/helpers";
-import { findDepartement } from "utils/helpers";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import TableListDropdown from "components/template/TableListDropdown";
 import Notification from "components/ui/Notification";
@@ -37,6 +35,8 @@ const ItemQueuesList = ({ type }) => {
     id: null,
     po_type: " ",
   });
+
+  const reversedDataListPoNumber = dataListPoNumber?.slice().reverse();
 
   const columns = [
     {
@@ -95,7 +95,7 @@ const ItemQueuesList = ({ type }) => {
             {
               label: "Tambah Ke PO",
               subMenu:
-                dataListPoNumber?.map((po) => ({
+                reversedDataListPoNumber?.map((po) => ({
                   label: `PO ${po.purchase_order_number} - ${po.po_name}`,
                   onClick: () => {
                     setDataForNotifAdded(

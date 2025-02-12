@@ -1,6 +1,11 @@
 // ProcurementReqList.js
 import { useEffect, useState } from "react";
-import { formatDate, findDepartement, getStatusClassName } from "utils/helpers";
+import {
+  formatDate,
+  findDepartement,
+  getStatusClassName,
+  getStatusName,
+} from "utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "components/ui";
 import DataTable from "components/shared/DataTable";
@@ -44,11 +49,11 @@ const ProcurementReqList = () => {
           case "status":
             return (
               <span
-                className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+                className={`px-2 py-1 rounded text-xs ${getStatusClassName(
                   value
                 )}`}
               >
-                {capitalize(value)}
+                {getStatusName(value)}
               </span>
             );
           case "hod":
@@ -92,7 +97,7 @@ const ProcurementReqList = () => {
         ...prev,
         params: {
           ...params,
-          total: approvedItems.length,
+          total: approvedItems?.length,
           per_page: data?.per_page,
         },
       }));

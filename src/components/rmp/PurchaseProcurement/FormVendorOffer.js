@@ -17,7 +17,6 @@ import {
   updateVendorSubmitStatus,
 } from "store/PurchaseOrder/purchaseOrderSlice";
 import ConfirmationCustom from "components/custom/ConfirmationCustom";
-import FormNumericInput from "components/shared/FormNumericInput";
 
 const validationSchema = Yup.object().shape({
   items: Yup.array().of(
@@ -34,7 +33,7 @@ const validationSchema = Yup.object().shape({
   costs: Yup.array().of(
     Yup.object().shape({
       cost_name: Yup.string(),
-      cost_value: Yup.number().min(0, "Cost must be non-negative"),
+      cost_value: Yup.number().min(0, "Cost must be non-negative").nullable(),
     })
   ),
   payment: Yup.object().shape({
@@ -83,7 +82,7 @@ const FormVendorOffer = ({ isEdit }) => {
     index,
   }));
   const { vendorOfferId } = useSelector((state) => state.purchaseOrder);
-  const idPo = dataOfferPoVendors?.purchase_order_id || null;
+  const idPo = dataDetailPurchaseOrder?.id || null;
   const detailVendor = dataOfferPoVendors?.vendor_detail;
 
   const PAYMENT_METHOD_MAPPING = {
@@ -92,26 +91,22 @@ const FormVendorOffer = ({ isEdit }) => {
     pay_in_full: "Bayar Lunas Diakhir",
   };
 
-  const PAYMENT_METHOD_MAPPING_REVERSE = {
-    "Bayar Sebagian": "pay_in_part",
-    "Bayar Lunas Dimuka": "pay_in_full",
-    "Bayar Lunas Diakhir": "pay_in_full",
-  };
-
   const initialValues = useMemo(() => {
     if (isEdit && dataOfferPoVendors) {
       // Transform the fetched data to match form structure
       const paymentData = dataOfferPoVendors.payments[0];
       return {
-        purchase_order_id: dataOfferPoVendors.purchase_order_id,
-        vendor_id: dataOfferPoVendors.vendor_id,
+        purchase_order_id: dataOfferPoVendors?.purchase_order_id,
+        vendor_id: dataOfferPoVendors?.vendor_id,
         items: dataOfferPoVendors.items.map((item) => ({
           po_item_id: item.po_item_id,
           offered_price: item.offered_price || 0,
         })),
         delivery_address: dataOfferPoVendors.delivery_address,
         delivery_cost: dataOfferPoVendors.delivery_cost,
-        costs: dataOfferPoVendors.costs || [{ cost_name: "", cost_value: 0 }],
+        costs: dataOfferPoVendors.costs || [
+          { cost_name: "", cost_value: null },
+        ],
         payment: {
           payment_method:
             PAYMENT_METHOD_MAPPING[paymentData.payment_method] || "",
@@ -136,7 +131,7 @@ const FormVendorOffer = ({ isEdit }) => {
       payment_method: "",
       delivery_address: "",
       delivery_cost: 0,
-      costs: [{ cost_name: "", cost_value: 0 }],
+      costs: [{ cost_name: "", cost_value: null }],
       payment: {
         amount: 0,
         down_payment_amount: 0,
@@ -170,6 +165,7 @@ const FormVendorOffer = ({ isEdit }) => {
   }, [isEdit, dataOfferPoVendors]);
 
   const submitOffer = async (payload) => {
+    console.log("Payload:", payload);
     try {
       let response;
       if (isEdit) {
@@ -251,7 +247,9 @@ const FormVendorOffer = ({ isEdit }) => {
             : "Bayar Sebagian",
         delivery_address: values.delivery_address,
         delivery_cost: values.delivery_cost,
-        costs: values.costs,
+        costs: values.costs.filter(
+          (cost) => cost.cost_value !== 0 && cost.cost_value !== null
+        ),
         payment: {
           amount: totalItemsAmount,
           down_payment_amount: values.payment.down_payment_amount,
@@ -284,38 +282,8 @@ const FormVendorOffer = ({ isEdit }) => {
 
   return (
     <div className="space-y-4 px-4">
-      <div className="flex justify-between mt-4">
-        <div className="p-3 pt-6">
-          <div className="space-y-2 mb-4">
-            <div className="grid grid-cols-1 gap-2">
-              <div className="flex items-center gap-10">
-                <p className="text-sm text-gray-500 w-32">Vendor</p>
-                <p className="text-sm text-gray-700">
-                  {dataDetailVendor?.name || "-"}
-                </p>
-              </div>
-              <div className="flex items-center gap-10">
-                <p className="text-sm text-gray-500 w-32">PIC </p>
-                <p className="text-sm text-gray-700">
-                  {dataDetailVendor?.pic_name || "-"}
-                </p>
-              </div>
-              <div className="flex items-center gap-10">
-                <p className="text-sm text-gray-500 w-32">No Telp</p>
-                <p className="text-sm text-gray-700">
-                  {dataDetailVendor?.pic_phone || "-"}
-                </p>
-              </div>
-              <div className="flex items-center gap-10">
-                <p className="text-sm text-gray-500 w-32">Alamat</p>
-                <p className="text-sm text-gray-700">
-                  {dataDetailVendor?.pic_address || "-"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <VendorDetails dataDetailVendor={dataDetailVendor} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -334,7 +302,11 @@ const FormVendorOffer = ({ isEdit }) => {
 
               {/* Payment Method */}
               <FormItem
-                label="Metode Pembayaran"
+                label={
+                  <span>
+                    Metode Pembayaran <span>*</span>
+                  </span>
+                }
                 invalid={
                   errors.payment?.payment_method &&
                   touched.payment?.payment_method
@@ -451,7 +423,11 @@ const FormVendorOffer = ({ isEdit }) => {
                         </div>
                         <FormItem
                           className="py-2"
-                          label="Jumlah Bayar"
+                          label={
+                            <span>
+                              Jumlah Bayar <span>*</span>
+                            </span>
+                          }
                           invalid={
                             errors.payment?.records?.[index]?.amount_paid &&
                             touched.payment?.records?.[index]?.amount_paid
@@ -482,7 +458,11 @@ const FormVendorOffer = ({ isEdit }) => {
               {/* Shipping Address */}
               <FormItem
                 className="py-2 pt-2"
-                label="Alamat Pengiriman"
+                label={
+                  <span>
+                    Alamat Pengiriman <span>*</span>
+                  </span>
+                }
                 invalid={errors.delivery_address && touched.delivery_address}
                 errorMessage={errors.delivery_address}
               >
@@ -522,7 +502,11 @@ const FormVendorOffer = ({ isEdit }) => {
 
               {/* Shipping Cost */}
               <FormItem
-                label="Biaya Pengiriman"
+                label={
+                  <span>
+                    Biaya Pengiriman <span>*</span>
+                  </span>
+                }
                 invalid={errors.delivery_cost && touched.delivery_cost}
                 errorMessage={errors.delivery_cost}
               >
@@ -546,6 +530,7 @@ const FormVendorOffer = ({ isEdit }) => {
                         { cost_name: "", cost_value: "" },
                       ])
                     }
+                    icon={<FiPlus />}
                   >
                     Tambah Biaya Lainnya
                   </Button>
@@ -686,6 +671,31 @@ const FormVendorOffer = ({ isEdit }) => {
   );
 };
 
+const VendorDetails = ({ dataDetailVendor }) => (
+  <div className="flex justify-between mt-4">
+    <div className="p-3 pt-6">
+      <div className="space-y-2 mb-4">
+        <div className="grid grid-cols-1 gap-2">
+          <VendorDetailItem label="Vendor" value={dataDetailVendor?.name} />
+          <VendorDetailItem label="PIC" value={dataDetailVendor?.pic_name} />
+          <VendorDetailItem
+            label="No Telp"
+            value={dataDetailVendor?.pic_phone}
+          />
+          <VendorDetailItem label="Alamat" value={dataDetailVendor?.address} />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const VendorDetailItem = ({ label, value }) => (
+  <div className="flex items-center gap-10">
+    <p className="text-sm text-gray-500 w-32">{label}</p>
+    <p className="text-sm text-gray-700">{value || "-"}</p>
+  </div>
+);
+
 const ItemsTable = ({ items, errors, touched }) => (
   <div className="mb-6">
     <CustomTable
@@ -702,7 +712,7 @@ const ItemsTable = ({ items, errors, touched }) => (
         { Header: "QTY", accessor: "quantity" },
         { Header: "UOM", accessor: "measurement" },
         {
-          Header: "Harga",
+          Header: "Harga *",
           accessor: "offered_price",
           Cell: ({ row }) => (
             <FormItem
