@@ -421,6 +421,8 @@ export function getStatusName(status) {
       return "Ditolak";
     case "waiting":
       return "Menunggu Persetujuan";
+    case "revised":
+      return "Direvisi";
     default:
       return "-";
   }

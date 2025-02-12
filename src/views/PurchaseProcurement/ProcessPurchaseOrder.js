@@ -58,7 +58,6 @@ const ProcessPurchaseOrder = () => {
 
   const handleVendorSelected = (vendor) => {
     setSelectedVendor(vendor);
-    console.log("Selected Vendor:", vendor);
   };
 
   useEffect(() => {
@@ -257,8 +256,10 @@ const ProcessPurchaseOrder = () => {
     setShowNotification(true);
   };
 
-  const handleDeleteItem = (id) => {
-    setTableDataItems((prevData) => prevData.filter((item) => item.id !== id));
+  const handleDeleteItem = (goods_id) => {
+    setTableDataItems((prevData) => {
+      return prevData.filter((item) => item.goods_id !== goods_id);
+    });
   };
 
   const handleNextStep = () => {
@@ -427,11 +428,7 @@ const ProcessPurchaseOrder = () => {
         {activeTab == 0 ? (
           <Button
             variant="solid"
-            onClick={() =>
-              dataItemPo.length > 0
-                ? handleNextStep()
-                : setIsOpenConfirmationAdd(true)
-            }
+            onClick={() => setIsOpenConfirmationAdd(true)}
             disabled={dataTableItems?.length == 0}
             loading={isLoadingAdd}
           >

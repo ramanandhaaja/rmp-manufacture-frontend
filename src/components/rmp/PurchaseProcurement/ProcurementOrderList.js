@@ -50,12 +50,12 @@ const ProcurementOrderList = () => {
             return row.original.category?.name || "-";
           case "po_type":
             return getCapitalizeType(value);
-          case "po_date":
+          case "created_at":
             return formatDate(value);
           case "po_status":
             return (
               <span
-                className={`px-2 py-1 rounded-full text-xs ${getPoStatusClassName(
+                className={`px-2 py-1 rounded text-xs ${getPoStatusClassName(
                   value
                 )}`}
               >

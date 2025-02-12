@@ -1,4 +1,5 @@
 import TableRowSkeleton from "components/shared/loaders/TableRowSkeleton";
+import { NoDataSvg } from "assets/svg";
 
 const CustomTable = ({ data, columns, onEdit, onDelete, isLoading }) => {
   return (
@@ -26,7 +27,13 @@ const CustomTable = ({ data, columns, onEdit, onDelete, isLoading }) => {
                   colSpan={columns.length}
                   className="py-6 px-4 text-center text-gray-700"
                 >
-                  Belum ada data
+                  <div className="flex  flex-col justify-center items-center ">
+                    <NoDataSvg />
+
+                    <div className="flex flex-col gap-1 items-center mt-[21px]">
+                      <p className="text-blue-999">Belum Ada Data</p>
+                    </div>
+                  </div>
                 </td>
               </tr>
             )}

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import TextBlockSkeleton from "components/shared/loaders/TextBlockSkeleton";
 import { Notification, toast, Button } from "components/ui";
 import CustomTable from "components/custom/CustomTable";
-import DetailOfferPayment from "views/PurchaseProcurement/DetailOfferPayment";
 import { formatNumber } from "utils/helpers";
 import Accordion, { AccordionItem } from "components/ui/Accordion/index";
 import { RiFileLine } from "react-icons/ri";

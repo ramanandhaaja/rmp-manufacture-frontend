@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import useVendor from "utils/hooks/vendorManagement/useVendor";
 import Tabs from "components/ui/Tabs";
 import LayoutRightSpace from "components/layout/LayoutRightSpace";
-import ModalMock from "components/custom/ModalMock";
+import ModalStatusVendor from "components/custom/ModalMock";
 import { Notification, toast, Button } from "components/ui";
 import useUser from "utils/hooks/useUser";
 import { getCapitalizeType } from "utils/helpers";
@@ -246,7 +246,7 @@ const DetailVendor = () => {
         </Tabs>
         {/* Content */}
       </div>
-      <ModalMock
+      <ModalStatusVendor
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleVerify}

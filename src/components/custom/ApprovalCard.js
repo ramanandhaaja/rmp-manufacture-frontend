@@ -1,6 +1,6 @@
 import { FiCalendar, FiUser, FiRefreshCcw } from "react-icons/fi";
 import { Button } from "components/ui";
-import { useRef } from "react";
+import { formatDate } from "utils/helpers";
 
 const ApprovalCard = ({
   handleStatusUpdate,
@@ -55,9 +55,11 @@ const ApprovalCard = ({
 
   return (
     <div className="max-w-sm p-3 rounded-lg border border-gray-200 shadow-sm bg-white">
-      <div className="flex items-center gap-2 text-gray-600 mb-3">
-        <FiCalendar size={16} />
-        <span className="text-sm">Pembaruan Terakhir : </span>
+      <div className="flex items-center gap-1 text-gray-600 mb-3">
+        <FiCalendar size={20} />
+        <span className="text-sm">
+          Pembaruan Terakhir : {formatDate(data.updated_at)}
+        </span>
       </div>
 
       <div className="flex items-center gap-2 text-gray-600 mb-4">

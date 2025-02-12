@@ -12,7 +12,7 @@ const ModalNoteInput = forwardRef(
       onConfirm,
       title = "Note Input",
       icon = <QuestionMarkCircledIcon height={56} width={56} color="#037DC3" />,
-      subtitle = "Please provide your input below.",
+      subtitle = "",
       isLoading = false,
       onSave,
       status,
@@ -23,8 +23,8 @@ const ModalNoteInput = forwardRef(
   ) => {
     const validationSchema = Yup.object().shape({
       note: Yup.string().when([], {
-        is: () => status === "revised",
-        then: Yup.string().required("Note is required"),
+        is: () => status === "revised" || status === "rejected",
+        then: Yup.string().required("Catatan harus diisi"),
         otherwise: Yup.string(),
       }),
     });
@@ -77,7 +77,7 @@ const ModalNoteInput = forwardRef(
             <Form className="w-full" onSubmit={handleSubmit}>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {status === "revised" ? "Catatan*" : "Catatan (opsional)"}
+                  Catatan*
                 </label>
                 <Field
                   as="textarea"

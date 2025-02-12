@@ -46,7 +46,7 @@ const AddPoGoodsList = ({
       Cell: ({ row }) => {
         return (
           <button
-            onClick={() => handleDeleteItem(row.original.id)}
+            onClick={() => handleDeleteItem(row.original.goods_id)}
             className="cursor-pointer"
           >
             <FiTrash size={24} color="red" />

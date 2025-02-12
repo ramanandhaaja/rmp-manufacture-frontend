@@ -27,7 +27,7 @@ const CreatePOModal = ({
     note: Yup.string(),
   });
   const { getGoodsCategory, dataGoodsCategory } = useGoodsCategory();
-  const { createPurchaseOrder, getPoList } = usePurchaseOrder();
+  const { createPurchaseOrder, getListExistingPo } = usePurchaseOrder();
   const initialValues = {
     po_name: "",
     goods_category_id: goodsCategory.id ? goodsCategory.id : null,
@@ -53,7 +53,7 @@ const CreatePOModal = ({
         onClose();
         setSubmitted(true);
         setSubmittedData(resp.data);
-        await getPoList();
+        await getListExistingPo();
       } else {
         toast.push(
           <Notification

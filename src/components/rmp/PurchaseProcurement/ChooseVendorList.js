@@ -145,6 +145,7 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
       ),
     },
   ];
+  console.log(selectedPoVendors);
 
   // useEffect(() => {
   //   if (
@@ -204,6 +205,7 @@ const ChooseVendorList = ({ onPayloadVendorChange }) => {
       .map((vendor) => ({
         vendor_id: vendor.id,
         name: vendor.name,
+        address: vendor.address,
         pic_name: vendor.pic_name,
         pic_phone: vendor.pic_phone,
         pic_email: vendor.pic_email,

@@ -11,8 +11,12 @@ import ConfirmationCustom from "components/custom/ConfirmationCustom";
 import ModalStatusInput from "components/custom/ModalStatusInput";
 import { PageConfig, getColumnConfig } from "./config";
 import useUser from "utils/hooks/useUser";
-import { findDepartement, getStatusClassName, formatDate } from "utils/helpers";
-import capitalize from "components/ui/utils/capitalize";
+import {
+  findDepartement,
+  getStatusClassName,
+  formatDate,
+  getStatusName,
+} from "utils/helpers";
 
 const PurchaseRequestList = () => {
   const navigate = useNavigate();
@@ -51,16 +55,12 @@ const PurchaseRequestList = () => {
                 onClick: () =>
                   navigate(`/purchase/request/detail/${row.original.id}`),
               },
-              {
-                label: "Edit",
-                // onClick: () =>
-                //   navigate(`/vendor-management/edit-vendor/${row.original.id}`),
-              },
+
               {
                 label: "Delete",
                 onClick: () => {
-                  setIsOpen(true);
-                  setId(row.original.id);
+                  setIsOpenDelete(true);
+                  setSelectedId(row.original.id);
                 },
               },
             ]}
@@ -98,7 +98,7 @@ const PurchaseRequestList = () => {
                   label: "Delete",
                   onClick: () => {
                     setIsOpen(true);
-                    setId(row.original.id);
+                    setSelectedId(row.original.id);
                   },
                 },
               ];
@@ -113,7 +113,7 @@ const PurchaseRequestList = () => {
                   label: "Delete",
                   onClick: () => {
                     setIsOpen(true);
-                    setId(row.original.id);
+                    setSelectedId(row.original.id);
                   },
                 },
               ];
@@ -165,7 +165,7 @@ const PurchaseRequestList = () => {
                   label: "Konfirmasi Permintaan",
                   onClick: () => {
                     setIsOpenStatus(true);
-                    setId(row.original.id);
+                    setSelectedId(row.original.id);
                   },
                 },
                 {
@@ -253,11 +253,11 @@ const PurchaseRequestList = () => {
           case "status":
             return (
               <span
-                className={`px-2 py-1 rounded-full text-xs ${getStatusClassName(
+                className={`px-2 py-1 rounded text-xs font-bold ${getStatusClassName(
                   value
                 )}`}
               >
-                {capitalize(value)}
+                {getStatusName(value)}
               </span>
             );
           default:
@@ -325,10 +325,23 @@ const PurchaseRequestList = () => {
       const response = await deletePurchaseReq(selectedId);
 
       if (response.status === "success") {
-        toast.push(<Notification type="success" title={response.message} />, {
-          placement: "top-center",
-        });
+        toast.push(
+          <Notification type="success" title="Data berhasil dihapus" />,
+          {
+            placement: "top-center",
+          }
+        );
         fetchData();
+      } else {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, gagal menghapus data"
+          />,
+          {
+            placement: "top-center",
+          }
+        );
       }
     } finally {
       setIsLoading(false);
@@ -394,7 +407,7 @@ const PurchaseRequestList = () => {
         onConfirm={handleDelete}
         title="Konfirmasi Hapus"
         text="Anda yakin akan menghapus data ini?"
-        confirmText="Hapus"
+        confirmText={isLoading ? "Menghapus..." : "Hapus"}
         isLoading={isLoading}
       />
 

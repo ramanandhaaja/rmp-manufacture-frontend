@@ -550,14 +550,15 @@ export const RMPSTATUSLABEL = {
   approved: "Disetujui",
   rejected: "Ditolak",
   revised: "Direvisi",
+  waiting: "Menunggu Persetujuan",
 };
 
 export const RMPSTATUSCOLOR = {
   approved: "bg-emerald-600 text-white",
   verified: "bg-blue-600 text-white",
   rejected: "bg-red-500 text-white",
-  revised: "bg-amber-400 text-white",
   waiting: "bg-yellow-500 text-white",
+  revised: "bg-orange-500 text-white",
 };
 export const RMPPOSTATUSCOLOR = {
   approved: "bg-emerald-600 text-white",

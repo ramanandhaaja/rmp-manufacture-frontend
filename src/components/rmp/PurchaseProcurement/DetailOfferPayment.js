@@ -14,7 +14,7 @@ const DetailOfferPayment = ({
       label: item.cost_name,
       value: totalAdditionalCost,
     })) || []),
-    { label: "Pajak", value: "-" },
+    { label: "Pajak", value: 120000 },
     { label: "Harga Grand Total", value: grandTotal },
   ];
 

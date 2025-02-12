@@ -2,9 +2,13 @@ import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import usePurchaseReq from "utils/hooks/PurchaseRequest/usePurchaseRequest";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { formatDate, getCapitalizeType } from "utils/helpers";
+import {
+  formatDate,
+  getCapitalizeType,
+  getStatusClassName,
+  getStatusName,
+} from "utils/helpers";
 import CustomTable from "components/custom/CustomTable";
-import useMasterGoods from "utils/hooks/useMasterGoods";
 import { findDepartement } from "utils/helpers";
 import { Button } from "components/ui";
 import { useNavigate } from "react-router-dom";
@@ -106,16 +110,16 @@ const DetailPurchaseReq = () => {
     setIsLoadingList(false);
   }, [id]);
 
-  const handleStatusUpdate = async (status, note = "") => {
+  const handleStatusUpdate = async (status, update_status_reason = "") => {
     setIsLoading(true);
     try {
       const payload = { status };
-      if (note) {
-        payload.note = note;
+      if (update_status_reason) {
+        payload.update_status_reason = update_status_reason;
       }
 
       const response = await updatePurchaseReqStatus(id, payload);
-
+      await getDetailPurchaseReq(id);
       if (response.status === "failed") {
         toast.push(
           <Notification
@@ -276,21 +280,13 @@ const DetailPurchaseReq = () => {
             Permintaan Pembelian Detail
           </h1>
 
-          {dataDetailPurchase.status === "approved" && (
-            <div className="bg-emerald-600 text-white h-8 px-3 py-1 rounded-lg text-sm">
-              Disetujui
-            </div>
-          )}
-          {dataDetailPurchase.status === "rejected" && (
-            <div className="bg-red-500 text-white h-8 px-3 py-1 rounded-lg text-sm">
-              Ditolak
-            </div>
-          )}
-          {dataDetailPurchase.status === "waiting" && (
-            <div className="bg-yellow-500 text-white h-8 px-3 py-1 rounded-lg text-sm">
-              Menunggu Persetujuan
-            </div>
-          )}
+          <div
+            className={`${getStatusClassName(
+              dataDetailPurchase?.status
+            )} text-white h-8 px-3 py-1 rounded-lg text-sm font-bold`}
+          >
+            {getStatusName(dataDetailPurchase?.status)}
+          </div>
         </div>
         <div className="flex gap-2">
           <Button

@@ -24,7 +24,7 @@ export const ROUTE_LIST = [
     key: "vendorManagement.addVendor",
     path: "/vendor-management/tambah-vendor",
     component: React.lazy(() => import("views/VendorManagement/AddVendor")),
-    authority: [],
+    authority: [ROLES.Procurement, ROLES.Department],
   },
   {
     key: "vendorManagement.detailVendor",
@@ -36,7 +36,7 @@ export const ROUTE_LIST = [
     key: "vendorManagement.editVendor",
     path: "/vendor-management/edit-vendor/:id",
     component: React.lazy(() => import("views/VendorManagement/EditVendor")),
-    authority: [],
+    authority: [ROLES.Procurement, ROLES.Department],
   },
   {
     key: "masterData.barangPurchase",
@@ -172,5 +172,18 @@ export const ROUTE_LIST = [
     path: "/purchase/pembayaran/detail-pembayaran/:id",
     component: React.lazy(() => import("views/Payment/DetailPayment")),
     authority: [ROLES.Procurement],
+  },
+
+  {
+    key: "purchase.productR&D",
+    path: "/purchase/product-r&d",
+    component: React.lazy(() => import("views/R&D")),
+    authority: [],
+  },
+  {
+    key: "purchase.productR&D.detailPermintaan",
+    path: "/purchase/product-r&d/detail-permintaan/:id",
+    component: React.lazy(() => import("views/R&D/DetailPermintaan")),
+    authority: [],
   },
 ];
