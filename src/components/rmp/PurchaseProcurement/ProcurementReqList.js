@@ -49,7 +49,7 @@ const ProcurementReqList = () => {
           case "status":
             return (
               <span
-                className={`px-2 py-1 rounded text-xs ${getStatusClassName(
+                className={`px-2 py-1 rounded text-xs font-semibold ${getStatusClassName(
                   value
                 )}`}
               >

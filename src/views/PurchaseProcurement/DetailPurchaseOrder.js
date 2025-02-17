@@ -17,6 +17,8 @@ import Tabs from "components/ui/Tabs";
 import TextBlockSkeleton from "components/shared/loaders/TextBlockSkeleton";
 import { FiCheckCircle } from "react-icons/fi";
 import ModalNoteInput from "components/custom/ModalNoteInput";
+import ModalUpload from "components/custom/ModalUpload";
+import PoAdjusmentNotes from "components/rmp/PurchaseProcurement/PoAdjusmentNotes";
 
 const DetailPurchaseOrder = () => {
   const navigate = useNavigate();
@@ -25,16 +27,22 @@ const DetailPurchaseOrder = () => {
   const {
     dataDetailPurchaseOrder,
     getPoDetail,
-    dataOfferPoVendors,
-    getDetailVendorOffer,
+    submitPoVerification,
+    releasePo,
+    getNotesBod,
+    dataPoNotesBod,
   } = usePurchaseOrder();
-  const [isLoadingList, setIsLoadingList] = useState(false);
+  const [isLoadingVerify, setIsLoadingVerify] = useState(false);
   const { id } = useParams();
   const { userRole, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [status, setStatus] = useState("");
   const [activeModal, setActiveModal] = useState(null);
+  const [isOpenPoRelease, setIsOpenPoRelease] = useState(false);
+  const [isLoadingUpload, setIsLoadingUpload] = useState(false);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
+  console.log(dataPoNotesBod);
 
   const columns = [
     {
@@ -163,8 +171,142 @@ const DetailPurchaseOrder = () => {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    const fetchDataNotes = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getNotesBod(id);
+        if (response.status === "failed") {
+          toast.push(
+            <Notification
+              type="danger"
+              title="Terjadi gangguan, gagal memuat data"
+              description={response.message}
+            />,
+            {
+              placement: "top-center",
+            }
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching PO details:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDataNotes();
+  }, []);
+
   const handleStepChange = (value) => {
     setActiveTab(value);
+  };
+
+  useEffect(() => {
+    if (activeModal === "adjust") {
+      setStatus("Direvisi");
+    } else {
+      setStatus("Disetujui");
+    }
+  }, [activeModal]);
+
+  const handleSave = async (values) => {
+    const payload = {
+      purchase_order_id: id,
+      po_status: status,
+      note: values.note,
+    };
+
+    const response = await submitPoVerification(payload);
+    setIsLoadingVerify(true);
+    try {
+      if (response.status === "success") {
+        toast.push(
+          <Notification
+            type="success"
+            title="Verifikasi PO telah berhasil"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+      } else {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, gagal verifikasi PO"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+      }
+    } catch (error) {
+      toast.push(
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan, gagal verifikasi PO"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+      console.error("Error submitting PO verification:", error);
+    } finally {
+      setIsLoadingVerify(false);
+      setActiveModal(null);
+    }
+  };
+
+  const handleConfirmUpload = async (file) => {
+    setIsLoadingUpload(true);
+    try {
+      const formData = new FormData();
+      formData.append("document", file);
+
+      const resp = await releasePo(id, formData);
+      if (resp.status === "success") {
+        toast.push(
+          <Notification
+            type="success"
+            title="Berhasil merilis PO"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+      } else {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, gagal merilis PO"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+      }
+    } catch (error) {
+      toast.push(
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan, gagal rilis PO"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+      console.error("Error submitting PO release:", error);
+    } finally {
+      setIsLoadingUpload(false);
+      setIsOpenPoRelease(false);
+    }
   };
 
   const ButtonDireksi = () => {
@@ -220,29 +362,10 @@ const DetailPurchaseOrder = () => {
         </Tabs.TabContent>
         <Tabs.TabContent value={2}>
           <div className=" p-6 w-full max-w-4xl">
-            <div className="grid grid-cols-3 gap-6">
-              <div className="flex items-center">
-                <p className="text-sm font-bold mb-2">12/5/2024, 10:00 WIB</p>
-              </div>
-              <div>
-                <div className=" p-4">
-                  <p className="text-sm font-bold text-gray-500">
-                    Catatan Adjustment
-                  </p>
-                  <p className="text-xs text-gray-700 mt-2">
-                    Diah Budiantio (Direks)
-                  </p>
-                </div>
-              </div>
-              <div>
-                <div className=" p-4 mb-4">
-                  <p className="text-gray-700">
-                    baik bu, untuk harganya sudah di negosiasikan kembali,
-                    silahkan di cek
-                  </p>
-                </div>
-              </div>
-            </div>
+            <PoAdjusmentNotes
+              data={dataPoNotesBod}
+              isLoading={isLoadingNotes}
+            />
           </div>
         </Tabs.TabContent>
       </Tabs>
@@ -306,12 +429,7 @@ const DetailPurchaseOrder = () => {
                           : "-"}
                       </p>
                     </div>
-                    <div className="flex items-center gap-10">
-                      <p className="text-sm text-gray-500 w-32">Departemen</p>
-                      <p className="text-sm text-gray-700">
-                        {dataDetailPurchaseOrder.department || "-"}
-                      </p>
-                    </div>
+
                     <div className="flex items-center gap-10">
                       <p className="text-sm text-gray-500 w-32">Catatan</p>
                       <p className="text-sm text-gray-700">
@@ -389,7 +507,7 @@ const DetailPurchaseOrder = () => {
                 Download PO
               </Button>
               <Button
-                //   onClick={() => formikRef.current.handleSubmit()}
+                onClick={() => setIsOpenPoRelease(true)}
                 variant="solid"
                 className="text-white"
               >
@@ -405,14 +523,22 @@ const DetailPurchaseOrder = () => {
       {!userRole.includes("bod") && <DetailPoGeneral />}
       <ModalNoteInput
         title={activeModal === "adjust" ? "Adjustment" : "Setujui PO"}
-        subtitle={
-          activeModal === "adjust"
-            ? "Silahkan tuliskan catatan Anda tentang penyesuaian Purchase Order"
-            : "Silahkan tuliskan catatan Anda tentang penyesuaian Purchase Order"
-        }
+        subtitle="Silahkan tuliskan catatan Anda tentang penyesuaian Purchase Order"
         isOpen={activeModal !== null}
         onClose={() => setActiveModal(null)}
         status={activeModal === "adjust" ? "revised" : "approved"}
+        isNoteOpsional={activeModal !== "adjust"}
+        onSave={handleSave}
+        isLoading={isLoadingVerify}
+      />
+      <ModalUpload
+        onConfirm={handleConfirmUpload}
+        isOpen={isOpenPoRelease}
+        onClose={() => setIsOpenPoRelease(false)}
+        title="Rilis PO"
+        subtitle={`Anda akan merilis PO [${dataDetailPurchaseOrder?.po_number}] ,
+         silahkan upload dokumen PO yang sudah di tanda tangani`}
+        isLoading={isLoadingUpload}
       />
     </LayoutRightSpace>
   );

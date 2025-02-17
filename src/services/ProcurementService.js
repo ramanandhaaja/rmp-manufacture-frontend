@@ -53,6 +53,13 @@ export async function getListPurchaseOrderNumberApi() {
   });
 }
 
+export async function getPoAdjustmentNoteApi(id) {
+  return ApiService.fetchData({
+    url: `purchase-order/adjusment-notes/${id}`,
+    method: "get",
+  });
+}
+
 export async function postPurchaseOrderApi(data) {
   return ApiService.fetchData({
     url: `purchase-order/create-po`,
@@ -92,7 +99,24 @@ export async function postVendorOfferApi(data) {
   return ApiService.fetchData({
     url: `purchase-order/submit-vendor-offers`,
     method: "post",
+    data,
+    withCredentials: true,
+  });
+}
 
+export async function postPoVerificationApi(data) {
+  return ApiService.fetchData({
+    url: `purchase-order/verification`,
+    method: "post",
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function postReleasePoApi(id, data) {
+  return ApiService.fetchData({
+    url: `purchase-order/release/${id}`,
+    method: "post",
     data,
     withCredentials: true,
   });

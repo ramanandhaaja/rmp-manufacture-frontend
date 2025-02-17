@@ -11,6 +11,7 @@ export const purchaseOrderSlice = createSlice({
     dataDetailPurchaseOrder: [],
     selectedPoVendors: [],
     dataOfferPoVendors: [],
+    dataPoNotesBod: [],
   },
   reducers: {
     setIdPo: (state, action) => {
@@ -33,6 +34,9 @@ export const purchaseOrderSlice = createSlice({
     },
     setDataDetailPurchaseOrder: (state, action) => {
       state.dataDetailPurchaseOrder = action.payload;
+    },
+    setDataPoNotesBod: (state, action) => {
+      state.dataPoNotesBod = action.payload;
     },
     setSelectedPoVendors: (state, action) => {
       // Preserve is_submit_offer status when setting new vendors
@@ -77,6 +81,8 @@ export const {
   dataListPoNumber,
   dataDetailPurchaseOrder,
   dataOfferPoVendors,
+  dataPoNotesBod,
+  setDataPoNotesBod,
   setDataOfferPoVendors,
   selectedPoVendors,
   setDataPurchaseOrder,

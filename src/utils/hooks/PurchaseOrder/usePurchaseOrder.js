@@ -11,6 +11,9 @@ import {
   patchItemToAnotherPoApi,
   putVendorOfferApi,
   getProcurementLogsApi,
+  getPoAdjustmentNoteApi,
+  postPoVerificationApi,
+  postReleasePoApi,
 } from "services/ProcurementService";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,6 +23,7 @@ import {
   setDataListPoNumber,
   setDataDetailPurchaseOrder,
   setDataOfferPoVendors,
+  setDataPoNotesBod,
 } from "../../../store/PurchaseOrder/purchaseOrderSlice";
 
 function usePurchaseOrder() {
@@ -30,6 +34,7 @@ function usePurchaseOrder() {
     dataListPoNumber,
     dataDetailPurchaseOrder,
     dataOfferPoVendors,
+    dataPoNotesBod,
   } = useSelector((state) => state.purchaseOrder);
 
   const getPoList = async (queryParams) => {
@@ -176,6 +181,28 @@ function usePurchaseOrder() {
     }
   };
 
+  const getNotesBod = async (id) => {
+    try {
+      const response = await getPoAdjustmentNoteApi(id);
+      if (response.data) {
+        dispatch(setDataPoNotesBod(response.data.data));
+        return {
+          status: "success",
+          message: response.data.message,
+        };
+      } else {
+        console.log(response);
+        return { status: "failed", message: "" };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   const createPurchaseOrder = async (purchaseData) => {
     try {
       const response = await postPurchaseOrderApi(purchaseData);
@@ -263,6 +290,49 @@ function usePurchaseOrder() {
     }
   };
 
+  const submitPoVerification = async (data) => {
+    try {
+      const response = await postPoVerificationApi(data);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
+  const releasePo = async (id, data) => {
+    try {
+      const response = await postReleasePoApi(id, data);
+      console.log(response);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   const editVendorOffer = async (id, data) => {
     try {
       const response = await putVendorOfferApi(id, data);
@@ -320,6 +390,10 @@ function usePurchaseOrder() {
     dataOfferPoVendors,
     editVendorOffer,
     getProcurementLog,
+    submitPoVerification,
+    releasePo,
+    getNotesBod,
+    dataPoNotesBod,
   };
 }
 

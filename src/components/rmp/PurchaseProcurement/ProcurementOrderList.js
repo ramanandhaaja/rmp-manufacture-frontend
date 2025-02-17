@@ -55,7 +55,7 @@ const ProcurementOrderList = () => {
           case "po_status":
             return (
               <span
-                className={`px-2 py-1 rounded text-xs ${getPoStatusClassName(
+                className={`px-2 py-1 rounded text-xs font-semibold ${getPoStatusClassName(
                   value
                 )}`}
               >
@@ -68,6 +68,39 @@ const ProcurementOrderList = () => {
       },
     }));
 
+  const renderDropdown = (row, statusPo) => {
+    if (statusPo === "Belum Diproses") {
+      return [
+        {
+          label: "Proses PO",
+          onClick: () =>
+            navigate(`/purchase/pengadaan/proses-po/${row.original.id}`),
+        },
+        {
+          label: "Hapus PO",
+          onClick: () => handleDelete(row.original.id),
+        },
+        {
+          label: "Detail PO",
+          onClick: () =>
+            navigate(`/purchase/pengadaan/detail-po/${row.original.id}`),
+        },
+      ];
+    } else {
+      return [
+        {
+          label: "Hapus PO",
+          onClick: () => handleDelete(row.original.id),
+        },
+        {
+          label: "Detail PO",
+          onClick: () =>
+            navigate(`/purchase/pengadaan/detail-po/${row.original.id}`),
+        },
+      ];
+    }
+  };
+
   // Add action column with dropdown
   if (PageConfigOrderList.enableActions) {
     columns.push({
@@ -75,6 +108,8 @@ const ProcurementOrderList = () => {
       accessor: "action",
       width: "100px",
       Cell: ({ row }) => {
+        const statusPo = row.original.po_status;
+
         return (
           <TableListDropdown
             placement={
@@ -82,22 +117,7 @@ const ProcurementOrderList = () => {
                 ? "bottom-end"
                 : "top-end"
             }
-            dropdownItemList={[
-              {
-                label: "Proses PO",
-                onClick: () =>
-                  navigate(`/purchase/pengadaan/proses-po/${row.original.id}`),
-              },
-              {
-                label: "Hapus PO",
-                onClick: () => handleDelete(row.original.id),
-              },
-              {
-                label: "Detail PO",
-                onClick: () =>
-                  navigate(`/purchase/pengadaan/detail-po/${row.original.id}`),
-              },
-            ]}
+            dropdownItemList={renderDropdown(row, statusPo)}
           />
         );
       },

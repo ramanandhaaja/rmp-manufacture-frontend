@@ -571,6 +571,7 @@ export const RMPPOSTATUSCOLOR = {
 export const PO_STATUS_STYLES = {
   "Belum Diproses": "bg-gray-500 text-white",
   "Menunggu Persetujuan": "bg-yellow-500 text-white",
+  Direvisi: "bg-orange-500 text-white",
   Disetujui: "bg-emerald-600 text-white",
   Pengiriman: "bg-blue-600 text-white",
   "PO Selesai": "bg-emerald-600 text-white",
