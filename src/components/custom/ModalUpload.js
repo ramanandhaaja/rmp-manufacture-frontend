@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Button, Dialog } from "components/ui";
+import { Button, Dialog, toast, Notification } from "components/ui";
 import Upload from "components/ui/Upload";
 import { AiOutlineUpload } from "react-icons/ai";
 
 const ModalUpload = ({
+  title,
+  subtitle,
+  showDownloadTitle,
   isOpen,
   onClose,
   isMultiple = false,
@@ -12,17 +15,47 @@ const ModalUpload = ({
   disableCancel = false,
   buttonType = "button",
   width = 500,
-  contentClassName = "p-5 rounded-2xl",
+  contentClassName = "p-5 rounded-2xl bg-white",
+  showDownload = false,
 }) => {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploadedFile, setUploadedFile] = useState(null);
 
-  const handleFileChange = (newFiles, oldFiles) => {
-    setUploadedFiles(newFiles);
+  const handleFileChange = (e) => {
+    const file = e[0];
+
+    if (file) {
+      if (file.size > 20 * 1024 * 1024) {
+        // 20MB limit
+        toast.push(
+          <Notification type="danger" title="File tidak boleh melebihi 20MB" />
+        );
+        return;
+      }
+
+      const allowedTypes = ["application/pdf", "pdf", ".pdf"];
+
+      const fileExtension = file.name.toLowerCase().split(".").pop();
+      const isValidType =
+        allowedTypes.includes(file.type) || fileExtension === "pdf";
+
+      if (!isValidType) {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Hanya file PDF yang diperbolehkan"
+          />
+        );
+        return;
+      }
+
+      setUploadedFile(file);
+    }
   };
 
-  const handleFileRemove = (removedFiles) => {
-    setUploadedFiles(removedFiles);
+  const handleFileRemove = () => {
+    setUploadedFile(null);
   };
+
   return (
     <Dialog
       isOpen={isOpen}
@@ -31,48 +64,56 @@ const ModalUpload = ({
       width={width}
       contentClassName={contentClassName}
     >
-      <div className="p-2 h-[300px]">
-        <div className="flex flex-col justify-center items-center py-4 ">
-          <h2 className="text-xl font-semibold ">Unggah Bukti Pembayaran</h2>
-          <p>Silahkan unggah bukti pembayaran yang sah</p>
+      <div className="flex flex-col h-full">
+        <div className="text-center mb-4">
+          <h2 className="text-xl font-semibold">{title}</h2>
+          <p className="text-gray-600 mt-2">{subtitle}</p>
         </div>
-
-        <Upload
-          accept=".jpg,.png,.pdf"
-          multiple={isMultiple}
-          fileList={uploadedFiles}
-          uploadLimit={5}
-          onChange={handleFileChange}
-          onFileRemove={handleFileRemove}
-          draggable={true}
-        >
-          <div className=" flex flex-col justify-center items-center h-[200px] gap-2">
-            <AiOutlineUpload size={40} />
-            <p> Unggah File (PDF max 20mb)</p>
-            <Button size="sm"> Telusuri File </Button>
+        {showDownload && (
+          <div className="mb-4">
+            <Button className="w-full">{showDownloadTitle}</Button>
           </div>
-        </Upload>
-      </div>
-      <div className="flex justify-center items-center gap-5 mt-5">
-        <Button
-          type="button"
-          variant="default"
-          onClick={onClose}
-          disabled={disableCancel}
-          className="ltr:mr-2 rtl:ml-2 !bg-transparent !w-[120px] !h-10"
-        >
-          Batal
-        </Button>
-        <Button
-          loading={isLoading}
-          type={buttonType}
-          size="md"
-          variant="solid"
-          onClick={onConfirm}
-          className="!w-[120px] !h-10"
-        >
-          Konfirmasi
-        </Button>
+        )}
+        <div className="flex-1">
+          <Upload
+            accept=".pdf"
+            multiple={false}
+            fileList={uploadedFile ? [uploadedFile] : []}
+            uploadLimit={1}
+            onChange={handleFileChange}
+            onFileRemove={handleFileRemove}
+            draggable={true}
+            showList={uploadedFile}
+          >
+            <div className="flex flex-col items-center justify-center h-[200px] rounded-lg hover:bg-gray-100 transition-colors">
+              <AiOutlineUpload className="w-10 h-10 text-gray-400 mb-2" />
+              <p className="text-gray-600 mb-2">Unggah File (PDF max 20mb)</p>
+              <Button size="sm" className="w-32">
+                Telusuri File
+              </Button>
+            </div>
+          </Upload>
+        </div>
+        <div className="flex justify-center items-center gap-4 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={disableCancel}
+            className="w-32 h-10"
+          >
+            Batal
+          </Button>
+          <Button
+            loading={isLoading}
+            type={buttonType}
+            variant="solid"
+            onClick={() => onConfirm(uploadedFile)}
+            className="w-32 h-10"
+          >
+            {isLoading ? "Loading..." : "Konfirmasi"}
+          </Button>
+        </div>
       </div>
     </Dialog>
   );

@@ -324,12 +324,7 @@ const DetailPurchaseReq = () => {
                   {dataDetailPurchase.id || "-"}
                 </p>
               </div>
-              <div className="flex items-center gap-10">
-                <p className="text-sm text-gray-500 w-32">Departemen</p>
-                <p className="text-sm text-gray-700">
-                  {findDepartement(dataDetailPurchase.department_id) || "-"}
-                </p>
-              </div>
+
               <div className="flex items-center gap-11">
                 <p className="text-sm text-gray-500 w-42">Tanggal Pengajuan</p>
                 <p className="text-sm text-gray-700">

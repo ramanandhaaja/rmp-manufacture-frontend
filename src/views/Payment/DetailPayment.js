@@ -598,6 +598,7 @@ const DetailVendorOffer = () => {
         onClose={() => setIsOpen(false)}
         onConfirm={() => setIsOpen(false)}
         title="Upload Bukti Pembayaran"
+        subtitle="Silahkan unggah bukti pembayaran yang sah"
       />
     </LayoutRightSpace>
   );

@@ -12,8 +12,8 @@ import { RiFileLine } from "react-icons/ri";
 import ModalUpload from "components/custom/ModalUpload";
 import Tabs from "components/ui/Tabs";
 import PaymentVendorList from "components/rmp/Payment/PaymentVendorList";
-import TimelineCustom from "components/custom/TimelineCustom";
 import { NoDataSvg } from "assets/svg";
+import ProcessDevelopment from "components/rmp/R&D/ProcessDevelopment";
 
 const DetailPermintaanRnd = () => {
   const { id } = useParams();
@@ -177,66 +177,67 @@ const DetailPermintaanRnd = () => {
   return (
     <LayoutRightSpace>
       <div className=" px-4">
-        <h1 className="text-2xl font-semibold text-indigo-900 mb-4">
+        <h1 className="text-2xl font-semibold text-indigo-900 mb-4 ">
           Detail Permintaan Pengembangan Vipalbumin
         </h1>
+        <div className="border-b border-gray-300 "></div>
+
         <Tabs value={activeTab} onChange={handleTabChange} variant="underline">
           <>
-            <Tabs.TabList>
+            <Tabs.TabList className="border-b border-gray-300 pt-2">
               <Tabs.TabNav value={"0"} className="flex-col">
-                <span className="text-base">Detail Permintaan</span>
+                <span className="text-base">1. Detail Permintaan</span>
               </Tabs.TabNav>
               <Tabs.TabNav value={"1"} className="flex-col">
-                <span className="text-base">Pengembangan</span>
+                <span className="text-base">2. Pengembangan</span>
               </Tabs.TabNav>
             </Tabs.TabList>
-            <div className="border-b border-gray-400 "></div>
           </>
           <Tabs.TabContent value={"0"}>
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between mt-6 px-4">
               <div className="py-3 ">
                 <div className="space-y-6 mb-4">
                   {isLoading ? (
                     <TextBlockSkeleton />
                   ) : (
                     <div className="grid grid-cols-1 gap-2">
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-32">Id</p>
+                      <div className="flex items-">
+                        <p className="text-sm text-gray-500 w-48">Id</p>
                         <p className="text-sm text-gray-700">67847</p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-32">
+                      <div className="flex items-center ">
+                        <p className="text-sm text-gray-500 w-48">
                           Tipe Pengembangan
                         </p>
                         <p className="text-sm text-gray-700">Produk Baru</p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-32">
+                      <div className="flex items-center ">
+                        <p className="text-sm text-gray-500 w-48">
                           Target Launching
                         </p>
                         <p className="text-sm text-gray-700">20/10/2024</p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-32">
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-48">
                           Kategori Produk
                         </p>
                         <p className="text-sm text-gray-700">
                           Obat Tradisional
                         </p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-32">Produsen</p>
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-48">Produsen</p>
                         <p className="text-sm text-gray-700">Royal</p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-32">Pendaftar</p>
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-48">Pendaftar</p>
                         <p className="text-sm text-gray-700">Royal</p>
                       </div>
-                      <div className="flex gap-10">
-                        <p className="text-sm text-gray-500 w-32">
+                      <div className="flex">
+                        <p className="text-sm text-gray-500 w-48">
                           Deskripsi Produk
                         </p>
-                        <p className="text-sm text-gray-700 w-55">
+                        <p className="text-sm text-gray-700 w-[400px]">
                           Lorem ipsum dolor sit amet, consectetur adipiscing
                           elit. Phasellus elementum viverra magna, non aliquam
                           augue accumsan eget. Maecenas ac condimentum purus.
@@ -247,7 +248,7 @@ const DetailPermintaanRnd = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between px-4">
               <div className="py-3 ">
                 <h2 className="text-xl font-semibold text-indigo-900 mb-4">
                   Detail Produk
@@ -257,20 +258,20 @@ const DetailPermintaanRnd = () => {
                     <TextBlockSkeleton />
                   ) : (
                     <div className="grid grid-cols-1 gap-2">
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-42">
+                      <div className="flex items-center ">
+                        <p className="text-sm text-gray-500 w-48">
                           Usulan Nama Produk 1
                         </p>
                         <p className="text-sm text-gray-700">CurePlus</p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-42">
+                      <div className="flex items-center ">
+                        <p className="text-sm text-gray-500 w-48">
                           Usulan Nama Produk 2
                         </p>
                         <p className="text-sm text-gray-700">VitaCure</p>
                       </div>
-                      <div className="flex items-center gap-10">
-                        <p className="text-sm text-gray-500 w-42">
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-48">
                           Usulan Nama Produk 3
                         </p>
                         <p className="text-sm text-gray-700">HealWell</p>
@@ -335,20 +336,8 @@ const DetailPermintaanRnd = () => {
             </div>
           </Tabs.TabContent>
           <Tabs.TabContent value="1">
-            <div className="mt-10">
-              {/* <div className="flex  flex-col justify-center items-center ">
-                <NoDataSvg />
-
-                <div className="flex flex-col gap-1 items-center mt-[21px]">
-                  <p className="text-blue-999 text-lg font-bold">
-                    Belum Ada Data
-                  </p>
-                  <p className="text-blue-999">
-                    Data pembayaran belum tersedia
-                  </p>
-                </div>
-              </div> */}
-              {/* <TimelineCustom steps={paymentLog} /> */}
+            <div className="mt-10 ">
+              <ProcessDevelopment />
             </div>
           </Tabs.TabContent>
         </Tabs>

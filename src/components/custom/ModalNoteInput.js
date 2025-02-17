@@ -18,6 +18,7 @@ const ModalNoteInput = forwardRef(
       status,
       width = 500,
       contentClassName = "p-5 rounded-2xl",
+      isNoteOpsional = false,
     },
     ref
   ) => {
@@ -75,9 +76,9 @@ const ModalNoteInput = forwardRef(
         >
           {({ errors, touched, handleSubmit }) => (
             <Form className="w-full" onSubmit={handleSubmit}>
-              <div className="mb-6">
+              <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Catatan*
+                  {isNoteOpsional ? "Catatan (opsional)" : "Catatan*"}
                 </label>
                 <Field
                   as="textarea"
@@ -101,7 +102,7 @@ const ModalNoteInput = forwardRef(
                   onClick={onClose}
                   className="ltr:mr-2 rtl:ml-2 !bg-transparent !w-[120px] !h-10"
                 >
-                  Cancel
+                  Tutup
                 </Button>
                 <Button
                   loading={isLoading}
@@ -111,7 +112,7 @@ const ModalNoteInput = forwardRef(
                   className="!w-[120px] !h-10"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Loading..." : "Confirm"}
+                  {isLoading ? "Loading..." : "Konfirmasi"}
                 </Button>
               </div>
             </Form>
