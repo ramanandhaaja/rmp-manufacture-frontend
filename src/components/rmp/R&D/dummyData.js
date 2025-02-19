@@ -198,3 +198,36 @@ export const productDevelopmentData = [
     ],
   },
 ];
+
+
+export const kompetitorData = [
+  {
+    nama: "PT Harapan Pharmacy",
+    zatAktif: "Paracetamol",
+    Kekuatan: "Kuat",
+    bentukSediaan: "Tablet",
+    Kemasan: "Strip",
+    Dosis: "150 Mg",
+    HNA: " 1.500",
+  },
+  {
+    nama: "PT Indah Pharmacy",
+
+    zatAktif: "Ibuprofen",
+    Kekuatan: "Kuat",
+    bentukSediaan: "Tablet",
+    Kemasan: "Botol",
+    Dosis: "110 Mg",
+    HNA: " 2.000",
+  },
+  {
+    nama: "PT Bintang Pharmacy",
+
+    zatAktif: "Amoxicillin",
+    Kekuatan: "Kuat",
+    bentukSediaan: "Capsule",
+    Kemasan: "Box",
+    Dosis: "150 Mg",
+    HNA: " 3.000",
+  },
+];
