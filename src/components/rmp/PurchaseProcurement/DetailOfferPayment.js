@@ -19,8 +19,8 @@ const DetailOfferPayment = ({
   ];
 
   return (
-    <div className="flex justify-between">
-      <div className="flex flex-col gap-2">
+    <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-3">
         {priceDetails.map((item, index) => (
           <p key={`label-${index}`} className="text-base font-semibold">
             {item.label}
@@ -28,11 +28,11 @@ const DetailOfferPayment = ({
         ))}
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {priceDetails.map((item, index) => (
           <p
             key={`value-${index}`}
-            className="text-base text-black font-semibold"
+            className="text-lg text-indigo-900 font-semibold"
           >
             {formatNumber(item.value)}
           </p>

@@ -5,7 +5,11 @@ import { IoMdClose } from "react-icons/io";
 import dayjs from "dayjs";
 import FileSvg from "assets/svg/FileSvg";
 import { TrashIcon } from "@radix-ui/react-icons";
-import { RMPSTATUSCOLOR, PO_STATUS_STYLES } from "constants/status.constant";
+import {
+  RMPSTATUSCOLOR,
+  PO_STATUS_STYLES,
+  PAYMENT_STATUS_STYLES,
+} from "constants/status.constant";
 // export const resizeFile = (file) =>
 //   new Promise((resolve) => {
 //     Resizer.imageFileResizer(
@@ -410,7 +414,7 @@ export const findDepartement = (id) => {
 };
 
 export function getStatusClassName(status) {
-  return RMPSTATUSCOLOR[status] || "bg-gray-500 text-white";
+  return RMPSTATUSCOLOR[status] || PO_STATUS_STYLES[status];
 }
 
 export function getStatusName(status) {
@@ -430,6 +434,10 @@ export function getStatusName(status) {
 
 export function getPoStatusClassName(status) {
   return PO_STATUS_STYLES[status] || "bg-gray-500 text-white";
+}
+
+export function getPaymentStatusClassName(status) {
+  return PAYMENT_STATUS_STYLES[status] || "bg-gray-500 text-white";
 }
 
 export function getCapitalizeType(type) {

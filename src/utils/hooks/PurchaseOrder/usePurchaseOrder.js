@@ -14,6 +14,9 @@ import {
   getPoAdjustmentNoteApi,
   postPoVerificationApi,
   postReleasePoApi,
+  postReplyAdjustmentNoteApi,
+  postConfirmPaymentApi,
+  getListPaymentApi,
 } from "services/ProcurementService";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -203,6 +206,28 @@ function usePurchaseOrder() {
     }
   };
 
+  const getPaymentLists = async () => {
+    try {
+      const response = await getListPaymentApi();
+      if (response.data) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        console.log(response);
+        return { status: "failed", message: "" };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   const createPurchaseOrder = async (purchaseData) => {
     try {
       const response = await postPurchaseOrderApi(purchaseData);
@@ -333,6 +358,27 @@ function usePurchaseOrder() {
     }
   };
 
+  const submitPayment = async (id, data) => {
+    try {
+      const response = await postConfirmPaymentApi(Number(id), data);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   const editVendorOffer = async (id, data) => {
     try {
       const response = await putVendorOfferApi(id, data);
@@ -372,6 +418,28 @@ function usePurchaseOrder() {
     }
   };
 
+  const replyAdjustmentNote = async (id, data) => {
+    try {
+      const response = await postReplyAdjustmentNoteApi(id, data);
+      console.log(response);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   return {
     getPoList,
     getPoQueueList,
@@ -394,6 +462,9 @@ function usePurchaseOrder() {
     releasePo,
     getNotesBod,
     dataPoNotesBod,
+    replyAdjustmentNote,
+    getPaymentLists,
+    submitPayment,
   };
 }
 

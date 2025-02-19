@@ -1,14 +1,8 @@
 import CustomTable from "components/custom/CustomTable";
 import { useEffect, useState } from "react";
-import {
-  formatDate,
-  getCapitalizeType,
-  findDepartement,
-  getPoStatusClassName,
-} from "utils/helpers";
+import { getPaymentStatusClassName } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Pagination, Notification, toast } from "components/ui";
-import CreatePOModal from "components/custom/ModalCreatePo";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import capitalize from "components/ui/utils/capitalize";
 import TableListDropdown from "components/template/TableListDropdown";
@@ -17,9 +11,15 @@ import { Tools } from "./tools";
 import { PageConfig } from "./config";
 import { formatNumber } from "utils/helpers";
 import { purchaseOrders } from "./dummyData";
+import {
+  setIdPo,
+  setPaymentMethod,
+} from "store/PurchaseOrder/purchaseOrderSlice";
+import { useDispatch } from "react-redux";
 
 const ProcurementOrderList = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [localState, setLocalState] = useState({
     params: {
@@ -31,8 +31,9 @@ const ProcurementOrderList = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-  const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
+  const { getPaymentLists } = usePurchaseOrder();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [dataPayment, setDataPayment] = useState([]);
 
   const columns = PageConfig.listFields
     .filter((field) => field.is_show)
@@ -44,12 +45,12 @@ const ProcurementOrderList = () => {
       Cell: ({ row }) => {
         const value = row.original[field.key];
         switch (field.key) {
-          case "jumlahPengeluaran":
+          case "amount":
             return formatNumber(value);
-          case "po_status":
+          case "status":
             return (
               <span
-                className={`px-2 py-1 rounded-full text-xs ${getPoStatusClassName(
+                className={`px-2 py-1 rounded text-xs font-semibold ${getPaymentStatusClassName(
                   value
                 )}`}
               >
@@ -79,10 +80,13 @@ const ProcurementOrderList = () => {
             dropdownItemList={[
               {
                 label: "Detail Pembayaran",
-                onClick: () =>
+                onClick: () => {
                   navigate(
-                    `/purchase/pembayaran/detail-pembayaran/${row.original.id}`
-                  ),
+                    `/purchase/pembayaran/detail-pembayaran/${row.original.payment_record_id}`
+                  );
+                  dispatch(setIdPo(row.original.po_id));
+                  dispatch(setPaymentMethod(row.original.payment_method));
+                },
               },
             ]}
           />
@@ -90,25 +94,36 @@ const ProcurementOrderList = () => {
       },
     });
   }
-  //   const fetchData = async (params = localState.params) => {
-  //     setIsLoading(true);
-  //     try {
-  //       const response = await getPoList(params);
-  //       const data = response.data;
-  //       setLocalState((prev) => ({
-  //         ...prev,
-  //         params: {
-  //           ...params,
-  //           total: data?.total,
-  //           per_page: data?.per_page,
-  //         },
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching purchase orders:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+  const fetchData = async (params = localState.params) => {
+    setIsLoading(true);
+    try {
+      const response = await getPaymentLists(params);
+      const data = response.data;
+      setDataPayment(data?.data);
+      setLocalState((prev) => ({
+        ...prev,
+        params: {
+          ...params,
+          total: data?.total,
+          per_page: data?.per_page,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(setIdPo(null));
+    dispatch(setPaymentMethod(""));
+    fetchData();
+  }, []);
+
+  //   useEffect(() => {
+  //     handlePoCreated();
+  //   }, [isSubmitted]);
 
   //   const handlePoCreated = () => {
   //     if (isSubmitted) {
@@ -126,13 +141,6 @@ const ProcurementOrderList = () => {
   //       fetchData();
   //     }
   //   };
-
-  //   useEffect(() => {
-  //     fetchData();
-  //   }, []);
-  //   useEffect(() => {
-  //     handlePoCreated();
-  //   }, [isSubmitted]);
 
   //   const handlePaginationChange = (page) => {
   //     fetchData({
@@ -186,7 +194,7 @@ const ProcurementOrderList = () => {
 
       <DataTable
         columns={columns}
-        data={purchaseOrders}
+        data={dataPayment}
         loading={isLoading}
         pagingData={{
           total: localState.params.total || 0,

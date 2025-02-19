@@ -4,6 +4,7 @@ export const purchaseOrderSlice = createSlice({
   name: "purchaseOrder",
   initialState: {
     idPo: null,
+    paymentMethod: "",
     vendorOfferId: null,
     dataPurchaseOrder: [],
     dataPurchaseQueue: [],
@@ -16,6 +17,9 @@ export const purchaseOrderSlice = createSlice({
   reducers: {
     setIdPo: (state, action) => {
       state.idPo = action.payload;
+    },
+    setPaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
     },
     setVendorOfferId: (state, action) => {
       state.vendorOfferId = action.payload;
@@ -75,6 +79,7 @@ export const purchaseOrderSlice = createSlice({
 
 export const {
   idPo,
+  paymentMethod,
   vendorOfferId,
   dataPurchaseOrder,
   dataPurchaseQueue,
@@ -92,6 +97,7 @@ export const {
   setSelectedPoVendors,
   setVendorOfferId,
   setIdPo,
+  setPaymentMethod,
   clearVendorSelections,
   updateVendorSubmitStatus,
 } = purchaseOrderSlice.actions;

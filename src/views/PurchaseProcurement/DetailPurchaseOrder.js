@@ -2,7 +2,11 @@ import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { formatDate, getCapitalizeType } from "utils/helpers";
+import {
+  formatDate,
+  getCapitalizeType,
+  getStatusClassName,
+} from "utils/helpers";
 import CustomTable from "components/custom/CustomTable";
 import { Button } from "components/ui";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +23,8 @@ import { FiCheckCircle } from "react-icons/fi";
 import ModalNoteInput from "components/custom/ModalNoteInput";
 import ModalUpload from "components/custom/ModalUpload";
 import PoAdjusmentNotes from "components/rmp/PurchaseProcurement/PoAdjusmentNotes";
+import DetailOfferPayment from "components/rmp/PurchaseProcurement/DetailOfferPayment";
+import { RiFileLine } from "react-icons/ri";
 
 const DetailPurchaseOrder = () => {
   const navigate = useNavigate();
@@ -31,18 +37,54 @@ const DetailPurchaseOrder = () => {
     releasePo,
     getNotesBod,
     dataPoNotesBod,
+    getDetailVendorOffer,
+    dataOfferPoVendors,
   } = usePurchaseOrder();
   const [isLoadingVerify, setIsLoadingVerify] = useState(false);
   const { id } = useParams();
   const { userRole, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingOffer, setIsLoadingOffer] = useState(false);
+
   const [activeTab, setActiveTab] = useState(0);
   const [status, setStatus] = useState("");
   const [activeModal, setActiveModal] = useState(null);
   const [isOpenPoRelease, setIsOpenPoRelease] = useState(false);
   const [isLoadingUpload, setIsLoadingUpload] = useState(false);
   const [isLoadingNotes, setIsLoadingNotes] = useState(false);
-  console.log(dataPoNotesBod);
+  const chosenVendor = dataDetailPurchaseOrder?.vendors?.filter(
+    (vendor) => vendor.status === "approved" ?? []
+  );
+  const chosenVendorOfferId = chosenVendor?.[0]?.offer_id;
+  const vendorDetail = dataOfferPoVendors?.vendor_detail;
+  const vendorItems = dataOfferPoVendors?.items;
+  const deliveryCost = dataOfferPoVendors?.delivery_cost;
+  const tax = 120000;
+  const totalOfferedPrice = vendorItems?.reduce(
+    (sum, item) => sum + item.offered_price,
+    0
+  );
+  const totalAdditionalCost = dataOfferPoVendors?.costs?.reduce(
+    (sum, item) => sum + item.cost_value,
+    0
+  );
+  const grandTotal =
+    totalOfferedPrice + totalAdditionalCost + deliveryCost + tax;
+  const goodsQty = dataDetailPurchaseOrder?.items?.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+  const renderPaymentMethod = (paymentMethod) => {
+    const paymentMethodMapping = {
+      pay_in_part: "Bayar Sebagian",
+      pay_in_full: "Bayar Lunas Dimuka",
+      pay_in_full: "Bayar Lunas Diakhir",
+    };
+    return paymentMethodMapping[paymentMethod];
+  };
+  const shouldShowVendorDetails =
+    dataDetailPurchaseOrder?.po_status === "Direvisi" ||
+    dataDetailPurchaseOrder?.po_status === "Disetujui";
 
   const columns = [
     {
@@ -172,10 +214,11 @@ const DetailPurchaseOrder = () => {
   }, [id]);
 
   useEffect(() => {
-    const fetchDataNotes = async () => {
-      setIsLoading(true);
+    if (!chosenVendorOfferId) return;
+    const fetchDataOffer = async () => {
+      setIsLoadingOffer(true);
       try {
-        const response = await getNotesBod(id);
+        const response = await getDetailVendorOffer(chosenVendorOfferId);
         if (response.status === "failed") {
           toast.push(
             <Notification
@@ -191,10 +234,39 @@ const DetailPurchaseOrder = () => {
       } catch (error) {
         console.error("Error fetching PO details:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingOffer(false);
       }
     };
 
+    fetchDataOffer();
+  }, [chosenVendorOfferId]);
+
+  const fetchDataNotes = async () => {
+    setIsLoadingNotes(true);
+    try {
+      const response = await getNotesBod(id);
+      if (response.status === "failed") {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Terjadi gangguan, gagal memuat data"
+            description={response.message}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching PO details:", error);
+    } finally {
+      setTimeout(() => {
+        setIsLoadingNotes(false);
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
     fetchDataNotes();
   }, []);
 
@@ -231,6 +303,7 @@ const DetailPurchaseOrder = () => {
             placement: "top-center",
           }
         );
+        await fetchDataNotes();
       } else {
         toast.push(
           <Notification
@@ -309,6 +382,30 @@ const DetailPurchaseOrder = () => {
     }
   };
 
+  const showBtnRilis = () => {
+    if (dataDetailPurchaseOrder?.po_status === "Disetujui") {
+      return (
+        <>
+          <Button
+          // onClick={() =>
+          //   navigate(`/purchase/request/detail/informasi-pembelian/${id}`)
+          // }
+          >
+            Download PO
+          </Button>
+          <Button
+            onClick={() => setIsOpenPoRelease(true)}
+            variant="solid"
+            className="text-white"
+          >
+            Rilis PO
+          </Button>
+        </>
+      );
+    }
+    return null;
+  };
+
   const ButtonDireksi = () => {
     return (
       <>
@@ -361,10 +458,11 @@ const DetailPurchaseOrder = () => {
           </div>
         </Tabs.TabContent>
         <Tabs.TabContent value={2}>
-          <div className=" p-6 w-full max-w-4xl">
+          <div className=" p-6 w-full">
             <PoAdjusmentNotes
               data={dataPoNotesBod}
               isLoading={isLoadingNotes}
+              fetchNotes={fetchDataNotes}
             />
           </div>
         </Tabs.TabContent>
@@ -375,26 +473,93 @@ const DetailPurchaseOrder = () => {
   const DetailPoGeneral = () => {
     return (
       <Tabs value={activeTab} onChange={handleStepChange} variant="underline">
-        {status === "approved" && (
-          <>
-            <Tabs.TabList>
-              <Tabs.TabNav value={0} className="flex-col">
-                <span className="text-base">Detail PO</span>
-              </Tabs.TabNav>
-              <Tabs.TabNav value={1} className="flex-col">
-                <span className="text-base">Detail Vendor</span>
-              </Tabs.TabNav>
-            </Tabs.TabList>
-            <div className="border-b border-gray-400 "></div>
-          </>
-        )}
+        <>
+          <Tabs.TabList>
+            <Tabs.TabNav value={0} className="flex-col">
+              <span className="text-base">Detail PO</span>
+            </Tabs.TabNav>
+            <Tabs.TabNav value={1} className="flex-col">
+              <span className="text-base">Vendor</span>
+            </Tabs.TabNav>
+            <Tabs.TabNav value={2} className="flex-col">
+              <span className="text-base">Catatan</span>
+            </Tabs.TabNav>
+          </Tabs.TabList>
+          <div className="border-b border-gray-400 "></div>
+        </>
 
         <Tabs.TabContent value={0}>
+          {/* detail vendor */}
+          {shouldShowVendorDetails && (
+            <div className="flex justify-between">
+              <div className="py-3 pt-6">
+                <h2 className="text-xl font-semibold text-indigo-900 mb-4">
+                  Vendor Terpilih
+                </h2>
+                <div className="space-y-6 mb-4">
+                  {isLoadingOffer ? (
+                    <TextBlockSkeleton />
+                  ) : (
+                    <div className="grid grid-cols-1 gap-2">
+                      <>
+                        <div className="flex items-center gap-10">
+                          <p className="text-sm text-gray-500 w-32">Nama PO</p>
+                          <p className="text-sm text-gray-700">
+                            {vendorDetail?.vendor_name || "-"}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-10">
+                          <p className="text-sm text-gray-500 w-32">PIC</p>
+                          <p className="text-sm text-gray-700">
+                            {vendorDetail?.vendor_pic_name || "-"}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-10">
+                          <p className="text-sm text-gray-500 w-32">
+                            No Telpon
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            {vendorDetail?.vendor_pic_phone || "-"}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-10">
+                          <p className="text-sm text-gray-500 w-32">Alamat</p>
+                          <p className="text-sm text-gray-700">
+                            {vendorDetail?.vendor_address || "-"}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-10">
+                          <p className="text-sm text-gray-500 w-32">
+                            Metode Pembayaran
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            {renderPaymentMethod(
+                              dataOfferPoVendors?.payments[0]?.payment_method ||
+                                "-"
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-10">
+                          <p className="text-sm text-gray-500 w-32">
+                            Alamat Pengiriman
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            {dataOfferPoVendors?.delivery_address || "-"}
+                          </p>
+                        </div>
+                      </>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {/* detail po */}
           <div className="flex justify-between">
-            <div className="py-3 pt-6">
-              <h1 className="text-xl font-semibold text-indigo-900 mb-4">
+            <div className="py-3 ">
+              <h2 className="text-xl font-semibold text-indigo-900 mb-4">
                 Detail PO
-              </h1>
+              </h2>
               <div className="space-y-6 mb-8">
                 {isLoading ? (
                   <TextBlockSkeleton />
@@ -403,20 +568,20 @@ const DetailPurchaseOrder = () => {
                     <div className="flex items-center gap-10">
                       <p className="text-sm text-gray-500 w-32">Nama PO</p>
                       <p className="text-sm text-gray-700">
-                        {dataDetailPurchaseOrder.po_name || "-"}
+                        {dataDetailPurchaseOrder?.po_name || "-"}
                       </p>
                     </div>
                     <div className="flex items-center gap-10">
                       <p className="text-sm text-gray-500 w-32">Tipe</p>
                       <p className="text-sm text-gray-700">
-                        {getCapitalizeType(dataDetailPurchaseOrder.po_type) ||
+                        {getCapitalizeType(dataDetailPurchaseOrder?.po_type) ||
                           "-"}
                       </p>
                     </div>
                     <div className="flex items-center gap-10">
                       <p className="text-sm text-gray-500 w-32">Kategori</p>
                       <p className="text-sm text-gray-700">
-                        {dataDetailPurchaseOrder.category_name || "-"}
+                        {dataDetailPurchaseOrder?.category_name || "-"}
                       </p>
                     </div>
                     <div className="flex items-center gap-[37px]">
@@ -424,8 +589,8 @@ const DetailPurchaseOrder = () => {
                         Tanggal Request PO
                       </p>
                       <p className="text-sm text-gray-700">
-                        {dataDetailPurchaseOrder.po_date
-                          ? formatDate(dataDetailPurchaseOrder.po_date)
+                        {dataDetailPurchaseOrder?.po_date
+                          ? formatDate(dataDetailPurchaseOrder?.po_date)
                           : "-"}
                       </p>
                     </div>
@@ -433,7 +598,7 @@ const DetailPurchaseOrder = () => {
                     <div className="flex items-center gap-10">
                       <p className="text-sm text-gray-500 w-32">Catatan</p>
                       <p className="text-sm text-gray-700">
-                        {dataDetailPurchaseOrder.note || "-"}
+                        {dataDetailPurchaseOrder?.note || "-"}
                       </p>
                     </div>
                   </div>
@@ -451,19 +616,72 @@ const DetailPurchaseOrder = () => {
               isLoading={isLoading}
             />
           </div>
-          <div className="py-4">
-            <h1 className="text-xl font-semibold text-indigo-900 pb-4">
-              Vendor
-            </h1>
+          <div className="border-b border-gray-400 "></div>
+
+          {shouldShowVendorDetails && (
+            <div className="pt-4 py-2">
+              <div className="flex justify-between font-semibold py-4">
+                <p className="text-lg">Total Qty Barang</p>
+                <p className="text-lg">{goodsQty}</p>
+              </div>
+              <h2 className="text-xl font-semibold text-indigo-900 mb-4">
+                Detail Pembayaran
+              </h2>
+
+              <div className="border-b border-gray-400 pb-4">
+                {isLoading ? (
+                  <TextBlockSkeleton />
+                ) : (
+                  <DetailOfferPayment
+                    dataOfferPoVendors={dataOfferPoVendors}
+                    totalOfferedPrice={totalOfferedPrice}
+                    deliveryCost={deliveryCost}
+                    totalAdditionalCost={totalAdditionalCost}
+                    grandTotal={grandTotal}
+                  />
+                )}
+              </div>
+              <div className="py-4 ">
+                <h2 className="text-base font-semibold mb-4">
+                  Penawaran Vendor
+                </h2>
+                {dataOfferPoVendors?.offering_document ? (
+                  <div className="border border-gray-400 rounded-lg p-2 w-[320px] flex items-center gap-1">
+                    <RiFileLine size={18} />
+                    {dataOfferPoVendors?.offering_document}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-700">
+                    Belum ada dokumen penawaran
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </Tabs.TabContent>
+        <Tabs.TabContent value={1}>
+          <div className="py-6">
             <CustomTable
-              data={dataDetailPurchaseOrder.vendors}
+              data={
+                shouldShowVendorDetails
+                  ? chosenVendor
+                  : dataDetailPurchaseOrder?.vendors
+              }
               columns={columnsVendor}
-              isLoading={isLoading}
+              isLoading={shouldShowVendorDetails ? isLoadingOffer : isLoading}
             />
           </div>
         </Tabs.TabContent>
-        <Tabs.TabContent value={1}>
-          <div>Detail vendor</div>
+
+        <Tabs.TabContent value={2}>
+          <div className=" p-6 w-full ">
+            <PoAdjusmentNotes
+              isShowInput
+              data={dataPoNotesBod}
+              isLoading={isLoadingNotes}
+              fetchNotes={fetchDataNotes}
+            />
+          </div>
         </Tabs.TabContent>
       </Tabs>
     );
@@ -478,43 +696,16 @@ const DetailPurchaseOrder = () => {
             {dataDetailPurchaseOrder?.po_name}
           </h1>
 
-          {dataDetailPurchaseOrder?.status === "approved" && (
-            <div className="bg-blue-200 text-blue-800 h-8 px-3 py-1 rounded-lg text-sm">
-              Disetujui
-            </div>
-          )}
-          {dataDetailPurchaseOrder?.status === "rejected" && (
-            <div className="bg-red-200 text-gray-700 h-8 px-3 py-1 rounded-lg text-sm">
-              Ditolak
-            </div>
-          )}
-          {dataDetailPurchaseOrder?.status === "waiting" && (
-            <div className="bg-gray-200 text-gray-700 h-8 px-3 py-1 rounded-lg text-sm">
-              Menunggu Persetujuan
-            </div>
-          )}
+          <div
+            className={`${getStatusClassName(
+              dataDetailPurchaseOrder?.po_status
+            )} text-white h-8 px-3 py-1 rounded-lg text-sm font-bold`}
+          >
+            {dataDetailPurchaseOrder?.po_status}
+          </div>
         </div>
         <div className="flex gap-2">
-          {userRole.includes("bod") ? (
-            <ButtonDireksi />
-          ) : (
-            <>
-              <Button
-              // onClick={() =>
-              //   navigate(`/purchase/request/detail/informasi-pembelian/${id}`)
-              // }
-              >
-                Download PO
-              </Button>
-              <Button
-                onClick={() => setIsOpenPoRelease(true)}
-                variant="solid"
-                className="text-white"
-              >
-                Rilis PO
-              </Button>
-            </>
-          )}
+          {userRole.includes("bod") ? <ButtonDireksi /> : showBtnRilis()}
         </div>
       </div>
 

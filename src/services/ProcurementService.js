@@ -60,6 +60,31 @@ export async function getPoAdjustmentNoteApi(id) {
   });
 }
 
+export async function getListPaymentApi() {
+  return ApiService.fetchData({
+    url: `purchase-order/payments`,
+    method: "get",
+  });
+}
+
+export async function postReplyAdjustmentNoteApi(id, data) {
+  return ApiService.fetchData({
+    url: `purchase-order/reply-adjusment-note/${id}`,
+    method: "post",
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function postConfirmPaymentApi(id, data) {
+  return ApiService.fetchData({
+    url: `purchase-order/confirm-payment/${id}`,
+    method: "post",
+    data,
+    withCredentials: true,
+  });
+}
+
 export async function postPurchaseOrderApi(data) {
   return ApiService.fetchData({
     url: `purchase-order/create-po`,

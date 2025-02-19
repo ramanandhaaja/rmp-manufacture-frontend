@@ -77,7 +77,7 @@ const ModalUpload = ({
         <div className="flex-1">
           <Upload
             accept=".pdf"
-            multiple={false}
+            multiple={isMultiple}
             fileList={uploadedFile ? [uploadedFile] : []}
             uploadLimit={1}
             onChange={handleFileChange}
