@@ -144,7 +144,7 @@ export const Tools = (props) => {
                 className={"!px-5 rounded-lg"}
                 icon={<PlusIcon />}
               >
-                Add {props.pageConfig.pageTitle}
+                Buat Permintaan Baru
               </Button>
             </Link>
           )}

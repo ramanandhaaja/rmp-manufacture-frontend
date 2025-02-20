@@ -28,6 +28,8 @@ const Upload = React.forwardRef((props, ref) => {
     className,
     field,
     form,
+    showUploadButton = true,
+    buttonText = "Upload",
     ...rest
   } = props;
 
@@ -115,11 +117,11 @@ const Upload = React.forwardRef((props, ref) => {
 
   const renderChildren = () => {
     if (!draggable && !children) {
-      return (
+      return showUploadButton ? (
         <Button disabled={disabled} onClick={(e) => e.preventDefault()}>
-          Upload
+          {buttonText}
         </Button>
-      );
+      ) : null;
     }
 
     if (draggable && !children) {
@@ -214,6 +216,8 @@ Upload.propTypes = {
   multiple: PropTypes.bool,
   accept: PropTypes.string,
   tip: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  showUploadButton: PropTypes.bool,
+  buttonText: PropTypes.string,
 };
 
 Upload.defaultProps = {
@@ -221,6 +225,8 @@ Upload.defaultProps = {
   showList: true,
   disabled: false,
   fileList: [],
+  showUploadButton: true,
+  buttonText: "Upload",
 };
 
 export default Upload;

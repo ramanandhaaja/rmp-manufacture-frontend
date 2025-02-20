@@ -4,7 +4,17 @@ import { useParams } from "react-router-dom";
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import TextBlockSkeleton from "components/shared/loaders/TextBlockSkeleton";
-import { Notification, toast, Button, Radio, DatePicker, Input, FormItem, FormContainer, Upload } from "components/ui";
+import {
+  Notification,
+  toast,
+  Button,
+  Radio,
+  DatePicker,
+  Input,
+  FormItem,
+  FormContainer,
+  Upload,
+} from "components/ui";
 import CustomTable from "components/custom/CustomTable";
 import { RiFileLine } from "react-icons/ri";
 import ModalUpload from "components/custom/ModalUpload";
@@ -27,7 +37,6 @@ const DetailPermintaanRnd = () => {
   const deliveryCost = dataOfferPoVendors?.delivery_cost;
   const [activeTab, setActiveTab] = useState("0");
   const navigate = useNavigate();
-
 
   const documents = Array(3).fill(null);
 
@@ -63,8 +72,6 @@ const DetailPermintaanRnd = () => {
     },
   ];
 
-
-
   const handleTabChange = (value) => {
     setActiveTab(value);
   };
@@ -80,18 +87,20 @@ const DetailPermintaanRnd = () => {
         <Tabs value={activeTab} onChange={handleTabChange} variant="underline">
           <>
             <Tabs.TabList className="border-b border-gray-300 pt-2">
-              <Tabs.TabNav value={"0"} className="flex-col">
+              <Tabs.TabNav value={0} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 1</span>
-                    <span className="text-sm text-gray-500 ">Detail Permintaan</span>
+                    <span className="text-sm text-gray-500 ">
+                      Detail Permintaan
+                    </span>
                   </div>
                   <div className="ml-2">
                     <MdNavigateNext size={24} />
                   </div>
                 </div>
               </Tabs.TabNav>
-              <Tabs.TabNav value={"1"} className="flex-col">
+              <Tabs.TabNav value={1} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 2</span>
@@ -102,22 +111,26 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </div>
               </Tabs.TabNav>
-              <Tabs.TabNav value={"2"} className="flex-col">
+              <Tabs.TabNav value={2} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 3</span>
-                    <span className="text-sm text-gray-500 ">Detail Produk</span>
+                    <span className="text-sm text-gray-500 ">
+                      Detail Produk
+                    </span>
                   </div>
                   <div className="ml-2">
                     <MdNavigateNext size={24} />
                   </div>
                 </div>
               </Tabs.TabNav>
-              <Tabs.TabNav value={"3"} className="flex-col">
+              <Tabs.TabNav value={3} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 4</span>
-                    <span className="text-sm text-gray-500 ">Dokumen Referensi</span>
+                    <span className="text-sm text-gray-500 ">
+                      Dokumen Referensi
+                    </span>
                   </div>
                 </div>
               </Tabs.TabNav>
@@ -127,7 +140,7 @@ const DetailPermintaanRnd = () => {
           <Formik>
             <Form className="space-y-6">
               <FormContainer>
-                <Tabs.TabContent value={"0"}>
+                <Tabs.TabContent value={0}>
                   <div className="flex justify-between px-4">
                     <div className="py-3 w-full">
                       <h2 className="text-xl font-semibold text-indigo-900 mt-4 mb-4">
@@ -138,7 +151,8 @@ const DetailPermintaanRnd = () => {
                           <TextBlockSkeleton />
                         ) : (
                           <div className="grid grid-cols-4 gap-2 w-full">
-                            <FormItem className="col-span-4 w-full"
+                            <FormItem
+                              className="col-span-4 w-full"
                               label={"Judul Permintaan"}
                               invalid="{errors.description && touched.description}"
                               errorMessage=""
@@ -152,7 +166,8 @@ const DetailPermintaanRnd = () => {
                                 uppercase={false}
                               />
                             </FormItem>
-                            <FormItem className="col-span-4 w-full"
+                            <FormItem
+                              className="col-span-4 w-full"
                               label={"Tipe Pengembangan"}
                               invalid="{errors.description && touched.description}"
                               errorMessage=""
@@ -167,7 +182,8 @@ const DetailPermintaanRnd = () => {
                               </Field>
                             </FormItem>
 
-                            <FormItem className="col-span-4 w-full"
+                            <FormItem
+                              className="col-span-4 w-full"
                               label={"Target Launching"}
                               invalid="{errors.description && touched.description}"
                               errorMessage=""
@@ -179,7 +195,8 @@ const DetailPermintaanRnd = () => {
                                 className="w-full"
                               />
                             </FormItem>
-                            <FormItem className="col-span-4 w-full"
+                            <FormItem
+                              className="col-span-4 w-full"
                               label={"Deskripsi Produk"}
                               invalid="{errors.description && touched.description}"
                               errorMessage=""
@@ -192,7 +209,8 @@ const DetailPermintaanRnd = () => {
                                 className="w-full"
                               />
                             </FormItem>
-                            <FormItem className="col-span-4 w-full"
+                            <FormItem
+                              className="col-span-4 w-full"
                               label={"Kategori Produk"}
                               invalid="{errors.description && touched.description}"
                               errorMessage=""
@@ -202,8 +220,12 @@ const DetailPermintaanRnd = () => {
                                 component={Radio.Group}
                                 className="w-full"
                               >
-                                <Radio value="Obat Tradisional">Obat Tradisional</Radio>
-                                <Radio value="Suplemen Kesehatan">Suplemen Kesehatan</Radio>
+                                <Radio value="Obat Tradisional">
+                                  Obat Tradisional
+                                </Radio>
+                                <Radio value="Suplemen Kesehatan">
+                                  Suplemen Kesehatan
+                                </Radio>
                                 <Radio value="Kosmetik">Kosmetik</Radio>
                               </Field>
                             </FormItem>
@@ -214,27 +236,23 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </Tabs.TabContent>
                 {/* LANGKAH 2 ///////////////////////////////*/}
-                <Tabs.TabContent value="1">
+                <Tabs.TabContent value={1}>
                   <div className="mt-10">
-                    <ListAddKompetitor
-                      dataTableItems={dummyData} />
+                    <ListAddKompetitor dataTableItems={dummyData} />
                   </div>
                 </Tabs.TabContent>
                 {/* LANGKAH 3 //////////////////////////////*/}
-                <Tabs.TabContent value="2">
+                <Tabs.TabContent value={2}>
                   <div className="mt-10">
                     <div className="border border-gray-300 rounded-md p-4">
-                      <FormItem className="col-span-4 w-full mb-4"
+                      <FormItem
+                        className="col-span-4 w-full mb-4"
                         label={"Nama 1"}
                         invalid="{errors.description && touched.description}"
                         errorMessage=""
                       >
                         <div className="flex items-center">
-                          <Input
-                            type="text"
-                            name="name1"
-                            placeholder="Nilai"
-                          />
+                          <Input type="text" name="name1" placeholder="Nilai" />
                           <button
                             type="button"
                             className="ml-2 text-red-500 hover:text-red-700"
@@ -245,18 +263,14 @@ const DetailPermintaanRnd = () => {
                         </div>
                       </FormItem>
 
-                      <FormItem className="col-span-4 w-full mb-4"
+                      <FormItem
+                        className="col-span-4 w-full mb-4"
                         label={"Nama 2"}
                         invalid="{errors.description && touched.description}"
                         errorMessage=""
                       >
-
                         <div className="flex items-center">
-                          <Input
-                            type="text"
-                            name="name2"
-                            placeholder="Nilai"
-                          />
+                          <Input type="text" name="name2" placeholder="Nilai" />
                           <button
                             type="button"
                             className="ml-2 text-red-500 hover:text-red-700"
@@ -275,8 +289,11 @@ const DetailPermintaanRnd = () => {
                       </Button>
                     </div>
                     <ListAddDetailProduk />
-                    <FormItem className="col-span-4 w-full"
-                      label={<span style={{ fontSize: '18px' }}>Pendaftar</span>}
+                    <FormItem
+                      className="col-span-4 w-full"
+                      label={
+                        <span style={{ fontSize: "18px" }}>Pendaftar</span>
+                      }
                       invalid="{errors.description && touched.description}"
                       errorMessage=""
                     >
@@ -300,8 +317,9 @@ const DetailPermintaanRnd = () => {
                         </Radio>
                       </Field>
                     </FormItem>
-                    <FormItem className="col-span-4 w-full"
-                      label={<span style={{ fontSize: '18px' }}>Produsen</span>}
+                    <FormItem
+                      className="col-span-4 w-full"
+                      label={<span style={{ fontSize: "18px" }}>Produsen</span>}
                       invalid="{errors.description && touched.description}"
                       errorMessage=""
                     >
@@ -328,7 +346,7 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </Tabs.TabContent>
                 {/* LANGKAH 4 //////////////////*/}
-                <Tabs.TabContent value="3">
+                <Tabs.TabContent value={3}>
                   <div className="mt-10">
                     <h2 className="text-xl font-semibold text-indigo-900 mt-4 mb-4">
                       Upload Dokumen Referensi
@@ -340,7 +358,9 @@ const DetailPermintaanRnd = () => {
                       draggable={true}
                     >
                       <div className="flex flex-col items-center justify-center h-[200px] rounded-lg hover:bg-gray-100 transition-colors">
-                        <p className="text-gray-600 mb-2">Unggah File (PDF max 20mb)</p>
+                        <p className="text-gray-600 mb-2">
+                          Unggah File (PDF max 20mb)
+                        </p>
                         <Button size="sm" className="w-32">
                           Telusuri File
                         </Button>
@@ -356,7 +376,6 @@ const DetailPermintaanRnd = () => {
                             <RiFileLine size={18} />
                             document-name.pdf
                           </div>
-
                         </div>
                       ))}
                     </div>
@@ -367,17 +386,19 @@ const DetailPermintaanRnd = () => {
           </Formik>
         </Tabs>
         <div className="flex justify-end gap-2 py-4">
-          <Button  disabled={activeTab == 0}>
-            Batal
-          </Button>
-          <Button  disabled={activeTab == 0}>
+          <Button
+            disabled={activeTab == 0}
+            onClick={() => setActiveTab(activeTab - 1)}
+          >
             Sebelumnya
           </Button>
-          <Button variant="solid">
-            Konfirmasi
+          <Button
+            variant="solid"
+            onClick={activeTab == 3 ? null : () => setActiveTab(activeTab + 1)}
+          >
+            {activeTab == 3 ? "Konfirmasi" : "Selanjutnya"}
           </Button>
         </div>
-
       </div>
       {/* <ModalUpload
         isOpen={isOpen}

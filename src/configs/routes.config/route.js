@@ -177,7 +177,13 @@ export const ROUTE_LIST = [
   {
     key: "purchase.productR&D",
     path: "/purchase/product-r&d",
-    //component: React.lazy(() => import("views/R&D")),
+    component: React.lazy(() => import("views/R&D")),
+    authority: [],
+  },
+
+  {
+    key: "purchase.productR&D.addPermintaan",
+    path: "/purchase/product-r&d/add",
     component: React.lazy(() => import("views/R&D/AddPermintaan")),
     authority: [],
   },
@@ -189,7 +195,7 @@ export const ROUTE_LIST = [
   },
   {
     key: "purchase.productR&D.addPermintaan",
-    path: "/purchase/product-r&d/add",
+    path: "/purchase/product-r&d/tambah-permintaan",
     component: React.lazy(() => import("views/R&D/AddPermintaan")),
     authority: [],
   },
