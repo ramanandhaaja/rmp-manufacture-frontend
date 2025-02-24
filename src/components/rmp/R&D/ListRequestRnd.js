@@ -11,6 +11,7 @@ import DataTable from "components/shared/DataTable";
 import { Tools } from "./Tools.js";
 import { PageConfig } from "./config.js";
 import { dataListDevelopmet } from "./dummyData.js";
+import { useLocation } from "react-router-dom";
 
 const ListRequestRnd = () => {
   const navigate = useNavigate();
@@ -27,6 +28,8 @@ const ListRequestRnd = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const location = useLocation();
+  const checkLocation = location.pathname.includes("product-r&d");
 
   const columns = PageConfig.listFields
     .filter((field) => field.is_show)
@@ -81,7 +84,9 @@ const ListRequestRnd = () => {
                 label: "Detail Permintaan",
                 onClick: () =>
                   navigate(
-                    `/purchase/product-r&d/detail-permintaan/${row.original.id}`
+                    checkLocation
+                      ? `/purchase/product-r&d/detail-permintaan/${row.original.id}`
+                      : `/research-development/detail-permintaan/${row.original.id}`
                   ),
               },
             ]}

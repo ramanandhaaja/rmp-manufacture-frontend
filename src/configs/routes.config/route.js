@@ -177,7 +177,7 @@ export const ROUTE_LIST = [
   {
     key: "purchase.productR&D",
     path: "/purchase/product-r&d",
-    component: React.lazy(() => import("views/R&D")),
+    component: React.lazy(() => import("views/R&D/PermintaanProdukR&d")),
     authority: [],
   },
 
@@ -193,10 +193,65 @@ export const ROUTE_LIST = [
     component: React.lazy(() => import("views/R&D/DetailPermintaan")),
     authority: [],
   },
+
   {
     key: "purchase.productR&D.addPermintaan",
     path: "/purchase/product-r&d/tambah-permintaan",
     component: React.lazy(() => import("views/R&D/AddPermintaan")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment",
+    path: "/research-development",
+    component: React.lazy(() => import("views/R&D/index")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.detailPermintaan",
+    path: "/research-development/detail-permintaan/:id",
+    component: React.lazy(() => import("views/R&D/DetailPermintaan")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.productR&D.detailPengembangan",
+    path: "/research-development/detail-pengembangan/:id",
+    component: React.lazy(() => import("views/R&D/DetailPengembangan")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.qttp",
+    path: "/research-development/pra-formulasi/qttp",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/Qttp")),
+    authority: [],
+  },
+  {
+    key: "researchAndDevelopment.cqa",
+    path: "/research-development/pra-formulasi/cqa",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/CQA")),
+    authority: [],
+  },
+  {
+    key: "researchAndDevelopment.cma",
+    path: "/research-development/pra-formulasi/cma",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/CMA")),
+    authority: [],
+  },
+  {
+    key: "researchAndDevelopment.cpp",
+    path: "/research-development/pra-formulasi/cpp",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/CPP")),
+    authority: [],
+  },
+  {
+    key: "researchAndDevelopment.technicalFeasibility",
+    path: "/research-development/pra-formulasi/technical-feasibility",
+    component: React.lazy(() =>
+      import("views/R&D/PraFormulasi/TechnicalFeasibility")
+    ),
     authority: [],
   },
 ];

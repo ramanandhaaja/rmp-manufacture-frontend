@@ -202,13 +202,23 @@ const navigationConfig = [
   },
   {
     key: "researchAndDevelopment",
-    path: "/research-developement",
+    path: "/research-development",
     title: "R&D",
     translateKey: "nav.researchAndDevelopment",
     icon: "claim",
     type: NAV_ITEM_TYPE_COLLAPSE,
     authority: [],
     subMenu: [
+      {
+        key: "researchAndDevelopment",
+        path: "/research-development",
+        title: "Permintaan R&D",
+        icon: "",
+        translateKey: "nav.researchAndDevelopment",
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [],
+        subMenu: [],
+      },
       {
         key: "researchAndDevelopment.formulation",
         path: "/research-developement/formulation",
@@ -549,7 +559,7 @@ const navigationConfig = [
       {
         key: "purchase.productR&D",
         path: "/purchase/product-r&d",
-        title: "Permintaan R&D",
+        title: "Permintaan Produk R&D",
         icon: "",
         translateKey: "nav.purchase.productR&D",
         type: NAV_ITEM_TYPE_ITEM,

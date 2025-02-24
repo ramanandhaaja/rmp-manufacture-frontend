@@ -44,6 +44,7 @@ const TableListDropdown = ({ dropdownItemList, placement }) => {
           ) : (
             // Render regular menu item
             <Dropdown.Item
+              disabled={item.disabled}
               key={item.label}
               eventKey={item.label}
               className="mb-1 flex justify-between items-center w-full"

@@ -9,6 +9,7 @@ import {
   RMPSTATUSCOLOR,
   PO_STATUS_STYLES,
   PAYMENT_STATUS_STYLES,
+  RND_STATUS_STYLES,
 } from "constants/status.constant";
 // export const resizeFile = (file) =>
 //   new Promise((resolve) => {
@@ -438,6 +439,10 @@ export function getPoStatusClassName(status) {
 
 export function getPaymentStatusClassName(status) {
   return PAYMENT_STATUS_STYLES[status] || "bg-gray-500 text-white";
+}
+
+export function getRNDStatusClassName(status) {
+  return RND_STATUS_STYLES[status] || "bg-gray-500 text-white";
 }
 
 export function getCapitalizeType(type) {

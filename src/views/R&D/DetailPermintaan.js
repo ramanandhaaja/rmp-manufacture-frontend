@@ -14,6 +14,7 @@ import Tabs from "components/ui/Tabs";
 import PaymentVendorList from "components/rmp/Payment/PaymentVendorList";
 import { NoDataSvg } from "assets/svg";
 import ProcessDevelopment from "components/rmp/R&D/ProcessDevelopment";
+import { useLocation } from "react-router-dom";
 
 const DetailPermintaanRnd = () => {
   const { id } = useParams();
@@ -25,6 +26,8 @@ const DetailPermintaanRnd = () => {
   const vendorItems = dataOfferPoVendors?.items;
   const deliveryCost = dataOfferPoVendors?.delivery_cost;
   const [activeTab, setActiveTab] = useState("0");
+  const location = useLocation();
+  const checkUrl = location.pathname.includes("product-r&d");
   //   const totalOfferedPrice = vendorItems.reduce(
   //     (sum, item) => sum + item.offered_price,
   //     0
@@ -174,6 +177,37 @@ const DetailPermintaanRnd = () => {
     setActiveTab(value);
   };
 
+  const renderTabList = () => {
+    console.log(checkUrl);
+    if (checkUrl) {
+      return (
+        <>
+          <Tabs.TabList className="border-b border-gray-300 pt-2">
+            <Tabs.TabNav value={"0"} className="flex-col">
+              <span className="text-base">Detail Permintaan</span>
+            </Tabs.TabNav>
+            <Tabs.TabNav value={"1"} className="flex-col">
+              <span className="text-base">Log Aktifitas</span>
+            </Tabs.TabNav>
+          </Tabs.TabList>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Tabs.TabList className="border-b border-gray-300 pt-2">
+            <Tabs.TabNav value={"0"} className="flex-col">
+              <span className="text-base">1. Detail Permintaan</span>
+            </Tabs.TabNav>
+            <Tabs.TabNav value={"1"} className="flex-col">
+              <span className="text-base">2. Pengembangan</span>
+            </Tabs.TabNav>
+          </Tabs.TabList>
+        </>
+      );
+    }
+  };
+
   return (
     <LayoutRightSpace>
       <div className=" px-4">
@@ -183,16 +217,7 @@ const DetailPermintaanRnd = () => {
         <div className="border-b border-gray-300 "></div>
 
         <Tabs value={activeTab} onChange={handleTabChange} variant="underline">
-          <>
-            <Tabs.TabList className="border-b border-gray-300 pt-2">
-              <Tabs.TabNav value={"0"} className="flex-col">
-                <span className="text-base">1. Detail Permintaan</span>
-              </Tabs.TabNav>
-              <Tabs.TabNav value={"1"} className="flex-col">
-                <span className="text-base">2. Pengembangan</span>
-              </Tabs.TabNav>
-            </Tabs.TabList>
-          </>
+          {renderTabList()}
           <Tabs.TabContent value={"0"}>
             <div className="flex justify-between mt-6 px-4">
               <div className="py-3 ">
@@ -330,14 +355,10 @@ const DetailPermintaanRnd = () => {
               ))}
             </div>
           </Tabs.TabContent>
-          <Tabs.TabContent value="2">
-            <div className="mt-10">
-              <PaymentVendorList />
-            </div>
-          </Tabs.TabContent>
+
           <Tabs.TabContent value="1">
             <div className="mt-10 ">
-              <ProcessDevelopment />
+              {checkUrl ? <div>Log Aktifitas</div> : <ProcessDevelopment />}
             </div>
           </Tabs.TabContent>
         </Tabs>

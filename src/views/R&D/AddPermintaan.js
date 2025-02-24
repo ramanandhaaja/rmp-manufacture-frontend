@@ -87,7 +87,7 @@ const DetailPermintaanRnd = () => {
         <Tabs value={activeTab} onChange={handleTabChange} variant="underline">
           <>
             <Tabs.TabList className="border-b border-gray-300 pt-2">
-              <Tabs.TabNav value={0} className="flex-col">
+              <Tabs.TabNav value={"0"} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 1</span>
@@ -100,7 +100,7 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </div>
               </Tabs.TabNav>
-              <Tabs.TabNav value={1} className="flex-col">
+              <Tabs.TabNav value={"1"} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 2</span>
@@ -111,7 +111,7 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </div>
               </Tabs.TabNav>
-              <Tabs.TabNav value={2} className="flex-col">
+              <Tabs.TabNav value={"2"} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 3</span>
@@ -124,7 +124,7 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </div>
               </Tabs.TabNav>
-              <Tabs.TabNav value={3} className="flex-col">
+              <Tabs.TabNav value={"3"} className="flex-col">
                 <div className="flex items-center">
                   <div className=" flex flex-col">
                     <span className="text-base ">Step 4</span>
@@ -140,7 +140,7 @@ const DetailPermintaanRnd = () => {
           <Formik>
             <Form className="space-y-6">
               <FormContainer>
-                <Tabs.TabContent value={0}>
+                <Tabs.TabContent value={"0"}>
                   <div className="flex justify-between px-4">
                     <div className="py-3 w-full">
                       <h2 className="text-xl font-semibold text-indigo-900 mt-4 mb-4">
@@ -236,13 +236,13 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </Tabs.TabContent>
                 {/* LANGKAH 2 ///////////////////////////////*/}
-                <Tabs.TabContent value={1}>
+                <Tabs.TabContent value={"1"}>
                   <div className="mt-10">
                     <ListAddKompetitor dataTableItems={dummyData} />
                   </div>
                 </Tabs.TabContent>
                 {/* LANGKAH 3 //////////////////////////////*/}
-                <Tabs.TabContent value={2}>
+                <Tabs.TabContent value={"2"}>
                   <div className="mt-10">
                     <div className="border border-gray-300 rounded-md p-4">
                       <FormItem
@@ -346,7 +346,7 @@ const DetailPermintaanRnd = () => {
                   </div>
                 </Tabs.TabContent>
                 {/* LANGKAH 4 //////////////////*/}
-                <Tabs.TabContent value={3}>
+                <Tabs.TabContent value={"3"}>
                   <div className="mt-10">
                     <h2 className="text-xl font-semibold text-indigo-900 mt-4 mb-4">
                       Upload Dokumen Referensi

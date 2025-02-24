@@ -17,7 +17,7 @@ const Line = (props) => {
         <div className="progress-inner">
           <div
             className={progressBackgroundClass}
-            style={{ width: `${percent}%` }}
+            style={{ width: `${percent}%`, backgroundColor: strokeColor }}
           />
         </div>
       </div>
