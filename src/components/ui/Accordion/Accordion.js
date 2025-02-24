@@ -1,7 +1,6 @@
-// src/components/Accordion.js
-import React, { useEffect, useState } from 'react';
-import Button from '../Buttons';
-import { DragHandleDots2Icon, TrashIcon } from '@radix-ui/react-icons';
+import React, { useEffect, useState } from "react";
+import Button from "../Buttons";
+import { DragHandleDots2Icon, TrashIcon } from "@radix-ui/react-icons";
 
 const AccordionItem = ({
   title,
@@ -14,10 +13,10 @@ const AccordionItem = ({
   onDeleteCard,
   isDelete = true,
   withDragHandle = true,
-  bodyClass = '',
-  titleClass = '',
+  bodyClass = "",
+  titleClass = "",
   isExpandedActive = true,
-  textColor = '',
+  textColor = "",
 }) => {
   return (
     <div className="rounded-b-md">
@@ -68,7 +67,7 @@ const AccordionItem = ({
         {isExpandedActive && (
           <svg
             className={`w-6 h-6 transition-transform transform ${
-              isActive ? 'rotate-180' : ''
+              isActive ? "rotate-180" : ""
             }`}
             fill="none"
             stroke="#94A3B8"
@@ -98,22 +97,32 @@ const AccordionItem = ({
   );
 };
 
-const Accordion = ({ children, className, indexActive }) => {
-  const [activeIndex, setActiveIndex] = useState(null);
+const Accordion = ({ children, className }) => {
+  // Remove indexActive from props since we want all items to be active
+  const [activeIndexes, setActiveIndexes] = useState([]); // Use array to track multiple active indexes
 
   useEffect(() => {
-    setActiveIndex(indexActive);
-  }, []);
+    // Set all indexes as active initially
+    const allIndexes = React.Children.map(children, (_, index) => index);
+    setActiveIndexes(allIndexes || []);
+  }, [children]);
 
   const handleItemClick = (index) => {
-    setActiveIndex(index === activeIndex ? null : index);
+    setActiveIndexes((prev) => {
+      if (prev.includes(index)) {
+        return prev.filter((i) => i !== index); // Remove index if already active
+      } else {
+        return [...prev, index]; // Add index if not active
+      }
+    });
   };
+
   return (
     <div className={className}>
       {React.Children.map(children, (child, index) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
-            isActive: index === activeIndex,
+            isActive: activeIndexes.includes(index),
             onItemClick: () => handleItemClick(index),
           });
         }

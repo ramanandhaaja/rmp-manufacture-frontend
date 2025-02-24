@@ -13,66 +13,16 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
+import { useLocation } from "react-router-dom";
 
 export const Tools = (props) => {
   const [openDialogBulkDelete, setOpenDialogBulkDelete] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // const csvHeader = useMemo(() => {
-  //   let h = [];
-  //   for (let index = 0; index < props.checkboxList.length; index++) {
-  //     const el = props.checkboxList[index];
-  //     h.push({
-  //       label: el,
-  //       key: el,
-  //     });
-  //   }
-  //   return h;
-  // }, [props.checkboxList]);
-
-  // const handleExport = async () => {
-  //   try {
-  //     setLoading(true)
-  //     const result = await apiExport({
-  //       export_to: "xlsx",
-  //       q: props?.localState?.params?.q,
-  //       options: props?.localState?.params?.options,
-  //     })
-  //     if (result && result.status === 200) {
-  //       const headers = result.headers
-  //       const blob = new Blob([result.data], { type: headers["content-type"] })
-  //       const link = document.createElement("a")
-  //       const url = window.URL.createObjectURL(blob)
-  //       link.href = url
-  //       const currentTime = new Date()
-  //       const formattedTime = currentTime
-  //         .toISOString()
-  //         .replace(/[-T:.]/g, "")
-  //         .slice(0, -5)
-  //       const fileName = `export_${pageConfig.pageTitle}_${formattedTime}.xlsx`
-  //       link.setAttribute("download", fileName)
-  //       document.body.appendChild(link)
-  //       link.click()
-  //       link.remove()
-  //     }
-  //     setLoading(false)
-  //   } catch (error) {
-  //     toast.push(
-  //       <Notification title={"Error"} type="danger">
-  //         {error?.response?.data?.message ||
-  //           error?.message ||
-  //           "Something went wrong"}
-  //       </Notification>,
-  //       {
-  //         placement: "top-center",
-  //       }
-  //     )
-  //     setLoading(false)
-  //   }
-  // }
+  const location = useLocation();
 
   const storedDataString = localStorage.getItem("filter_mst_user");
   const storedData = JSON.parse(storedDataString);
+  const checkUrl = location.pathname.includes("product-r&d");
 
   return (
     <>
@@ -131,7 +81,7 @@ export const Tools = (props) => {
             </div>
           )}
 
-          {props.pageConfig.enableCreate && (
+          {props.pageConfig.enableCreate && checkUrl && (
             <Link
               to={props.pageConfig.pageCreate}
               className="block lg:inline-block lg:mb-0 mb-4 ml-2"
@@ -150,69 +100,6 @@ export const Tools = (props) => {
           )}
         </div>
       </div>
-
-      <ConfirmDialog
-        isOpen={openDialogBulkDelete}
-        onClose={() => {
-          setOpenDialogBulkDelete(false);
-        }}
-        onRequestClose={() => {
-          setOpenDialogBulkDelete(false);
-        }}
-        type="danger"
-        title="Bulk Delete data"
-        onCancel={() => {
-          setOpenDialogBulkDelete(false);
-        }}
-        // onConfirm={async () => {
-        //   try {
-        //     let params = {
-        //       ids: [],
-        //     };
-
-        //     for (let index = 0; index < props.deleteIds.length; index++) {
-        //       const el = props.deleteIds[index];
-        //       params.ids.push(el);
-        //     }
-
-        //     await apiDestroy(0, params);
-        //     props.getData({ ...props.localState.params, page: 1 });
-        //     setOpenDialogBulkDelete(false);
-
-        //     toast.push(
-        //       <Notification
-        //         title={"Successfuly Deleted"}
-        //         type="success"
-        //         duration={2500}
-        //       >
-        //         Data successfuly deleted
-        //       </Notification>,
-        //       {
-        //         placement: "top-center",
-        //       }
-        //     );
-
-        //     props.setIds([]);
-        //   } catch (error) {
-        //     toast.push(
-        //       <Notification title={"Error"} type="danger">
-        //         {error?.response?.data?.message ||
-        //           error?.message ||
-        //           "Something went wrong"}
-        //       </Notification>,
-        //       {
-        //         placement: "top-center",
-        //       }
-        //     );
-        //   }
-        // }}
-        confirmButtonColor="red-600"
-      >
-        <p>
-          Are you sure you want to delete this data? All record related to this
-          data will be deleted as well. This action cannot be undone.
-        </p>
-      </ConfirmDialog>
     </>
   );
 };

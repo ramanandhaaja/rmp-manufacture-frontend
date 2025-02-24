@@ -90,18 +90,26 @@ export const productDevelopmentData = [
       {
         id: "1.1",
         title: "Melaksanakan Studi Praformulasi (QbD) QTTP",
+        url: "/research-development/pra-formulasi/qttp",
+        status: "Selesai",
       },
       {
         id: "1.2",
         title: "Melaksanakan Studi Praformulasi (QbD) CQA",
+        url: "/research-development/pra-formulasi/cqa",
+        status: "Proses",
       },
       {
         id: "1.3",
         title: "Melaksanakan Studi Praformulasi (QbD) CMA",
+        url: "/research-development/pra-formulasi/cma",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "1.4",
         title: "Melaksanakan Studi Praformulasi (QbD) Technical Feasibility",
+        url: "/research-development/pra-formulasi/technical-feasibility",
+        status: "Butuh Konfirmasi",
       },
     ],
   },
@@ -112,30 +120,37 @@ export const productDevelopmentData = [
       {
         id: "2.1",
         title: "Riset Bahan dan Vendor",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "2.2",
         title: "Trial Bahan Kemas",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "2.3",
         title: "Penetapan Bahan Kemas",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "2.4",
         title: "Trial Formula",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "2.5",
         title: "Formula Produk",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "2.6",
         title: "Trial Metode Analisis",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "2.7",
         title: "Metode Pemeriksaan",
+        status: "Butuh Konfirmasi",
       },
     ],
   },
@@ -146,18 +161,22 @@ export const productDevelopmentData = [
       {
         id: "3.1",
         title: "Penentuan Nama Produk",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "3.2",
         title: "Ceklist Cetak Desain Kemas",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "3.3",
         title: "Prosedur Produksi & Batch Record",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "3.4",
         title: "COGM",
+        status: "Butuh Konfirmasi",
       },
     ],
   },
@@ -168,10 +187,12 @@ export const productDevelopmentData = [
       {
         id: "4.1",
         title: "Pilot Scale Batch Product",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "4.2",
         title: "Validasi Proses",
+        status: "Butuh Konfirmasi",
       },
     ],
   },
@@ -182,23 +203,26 @@ export const productDevelopmentData = [
       {
         id: "5.1",
         title: "Registrasi BPOM",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "5.2",
         title: "Registrasi BPJH",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "5.3",
         title: "Permintaan Desain Kemas",
+        status: "Butuh Konfirmasi",
       },
       {
         id: "5.4",
         title: "Pengembangan Desain Kemas",
+        status: "Butuh Konfirmasi",
       },
     ],
   },
 ];
-
 
 export const kompetitorData = [
   {
