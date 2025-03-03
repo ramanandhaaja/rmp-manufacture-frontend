@@ -264,15 +264,41 @@ export const formatDate = (dateString) => {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
 
-  return `${day}/${month}/${year}`;
+  return `${day}-${month}-${year}`;
 };
 
 export function parseDate(inputDate) {
-  const parts = inputDate.split("/");
-  // JavaScript Date object month is zero-based, so subtract 1 from the month
-  const date = new Date(parts[2], parts[1] - 1, parts[0]);
-  const parsedDate = date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
-  return parsedDate;
+  // If input is already a Date object
+  if (inputDate instanceof Date) {
+    return inputDate.toISOString().split("T")[0];
+  }
+
+  // If input is a string
+  if (typeof inputDate === "string") {
+    // Check if the string contains '-' for the format YYYY-MM-DD
+    if (inputDate.includes("-")) {
+      const parts = inputDate.split("-");
+      // Make sure we have valid parts
+      if (parts.length === 3) {
+        const date = new Date(parts[0], parts[1] - 1, parts[2]);
+        return date.toISOString().split("T")[0];
+      }
+    }
+
+    // Check if the string contains '/' for the format DD/MM/YYYY
+    if (inputDate.includes("/")) {
+      const parts = inputDate.split("/");
+      // Make sure we have valid parts
+      if (parts.length === 3) {
+        // Create date from DD/MM/YYYY format
+        const date = new Date(parts[2], parts[1] - 1, parts[0]);
+        return date.toISOString().split("T")[0];
+      }
+    }
+  }
+
+  // If the input is invalid, return null or throw an error
+  return null;
 }
 
 export const SingleImageView = ({
@@ -428,6 +454,10 @@ export function getStatusName(status) {
       return "Menunggu Persetujuan";
     case "revised":
       return "Direvisi";
+    case "draft":
+      return "Draft";
+    case "submit":
+      return "Submit";
     default:
       return "-";
   }

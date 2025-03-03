@@ -554,6 +554,8 @@ export const RMPSTATUSLABEL = {
 };
 
 export const RMPSTATUSCOLOR = {
+  draft: "bg-gray-400 text-white",
+  submit: "bg-blue-600 text-white",
   approved: "bg-emerald-600 text-white",
   verified: "bg-blue-600 text-white",
   rejected: "bg-red-500 text-white",

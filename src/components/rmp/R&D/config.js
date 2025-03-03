@@ -20,7 +20,7 @@ export const PageConfig = {
   enableRefreshTable: true,
   listFields: [
     {
-      key: "noPDR",
+      key: "id",
       label: "No PDR",
       sortable: true,
       width: "120px",
@@ -28,35 +28,35 @@ export const PageConfig = {
       type: "id",
     },
     {
-      key: "judul",
+      key: "title",
       label: "Judul Permintaan",
       sortable: true,
       width: "150px",
       is_show: true,
     },
     {
-      key: "tanggalPermintaan",
+      key: "created_at",
       label: "Tanggal Permintaan",
       sortable: true,
       width: "150px",
       is_show: true,
     },
     {
-      key: "targetLaunching",
+      key: "launching_date",
       label: "Target Launching",
       sortable: false,
       width: "150px",
       is_show: true,
     },
     {
-      key: "tanggalPersetujuan",
+      key: "approved_date",
       label: "Tanggal Persetujuan",
       sortable: false,
       width: "120px",
       is_show: true,
     },
     {
-      key: "prioritas",
+      key: "priority",
       label: "Prioritas",
       sortable: true,
       width: "180px",
@@ -64,7 +64,7 @@ export const PageConfig = {
       type: "date",
     },
     {
-      key: "dokumen",
+      key: "document",
       label: "Dokumen",
       sortable: false,
       width: "100px",
@@ -136,7 +136,7 @@ export const PageConfigDevelopment = {
   enableRefreshTable: true,
   listFields: [
     {
-      key: "noPDR",
+      key: "id",
       label: "No PDR",
       sortable: true,
       width: "120px",
@@ -144,14 +144,14 @@ export const PageConfigDevelopment = {
       type: "id",
     },
     {
-      key: "judul",
+      key: "title",
       label: "Judul Permintaan",
       sortable: true,
       width: "150px",
       is_show: true,
     },
     {
-      key: "tanggalPermintaan",
+      key: "created_at",
       label: "Tanggal Permintaan",
       sortable: true,
       width: "150px",
@@ -159,7 +159,7 @@ export const PageConfigDevelopment = {
     },
 
     {
-      key: "tanggalPersetujuan",
+      key: "approved_date",
       label: "Tanggal Persetujuan",
       sortable: false,
       width: "120px",
@@ -167,7 +167,7 @@ export const PageConfigDevelopment = {
     },
 
     {
-      key: "status",
+      key: "progress",
       label: "Status",
       sortable: false,
       width: "180px",

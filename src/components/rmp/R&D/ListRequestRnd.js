@@ -4,7 +4,6 @@ import { formatDate, getStatusClassName, getStatusName } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Pagination, Notification, toast } from "components/ui";
 import CreatePOModal from "components/custom/ModalCreatePo";
-import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import capitalize from "components/ui/utils/capitalize";
 import TableListDropdown from "components/template/TableListDropdown";
 import DataTable from "components/shared/DataTable";
@@ -12,8 +11,13 @@ import { Tools } from "./Tools.js";
 import { PageConfig } from "./config.js";
 import { dataListDevelopmet } from "./dummyData.js";
 import { useLocation } from "react-router-dom";
+import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq.js";
+import { useSelector, useDispatch } from "react-redux";
+import { clearDataRndRequest } from "store/Rnd/rndSlice";
 
 const ListRequestRnd = () => {
+  const dispatch = useDispatch();
+  const { rndRequestId } = useSelector((state) => state.rnd);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [localState, setLocalState] = useState({
@@ -26,11 +30,10 @@ const ListRequestRnd = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-  const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const location = useLocation();
   const checkLocation = location.pathname.includes("product-r&d");
-
+  const { getRndRequest, dataRndRequest } = useCreateRndReq();
   const columns = PageConfig.listFields
     .filter((field) => field.is_show)
     .map((field) => ({
@@ -41,13 +44,14 @@ const ListRequestRnd = () => {
       Cell: ({ row }) => {
         const value = row.original[field.key];
         switch (field.key) {
-          case "tanggalPermintaan":
+          case "created_at":
             return formatDate(value);
-          case "targetLaunching":
+          case "launching_date":
             return formatDate(value);
-          case "tanggalPersetujuan":
+          case "approved_date":
+            if (value == null) return "-";
             return formatDate(value);
-          case "dokumen":
+          case "document":
             return "-";
           case "status":
             return (
@@ -95,64 +99,49 @@ const ListRequestRnd = () => {
       },
     });
   }
-  //   const fetchData = async (params = localState.params) => {
-  //     setIsLoading(true);
-  //     try {
-  //       const response = await getPoList(params);
-  //       const data = response.data;
-  //       setLocalState((prev) => ({
-  //         ...prev,
-  //         params: {
-  //           ...params,
-  //           total: data?.total,
-  //           per_page: data?.per_page,
-  //         },
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching purchase orders:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+  const fetchData = async (params = localState.params) => {
+    setIsLoading(true);
+    try {
+      const response = await getRndRequest(params);
+      const data = response.data;
+      setLocalState((prev) => ({
+        ...prev,
+        params: {
+          ...params,
+          total: data?.total,
+          per_page: data?.per_page,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  //   const handlePoCreated = () => {
-  //     if (isSubmitted) {
-  //       toast.push(
-  //         <Notification
-  //           title="PO Baru Berhasil Dibuat"
-  //           duration={2000}
-  //           closable
-  //           type="success"
-  //           width={700}
-  //           onClose={() => setIsSubmitted(false)}
-  //         />,
-  //         { placement: "top-center" }
-  //       );
-  //       fetchData();
-  //     }
-  //   };
+  console.log(rndRequestId);
+  useEffect(() => {
+    dispatch(clearDataRndRequest());
+  }, [dispatch]);
 
-  //   useEffect(() => {
-  //     fetchData();
-  //   }, []);
-  //   useEffect(() => {
-  //     handlePoCreated();
-  //   }, [isSubmitted]);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  //   const handlePaginationChange = (page) => {
-  //     fetchData({
-  //       ...localState.params,
-  //       page,
-  //     });
-  //   };
+  const handlePaginationChange = (page) => {
+    fetchData({
+      ...localState.params,
+      page,
+    });
+  };
 
-  //   const handlePageSizeChange = (size) => {
-  //     fetchData({
-  //       ...localState.params,
-  //       per_page: size,
-  //       page: 1,
-  //     });
-  //   };
+  const handlePageSizeChange = (size) => {
+    fetchData({
+      ...localState.params,
+      per_page: size,
+      page: 1,
+    });
+  };
 
   //   const handleDelete = async (id) => {
   //     try {
@@ -170,7 +159,6 @@ const ListRequestRnd = () => {
   //       page: 1,
   //     });
   //   };
-
   return (
     <div className="p-6 bg-white rounded-lg">
       <div className="py-4">
@@ -186,7 +174,7 @@ const ListRequestRnd = () => {
 
       <DataTable
         columns={columns}
-        data={dataListDevelopmet}
+        data={dataRndRequest}
         loading={isLoading}
         pagingData={{
           total: localState.params.total || 0,
@@ -194,10 +182,8 @@ const ListRequestRnd = () => {
           pageSize: localState.params.per_page,
         }}
         // onSort={onSort}
-        // onPaginationChange={handlePaginationChange}
-        // onSelectChange={handlePageSizeChange}
-        // selectable={PageConfigOrderList.enableBulkDelete}
-
+        onPaginationChange={handlePaginationChange}
+        onSelectChange={handlePageSizeChange}
         showHeader={true}
         showPagination={PageConfig.enablePagination}
         showLimitPerPage={PageConfig.enableLimitPerPage}

@@ -11,6 +11,8 @@ import DataTable from "components/shared/DataTable";
 import { Tools } from "./Tools.js";
 import { PageConfigDevelopment } from "./config";
 import { dataListDevelopmet } from "./dummyData";
+import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq.js";
+import { useSelector } from "react-redux";
 
 const ListDevelopment = () => {
   const navigate = useNavigate();
@@ -25,8 +27,8 @@ const ListDevelopment = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-  const { getPoList, dataPurchaseOrder } = usePurchaseOrder();
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { getRndRequest, dataRndRequest } = useCreateRndReq();
+  const { rndRequestId } = useSelector((state) => state.rnd);
 
   const columns = PageConfigDevelopment.listFields
     .filter((field) => field.is_show)
@@ -38,20 +40,21 @@ const ListDevelopment = () => {
       Cell: ({ row }) => {
         const value = row.original[field.key];
         switch (field.key) {
-          case "tanggalPermintaan":
+          case "created_at":
             return formatDate(value);
 
-          case "tanggalPersetujuan":
+          case "approved_date":
+            if (value == null) return "-";
             return formatDate(value);
 
-          case "status":
+          case "progress":
             return (
               <span
                 className={`px-2 py-1 rounded font-bold text-xs ${getStatusClassName(
                   value
                 )}`}
               >
-                {getStatusName(value)}
+                {value}
               </span>
             );
           default:
@@ -60,64 +63,46 @@ const ListDevelopment = () => {
       },
     }));
 
-  //   const fetchData = async (params = localState.params) => {
-  //     setIsLoading(true);
-  //     try {
-  //       const response = await getPoList(params);
-  //       const data = response.data;
-  //       setLocalState((prev) => ({
-  //         ...prev,
-  //         params: {
-  //           ...params,
-  //           total: data?.total,
-  //           per_page: data?.per_page,
-  //         },
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching purchase orders:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+  const fetchData = async (params = localState.params) => {
+    setIsLoading(true);
+    try {
+      const response = await getRndRequest(params);
+      const data = response.data;
+      setLocalState((prev) => ({
+        ...prev,
+        params: {
+          ...params,
+          total: data?.total,
+          per_page: data?.per_page,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  //   const handlePoCreated = () => {
-  //     if (isSubmitted) {
-  //       toast.push(
-  //         <Notification
-  //           title="PO Baru Berhasil Dibuat"
-  //           duration={2000}
-  //           closable
-  //           type="success"
-  //           width={700}
-  //           onClose={() => setIsSubmitted(false)}
-  //         />,
-  //         { placement: "top-center" }
-  //       );
-  //       fetchData();
-  //     }
-  //   };
+  console.log(rndRequestId);
 
-  //   useEffect(() => {
-  //     fetchData();
-  //   }, []);
-  //   useEffect(() => {
-  //     handlePoCreated();
-  //   }, [isSubmitted]);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  //   const handlePaginationChange = (page) => {
-  //     fetchData({
-  //       ...localState.params,
-  //       page,
-  //     });
-  //   };
+  const handlePaginationChange = (page) => {
+    fetchData({
+      ...localState.params,
+      page,
+    });
+  };
 
-  //   const handlePageSizeChange = (size) => {
-  //     fetchData({
-  //       ...localState.params,
-  //       per_page: size,
-  //       page: 1,
-  //     });
-  //   };
+  const handlePageSizeChange = (size) => {
+    fetchData({
+      ...localState.params,
+      per_page: size,
+      page: 1,
+    });
+  };
 
   //   const handleDelete = async (id) => {
   //     try {
@@ -141,7 +126,7 @@ const ListDevelopment = () => {
       <div className="py-4">
         <Tools
           localState={localState}
-          // getData={fetchData}
+          getData={fetchData}
           deleteIds={selectedIds}
           setIds={setSelectedIds}
           pageConfig={PageConfigDevelopment}
@@ -151,7 +136,7 @@ const ListDevelopment = () => {
 
       <DataTable
         columns={columns}
-        data={dataListDevelopmet}
+        data={dataRndRequest}
         loading={isLoading}
         pagingData={{
           total: localState.params.total || 0,
@@ -159,8 +144,8 @@ const ListDevelopment = () => {
           pageSize: localState.params.per_page,
         }}
         // onSort={onSort}
-        // onPaginationChange={handlePaginationChange}
-        // onSelectChange={handlePageSizeChange}
+        onPaginationChange={handlePaginationChange}
+        onSelectChange={handlePageSizeChange}
         // selectable={PageConfigDevelopmentOrderList.enableBulkDelete}
 
         showHeader={true}

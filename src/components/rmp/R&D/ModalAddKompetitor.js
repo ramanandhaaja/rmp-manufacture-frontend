@@ -11,60 +11,100 @@ import {
   Notification,
   toast,
 } from "components/ui";
+import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq";
 
 const validationSchema = Yup.object().shape({
-  nama: Yup.string().required("Nama harus diisi"),
-  kekuatan: Yup.string().required("Kekuatan harus diisi"),
-  dosis: Yup.string().required("Dosis harus diisi"),
-  bentukSediaan: Yup.string().required("Bentuk Sediaan harus diisi"),
-  kemasan: Yup.string().required("Kemasan harus diisi"),
-  targetHNA: Yup.string().required("Target HNA harus diisi"),
+  name: Yup.string().required("Nama harus diisi"),
+  strength: Yup.string().required("Kekuatan harus diisi"),
+  dose: Yup.string().required("Dosis harus diisi"),
+  form: Yup.string().required("Bentuk Sediaan harus diisi"),
+  packaging: Yup.string().required("Kemasan harus diisi"),
+  hna_target: Yup.number().nullable().required("Target HNA harus diisi"),
 });
 
 const bentukSediaanOptions = [
-  { value: 'Tablet', label: 'Tablet' },
-  { value: 'Kapsul', label: 'Kapsul' },
-  { value: 'Sirup', label: 'Sirup' },
-  { value: 'Salep', label: 'Salep' },
-  { value: 'Injeksi', label: 'Injeksi' },
-  { value: 'Pil', label: 'Pil' },
+  { value: "Tablet", label: "Tablet" },
+  { value: "Kapsul", label: "Kapsul" },
+  { value: "Sirup", label: "Sirup" },
+  { value: "Salep", label: "Salep" },
+  { value: "Injeksi", label: "Injeksi" },
+  { value: "Pil", label: "Pil" },
 ];
 
 const kemasanOptions = [
-  { value: 'Box', label: 'Box' },
-  { value: 'Botol', label: 'Botol' },
-  { value: 'Ampule', label: 'Ampule' },
-  { value: 'Vial', label: 'Vial' },
-  { value: 'Tube', label: 'Tube' },
-  { value: 'Pouch', label: 'Pouch' },
+  { value: "Box", label: "Box" },
+  { value: "Botol", label: "Botol" },
+  { value: "Ampule", label: "Ampule" },
+  { value: "Vial", label: "Vial" },
+  { value: "Tube", label: "Tube" },
+  { value: "Pouch", label: "Pouch" },
 ];
 
-const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
+const ModalAddKompetitor = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  idRequestRnd,
+  fetchData,
+}) => {
   const initialValues = {
-    nama: "",
-    kekuatan: "",
-    dosis: "",
-    bentukSediaan: "",
-    kemasan: "",
-    targetHNA: "",
+    name: "",
+    strength: "",
+    dose: "",
+    form: "",
+    packaging: "",
+    hna_target: null,
   };
+  const { addCompetitorRnd, dataKompetitor } = useCreateRndReq();
 
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
+    console.log(values);
+
     try {
       setSubmitting(true);
-      await onSubmit(values);
-      resetForm();
-      onClose();
+      const payload = {
+        ...values,
+        rnd_request_id: idRequestRnd,
+      };
+      const resp = await addCompetitorRnd(payload);
+      if (resp.status === "failed") {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi kesalahan, gagal menambahkan kompetitor"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        return;
+      }
+
       toast.push(
-        <Notification title="Berhasil" type="success">
-          Kompetitor berhasil ditambahkan
-        </Notification>
+        <Notification
+          type="success"
+          title="Berhasil menambahkan kompetitor"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
       );
+      setTimeout(() => {
+        onClose();
+        fetchData();
+      }, 1000);
     } catch (error) {
       toast.push(
-        <Notification title="Gagal" type="danger">
-          Terjadi kesalahan saat menambahkan kompetitor
-        </Notification>
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan, gagal menambahkan kompetitor"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
       );
     } finally {
       setSubmitting(false);
@@ -97,7 +137,7 @@ const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ touched, errors, isSubmitting }) => (
+            {({ touched, errors, isSubmitting, setFieldValue }) => (
               <Form>
                 <FormContainer>
                   <div className="space-y-4">
@@ -107,10 +147,10 @@ const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
                       </label>
                       <Field
                         type="text"
-                        name="nama"
+                        name="name"
                         placeholder="Value"
                         component={Input}
-                        style={{ backgroundColor: 'white' }}
+                        style={{ backgroundColor: "white" }}
                         className="w-full rounded-md border-gray-300"
                       />
                     </div>
@@ -122,10 +162,10 @@ const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
                         </label>
                         <Field
                           type="text"
-                          name="kekuatan"
+                          name="strength"
                           placeholder="Value"
                           component={Input}
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: "white" }}
                           className="w-full rounded-md border-gray-300"
                         />
                       </div>
@@ -135,10 +175,10 @@ const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
                         </label>
                         <Field
                           type="text"
-                          name="dosis"
+                          name="dose"
                           placeholder="Value"
                           component={Input}
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: "white" }}
                           className="w-full rounded-md border-gray-300"
                         />
                       </div>
@@ -149,24 +189,36 @@ const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Bentuk Sediaan
                         </label>
-                        <Field
-                          name="bentukSediaan"
-                          component={Select}
+                        <Select
+                          name="form"
                           options={bentukSediaanOptions}
                           placeholder="Select"
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: "white" }}
+                          onChange={(option) => {
+                            if (option) {
+                              setFieldValue("form", option.value);
+                            } else {
+                              setFieldValue("form", "");
+                            }
+                          }}
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Kemasan
                         </label>
-                        <Field
-                          name="kemasan"
-                          component={Select}
+                        <Select
+                          name="packaging"
                           options={kemasanOptions}
                           placeholder="Select"
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: "white" }}
+                          onChange={(option) => {
+                            if (option) {
+                              setFieldValue("packaging", option.value);
+                            } else {
+                              setFieldValue("packaging", "");
+                            }
+                          }}
                         />
                       </div>
                     </div>
@@ -177,10 +229,10 @@ const ModalAddKompetitor = ({ isOpen, onClose, onSubmit }) => {
                       </label>
                       <Field
                         type="text"
-                        name="targetHNA"
+                        name="hna_target"
                         placeholder="Value"
                         component={Input}
-                        style={{ backgroundColor: 'white' }}
+                        style={{ backgroundColor: "white" }}
                         className="w-full rounded-md border-gray-300"
                       />
                     </div>
