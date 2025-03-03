@@ -8,6 +8,7 @@ import goodsType from "./goodsTypeSlice";
 import masterGoods from "./masterGoodsPurchaseSlice";
 import purchase from "./PurchaseRequest/purchaseSlice";
 import purchaseOrder from "./PurchaseOrder/purchaseOrderSlice";
+import rnd from "./Rnd/rndSlice";
 
 const rootReducer = (asyncReducers) => (state, action) => {
   const combinedReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
     purchase,
     goodsType,
     purchaseOrder,
+    rnd,
     ...asyncReducers,
   });
   return combinedReducer(state, action);

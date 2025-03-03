@@ -1,5 +1,5 @@
 .menu-item {
-  @apply cursor-pointer font-semibold px-3 rounded-md flex items-center w-full whitespace-nowrap gap-x-2;
+  @apply cursor-pointer font-semibold px-3  flex items-center w-full whitespace-nowrap gap-x-2;
 
   &.menu-item-light {
     @apply text-slate-500;

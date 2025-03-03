@@ -10,7 +10,7 @@ const persistConfig = {
   key: PERSIST_STORE_NAME,
   keyPrefix: "",
   storage,
-  whitelist: ["auth", "purchaseOrder"],
+  whitelist: ["auth", "purchaseOrder", "rnd"],
 };
 
 const store = configureStore({

@@ -11,7 +11,7 @@ const TableListDropdown = ({ dropdownItemList, placement }) => {
         }
         placement={placement}
       >
-        {dropdownItemList.map((item) =>
+        {dropdownItemList.map((item, index) =>
           item.subMenu ? (
             // Render nested menu
             <Dropdown.Menu
@@ -47,7 +47,9 @@ const TableListDropdown = ({ dropdownItemList, placement }) => {
               disabled={item.disabled}
               key={item.label}
               eventKey={item.label}
-              className="mb-1 flex justify-between items-center w-full"
+              className={`mb-1 flex justify-between items-center w-full shadow-none ${
+                item.border ? "border-b border-gray-400" : ""
+              }`}
               onClick={item.onClick}
             >
               <span className="text-black">{item.label}</span>

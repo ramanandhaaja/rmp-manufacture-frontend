@@ -11,62 +11,115 @@ import {
   Notification,
   toast,
 } from "components/ui";
+import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq";
 
 const validationSchema = Yup.object().shape({
-  zatAktif: Yup.string().required("Zat Aktif harus diisi"),
-  kekuatan: Yup.string().required("Kekuatan harus diisi"),
-  dosis: Yup.string().required("Dosis harus diisi"),
-  bentukSediaan: Yup.string().required("Bentuk Sediaan harus diisi"),
-  kemasan: Yup.string().required("Kemasan harus diisi"),
+  active_substance: Yup.string().required("Zat Aktif harus diisi"),
+  strength: Yup.string().required("Kekuatan harus diisi"),
+  dose: Yup.string().required("Dosis harus diisi"),
+  form: Yup.string().required("Bentuk Sediaan harus diisi"),
+  packaging: Yup.string().required("Kemasan harus diisi"),
   brand: Yup.string().required("Brand harus diisi"),
-  targetHNA: Yup.string().required("Target HNA harus diisi"),
+  hna_target: Yup.number()
+    .required("Target HNA harus diisi")
+    .typeError("Harus berupa angka")
+    .nullable()
+    .transform((value, originalValue) =>
+      String(originalValue).trim() === "" ? null : value
+    ),
 });
 
 const bentukSediaanOptions = [
-  { value: 'Tablet', label: 'Tablet' },
-  { value: 'Kapsul', label: 'Kapsul' },
-  { value: 'Sirup', label: 'Sirup' },
-  { value: 'Salep', label: 'Salep' },
-  { value: 'Injeksi', label: 'Injeksi' },
-  { value: 'Pil', label: 'Pil' },
+  { value: "Tablet", label: "Tablet" },
+  { value: "Kapsul", label: "Kapsul" },
+  { value: "Sirup", label: "Sirup" },
+  { value: "Salep", label: "Salep" },
+  { value: "Injeksi", label: "Injeksi" },
+  { value: "Pil", label: "Pil" },
 ];
 
 const kemasanOptions = [
-  { value: 'Box', label: 'Box' },
-  { value: 'Botol', label: 'Botol' },
-  { value: 'Ampule', label: 'Ampule' },
-  { value: 'Vial', label: 'Vial' },
-  { value: 'Tube', label: 'Tube' },
-  { value: 'Pouch', label: 'Pouch' },
+  { value: "Box", label: "Box" },
+  { value: "Botol", label: "Botol" },
+  { value: "Ampule", label: "Ampule" },
+  { value: "Vial", label: "Vial" },
+  { value: "Tube", label: "Tube" },
+  { value: "Pouch", label: "Pouch" },
 ];
 
-const ModalAddDetailProduk = ({ isOpen, onClose, onSubmit }) => {
+const ModalAddDetailProduk = ({ isOpen, onClose, idRequestRnd, fetchData }) => {
+  const { createRndProductSubstances } = useCreateRndReq();
+
   const initialValues = {
-    zatAktif: "",
-    kekuatan: "",
-    dosis: "",
-    bentukSediaan: "",
-    kemasan: "",
+    active_substance: "",
+    strength: "",
+    dose: "",
+    form: "",
+    packaging: "",
     brand: "",
-    targetHNA: "",
+    hna_target: null,
   };
 
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       setSubmitting(true);
-      await onSubmit(values);
-      resetForm();
-      onClose();
+      const payload = {
+        ...values,
+        rnd_request_id: idRequestRnd,
+      };
+      const resp = await createRndProductSubstances(payload);
+      if (resp.status === "failed") {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Gagal menambahkan detail produk, Pastikan data sudah benar"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        return;
+      }
+
+      if (resp.status === "network error") {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi masalah jaringan, gagal menambahkan detail produk"
+            width={700}
+          />,
+          {
+            placement: "top-center",
+          }
+        );
+        return;
+      }
+
       toast.push(
-        <Notification title="Berhasil" type="success">
-          Detail produk berhasil ditambahkan
-        </Notification>
+        <Notification
+          type="success"
+          title="Berhasil menambahkan detail produk"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
       );
+      setTimeout(() => {
+        onClose();
+        fetchData();
+      }, 1000);
     } catch (error) {
       toast.push(
-        <Notification title="Gagal" type="danger">
-          Terjadi kesalahan saat menambahkan detail produk
-        </Notification>
+        <Notification
+          type="danger"
+          title="Maaf terjadi kesalahan, gagal menambahkan kompetitor"
+          width={700}
+        />,
+        {
+          placement: "top-center",
+        }
       );
     } finally {
       setSubmitting(false);
@@ -99,107 +152,128 @@ const ModalAddDetailProduk = ({ isOpen, onClose, onSubmit }) => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ touched, errors, isSubmitting }) => (
+            {({ touched, errors, isSubmitting, setFieldValue }) => (
               <Form>
                 <FormContainer>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Zat Aktif
-                      </label>
+                    <FormItem
+                      label="Zat Aktif"
+                      invalid={
+                        errors.active_substance && touched.active_substance
+                      }
+                      errorMessage={errors.active_substance}
+                    >
                       <Field
                         type="text"
-                        name="zatAktif"
+                        name="active_substance"
                         placeholder="Value"
                         component={Input}
-                        style={{ backgroundColor: 'white' }}
+                        style={{ backgroundColor: "white" }}
                         className="w-full rounded-md border-gray-300"
                       />
+                    </FormItem>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormItem
+                        label="Kekuatan"
+                        invalid={errors.strength && touched.strength}
+                        errorMessage={errors.strength}
+                      >
+                        <Field
+                          type="text"
+                          name="strength"
+                          placeholder="Value"
+                          component={Input}
+                          style={{ backgroundColor: "white" }}
+                          className="w-full rounded-md border-gray-300"
+                        />
+                      </FormItem>
+                      <FormItem
+                        label="Dosis"
+                        invalid={errors.dose && touched.dose}
+                        errorMessage={errors.dose}
+                      >
+                        <Field
+                          type="text"
+                          name="dose"
+                          placeholder="Value"
+                          component={Input}
+                          style={{ backgroundColor: "white" }}
+                          className="w-full rounded-md border-gray-300"
+                        />
+                      </FormItem>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Kekuatan
-                        </label>
-                        <Field
-                          type="text"
-                          name="kekuatan"
-                          placeholder="Value"
-                          component={Input}
-                          style={{ backgroundColor: 'white' }}
-                          className="w-full rounded-md border-gray-300"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Dosis
-                        </label>
-                        <Field
-                          type="text"
-                          name="dosis"
-                          placeholder="Value"
-                          component={Input}
-                          style={{ backgroundColor: 'white' }}
-                          className="w-full rounded-md border-gray-300"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Bentuk Sediaan
-                        </label>
-                        <Field
-                          name="bentukSediaan"
-                          component={Select}
+                      <FormItem
+                        label="Bentuk Sediaan"
+                        invalid={errors.form && touched.form}
+                        errorMessage={errors.form}
+                      >
+                        <Select
+                          name="form"
                           options={bentukSediaanOptions}
                           placeholder="Select"
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: "white" }}
+                          onChange={(options) => {
+                            if (options) {
+                              setFieldValue("form", options.value);
+                            } else {
+                              setFieldValue("form", "");
+                            }
+                          }}
                         />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Kemasan
-                        </label>
-                        <Field
-                          name="kemasan"
-                          component={Select}
+                      </FormItem>
+                      <FormItem
+                        label="Kemasan"
+                        invalid={errors.packaging && touched.packaging}
+                        errorMessage={errors.packaging}
+                      >
+                        <Select
+                          name="packaging"
                           options={kemasanOptions}
                           placeholder="Select"
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: "white" }}
+                          onChange={(options) => {
+                            if (options) {
+                              setFieldValue("packaging", options.value);
+                            } else {
+                              setFieldValue("packaging", "");
+                            }
+                          }}
                         />
-                      </div>
+                      </FormItem>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Brand
-                      </label>
+                    <FormItem
+                      label="Brand"
+                      invalid={errors.brand && touched.brand}
+                      errorMessage={errors.brand}
+                    >
                       <Field
                         type="text"
                         name="brand"
                         placeholder="Value"
                         component={Input}
-                        style={{ backgroundColor: 'white' }}
+                        style={{ backgroundColor: "white" }}
                         className="w-full rounded-md border-gray-300"
                       />
-                    </div>
+                    </FormItem>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Target HNA
-                      </label>
+                    <FormItem
+                      label="Target HNA"
+                      invalid={errors.hna_target && touched.hna_target}
+                      errorMessage={errors.hna_target}
+                    >
                       <Field
-                        type="text"
-                        name="targetHNA"
+                        type="number"
+                        name="hna_target"
                         placeholder="Value"
                         component={Input}
-                        style={{ backgroundColor: 'white' }}
+                        style={{ backgroundColor: "white" }}
                         className="w-full rounded-md border-gray-300"
                       />
-                    </div>
+                    </FormItem>
                   </div>
 
                   <div className="flex gap-2 grid grid-cols-2 mt-6">

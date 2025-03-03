@@ -2,75 +2,268 @@ import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import usePurchaseOrder from "utils/hooks/PurchaseOrder/usePurchaseOrder";
 import { useParams } from "react-router-dom";
 import { FiPlus, FiTrash } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import TextBlockSkeleton from "components/shared/loaders/TextBlockSkeleton";
-import {
-  Notification,
-  toast,
-  Button,
-  Radio,
-  DatePicker,
-  Input,
-  FormItem,
-  FormContainer,
-  Upload,
-} from "components/ui";
-import CustomTable from "components/custom/CustomTable";
-import { RiFileLine } from "react-icons/ri";
-import ModalUpload from "components/custom/ModalUpload";
+import { Notification, toast, Button } from "components/ui";
+
 import Tabs from "components/ui/Tabs";
-import PaymentVendorList from "components/rmp/Payment/PaymentVendorList";
 import { MdNavigateNext } from "react-icons/md";
-import { Formik, Form, Field } from "formik";
 import { useNavigate } from "react-router-dom";
-import ListAddKompetitor from "components/rmp/R&D/ListAddKompetitor";
-import ListAddDetailProduk from "components/rmp/R&D/ListAddDetailProduk";
+import FormAddKompetitor from "components/rmp/R&D/FormAddKompetitor";
+import FormDetailPermintaan from "components/rmp/R&D/FormDetailPermintaan";
+import FormAddDetailProduk from "components/rmp/R&D/FormAddDetailProduk";
+import FormDokumenReferensi from "components/rmp/R&D/FormDokumenReferensi";
+import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq";
+import { useSelector } from "react-redux";
+import ConfirmationCustom from "components/custom/ConfirmationCustom";
 
 const DetailPermintaanRnd = () => {
-  const { id } = useParams();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { getDetailVendorOffer, dataOfferPoVendors, dataDetailPurchaseOrder } =
-    usePurchaseOrder(id);
-  const vendorDetail = dataOfferPoVendors?.vendor_detail;
-  const vendorItems = dataOfferPoVendors?.items;
-  const deliveryCost = dataOfferPoVendors?.delivery_cost;
-  const [activeTab, setActiveTab] = useState("0");
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    createRndRequest,
+    dataDetailRndRequest,
+    createRndDetailProduct,
+    createRndDocReference,
+  } = useCreateRndReq();
+  const [activeTab, setActiveTab] = useState("0");
+  const { rndRequestId } = useSelector((state) => state.rnd);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const documents = Array(3).fill(null);
+  const [stepStatus, setStepStatus] = useState({
+    detailPermintaan: "pending",
+    kompetitor: "pending",
+    detailProduk: "pending",
+    dokumenReferensi: "pending",
+  });
+  // Create refs for each form
+  const formRefs = {
+    0: useRef(null),
+    1: useRef(null),
+    2: useRef(null),
+    3: useRef(null),
+  };
 
-  const dummyData = [
-    {
-      nama: "PT Harapan Pharmacy",
-      zatAktif: "Paracetamol",
-      Kekuatan: "Kuat",
-      bentukSediaan: "Tablet",
-      Kemasan: "Strip",
-      Dosis: "150 Mg",
-      HNA: " 1.500",
-    },
-    {
-      nama: "PT Indah Pharmacy",
+  const getStepName = (step) => {
+    const stepNames = {
+      detailPermintaan: "Detail Permintaan",
+      kompetitor: "Data Kompetitor",
+      detailProduk: "Detail Produk",
+      dokumenReferensi: "Dokumen Referensi",
+    };
+    return stepNames[step] || step;
+  };
 
-      zatAktif: "Ibuprofen",
-      Kekuatan: "Kuat",
-      bentukSediaan: "Tablet",
-      Kemasan: "Botol",
-      Dosis: "110 Mg",
-      HNA: " 2.000",
-    },
-    {
-      nama: "PT Bintang Pharmacy",
+  const handleStepSubmit = async (values, step) => {
+    try {
+      setIsLoading(true);
 
-      zatAktif: "Amoxicillin",
-      Kekuatan: "Kuat",
-      bentukSediaan: "Capsule",
-      Kemasan: "Box",
-      Dosis: "150 Mg",
-      HNA: " 3.000",
-    },
-  ];
+      switch (step) {
+        case "detailPermintaan":
+          try {
+            const response = await createRndRequest(values);
+
+            // Handle success specific to detailPermintaan
+            if (response.status === "success") {
+              toast.push(
+                <Notification
+                  type="success"
+                  title="Detail permintaan berhasil disimpan"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+
+              setStepStatus((prev) => ({
+                ...prev,
+                [step]: "completed",
+              }));
+
+              // Step-specific navigation
+              setTimeout(() => {
+                setActiveTab(String(Number(activeTab) + 1));
+              }, 2000);
+            } else if (response.status === "failed") {
+              toast.push(
+                <Notification
+                  type="danger"
+                  title="Detail permintaan gagal disimpan. Pastikan data terisi dengan benar"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+            } else if (response.status === "network error") {
+              toast.push(
+                <Notification
+                  type="danger"
+                  title="Maaf terdapat masalah jaringan pada detail permintaan"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+            }
+          } catch (error) {
+            console.error("Error in detailPermintaan:", error);
+            throw error; // Re-throw to be caught by the outer try-catch
+          }
+          break;
+
+        case "detailProduk":
+          try {
+            const payload = {
+              rnd_request_id: rndRequestId,
+              manufacturer:
+                values.manufacturer == "Lainnya"
+                  ? values.manufacturerLainnya
+                  : values.manufacturer,
+              registrant:
+                values.registrant == "Lainnya"
+                  ? values.registrantLainnya
+                  : values.registrant,
+              name: values.name,
+            };
+            const response = await createRndDetailProduct(payload);
+            if (response.status === "success") {
+              toast.push(
+                <Notification
+                  type="success"
+                  title="Detail produk berhasil disimpan"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+
+              setStepStatus((prev) => ({
+                ...prev,
+                [step]: "completed",
+              }));
+
+              // Step-specific navigation
+              setTimeout(() => {
+                setActiveTab(String(Number(activeTab) + 1));
+              }, 2000);
+            } else {
+              toast.push(
+                <Notification
+                  type="danger"
+                  title="Detail produk gagal disimpan. Pastikan data terisi dengan benar"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+            }
+          } catch (error) {
+            console.error("Error in detailProduk:", error);
+            throw error; // Re-throw to be caught by the outer try-catch
+          }
+          break;
+
+        case "dokumenReferensi":
+          toast.push(
+            <Notification
+              type="success"
+              title="Permintaan R&D berhasil Diajukan"
+              width={700}
+            />,
+            { placement: "top-center" }
+          );
+          setTimeout(() => {
+            navigate("/purchase/product-r&d");
+          }, 2000);
+          // try {
+          //   const formData = new FormData();
+
+          //   if (Array.isArray(values.documents)) {
+          //     values.documents.forEach((doc, index) => {
+          //       // For each document, append both the file and its name
+          //       formData.append(`rnd_request_id`, rndRequestId);
+          //       formData.append(`file_path[${index}]`, doc.file);
+          //       formData.append(`name[${index}]`, doc.documentName);
+          //     });
+          //   }
+
+          //   const response = await createRndDocReference(formData);
+          //   if (response.status === "success") {
+          //     toast.push(
+          //       <Notification
+          //         type="success"
+          //         title="Dokumen referensi berhasil disimpan"
+          //         width={700}
+          //       />,
+          //       { placement: "top-center" }
+          //     );
+
+          //     setTimeout(() => {
+          //       navigate("/purchase/product-r&d");
+          //     }, 2000);
+          //   } else {
+          //     toast.push(
+          //       <Notification
+          //         type="danger"
+          //         title="Maaf terjadi kesalahan, gagal menyimpan dokumen referensi"
+          //         width={700}
+          //       />,
+          //       { placement: "top-center" }
+          //     );
+          //   }
+          // } catch (error) {
+          //   console.error("Error in dokumenReferensi:", error);
+          //   throw error;
+          // }
+          break;
+      }
+    } catch (error) {
+      console.error(`Error in handleStepSubmit:`, error);
+      toast.push(
+        <Notification
+          type="danger"
+          title={`Terjadi kesalahan sistem: ${error.message}`}
+          width={700}
+        />,
+        { placement: "top-center" }
+      );
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+    }
+  };
+
+  const handleNextClick = () => {
+    if (activeTab == 1) {
+      setActiveTab(String(Number(activeTab) + 1));
+    }
+    if (activeTab == 3) {
+      setIsOpenModal(true);
+      return;
+    }
+    const currentFormRef = formRefs[activeTab]?.current;
+    if (currentFormRef?.submitForm) {
+      currentFormRef.submitForm();
+    }
+  };
+
+  const handleConfirmSubmission = () => {
+    const docReferenceFormRef = formRefs["3"]?.current;
+
+    // If the form ref exists, submit it
+    if (docReferenceFormRef?.submitForm) {
+      docReferenceFormRef.submitForm();
+      setIsOpenModal(false);
+    } else {
+      // Handle the case where form ref doesn't exist
+      console.error("Document reference form ref not found");
+      toast.push(
+        <Notification
+          type="danger"
+          title="Tidak dapat mengajukan permintaan. Silakan coba lagi."
+          width={700}
+        />,
+        { placement: "top-center" }
+      );
+    }
+  };
 
   const handleTabChange = (value) => {
     setActiveTab(value);
@@ -137,275 +330,76 @@ const DetailPermintaanRnd = () => {
             </Tabs.TabList>
           </>
           {/* LANGKAH 1 //////////////////*/}
-          <Formik>
-            <Form className="space-y-6">
-              <FormContainer>
-                <Tabs.TabContent value={"0"}>
-                  <div className="flex justify-between px-4">
-                    <div className="py-3 w-full">
-                      <h2 className="text-xl font-semibold text-indigo-900 mt-4 mb-4">
-                        Detail Produk
-                      </h2>
-                      <div className="space-y-6 mb-8">
-                        {isLoading ? (
-                          <TextBlockSkeleton />
-                        ) : (
-                          <div className="grid grid-cols-4 gap-2 w-full">
-                            <FormItem
-                              className="col-span-4 w-full"
-                              label={"Judul Permintaan"}
-                              invalid="{errors.description && touched.description}"
-                              errorMessage=""
-                            >
-                              <Field
-                                type="text"
-                                name="name"
-                                placeholder="Masukan Judul Permintaan"
-                                component={Input}
-                                className="w-full"
-                                uppercase={false}
-                              />
-                            </FormItem>
-                            <FormItem
-                              className="col-span-4 w-full"
-                              label={"Tipe Pengembangan"}
-                              invalid="{errors.description && touched.description}"
-                              errorMessage=""
-                            >
-                              <Field
-                                name="name"
-                                component={Radio.Group}
-                                className="w-full"
-                              >
-                                <Radio value="Produk Baru">Produk Baru</Radio>
-                                <Radio value="Produk Lama">Produk Lama</Radio>
-                              </Field>
-                            </FormItem>
-
-                            <FormItem
-                              className="col-span-4 w-full"
-                              label={"Target Launching"}
-                              invalid="{errors.description && touched.description}"
-                              errorMessage=""
-                            >
-                              <Field
-                                name="name"
-                                placeholder="Select Target Launch Date"
-                                component={DatePicker}
-                                className="w-full"
-                              />
-                            </FormItem>
-                            <FormItem
-                              className="col-span-4 w-full"
-                              label={"Deskripsi Produk"}
-                              invalid="{errors.description && touched.description}"
-                              errorMessage=""
-                            >
-                              <Input
-                                textArea
-                                id="note"
-                                name="note"
-                                rows={4}
-                                className="w-full"
-                              />
-                            </FormItem>
-                            <FormItem
-                              className="col-span-4 w-full"
-                              label={"Kategori Produk"}
-                              invalid="{errors.description && touched.description}"
-                              errorMessage=""
-                            >
-                              <Field
-                                name="name"
-                                component={Radio.Group}
-                                className="w-full"
-                              >
-                                <Radio value="Obat Tradisional">
-                                  Obat Tradisional
-                                </Radio>
-                                <Radio value="Suplemen Kesehatan">
-                                  Suplemen Kesehatan
-                                </Radio>
-                                <Radio value="Kosmetik">Kosmetik</Radio>
-                              </Field>
-                            </FormItem>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Tabs.TabContent>
-                {/* LANGKAH 2 ///////////////////////////////*/}
-                <Tabs.TabContent value={"1"}>
-                  <div className="mt-10">
-                    <ListAddKompetitor dataTableItems={dummyData} />
-                  </div>
-                </Tabs.TabContent>
-                {/* LANGKAH 3 //////////////////////////////*/}
-                <Tabs.TabContent value={"2"}>
-                  <div className="mt-10">
-                    <div className="border border-gray-300 rounded-md p-4">
-                      <FormItem
-                        className="col-span-4 w-full mb-4"
-                        label={"Nama 1"}
-                        invalid="{errors.description && touched.description}"
-                        errorMessage=""
-                      >
-                        <div className="flex items-center">
-                          <Input type="text" name="name1" placeholder="Nilai" />
-                          <button
-                            type="button"
-                            className="ml-2 text-red-500 hover:text-red-700"
-                            aria-label="Delete"
-                          >
-                            <FiTrash size={24} color="red" />
-                          </button>
-                        </div>
-                      </FormItem>
-
-                      <FormItem
-                        className="col-span-4 w-full mb-4"
-                        label={"Nama 2"}
-                        invalid="{errors.description && touched.description}"
-                        errorMessage=""
-                      >
-                        <div className="flex items-center">
-                          <Input type="text" name="name2" placeholder="Nilai" />
-                          <button
-                            type="button"
-                            className="ml-2 text-red-500 hover:text-red-700"
-                            aria-label="Delete"
-                          >
-                            <FiTrash size={24} color="red" />
-                          </button>
-                        </div>
-                      </FormItem>
-
-                      <Button type="button" onClick={() => setIsOpen(true)}>
-                        <span className="gap-2 flex items-center">
-                          <FiPlus />
-                          Tambah Nama
-                        </span>
-                      </Button>
-                    </div>
-                    <ListAddDetailProduk />
-                    <FormItem
-                      className="col-span-4 w-full"
-                      label={
-                        <span style={{ fontSize: "18px" }}>Pendaftar</span>
-                      }
-                      invalid="{errors.description && touched.description}"
-                      errorMessage=""
-                    >
-                      <Field
-                        name="name"
-                        component={Radio.Group}
-                        className="w-full"
-                      >
-                        <Radio value="Royal">Royal</Radio>
-                        <Radio value="Fahrenheir">Fahrenheit</Radio>
-                        <Radio value="Yarindo">Yarindo</Radio>
-                        <Radio value="Lainnya">
-                          Lainnya
-                          <Field
-                            type="text"
-                            name="otherProducer"
-                            placeholder=""
-                            component={Input}
-                            className="ml-4 w-48"
-                          />
-                        </Radio>
-                      </Field>
-                    </FormItem>
-                    <FormItem
-                      className="col-span-4 w-full"
-                      label={<span style={{ fontSize: "18px" }}>Produsen</span>}
-                      invalid="{errors.description && touched.description}"
-                      errorMessage=""
-                    >
-                      <Field
-                        name="name"
-                        component={Radio.Group}
-                        className="w-full "
-                      >
-                        <Radio value="Royal">Royal</Radio>
-                        <Radio value="Fahrenheir">Fahrenheit</Radio>
-                        <Radio value="Yarindo">Yarindo</Radio>
-                        <Radio value="Lainnya">
-                          Lainnya
-                          <Field
-                            type="text"
-                            name="otherProducer"
-                            placeholder=""
-                            component={Input}
-                            className="ml-4 w-48"
-                          />
-                        </Radio>
-                      </Field>
-                    </FormItem>
-                  </div>
-                </Tabs.TabContent>
-                {/* LANGKAH 4 //////////////////*/}
-                <Tabs.TabContent value={"3"}>
-                  <div className="mt-10">
-                    <h2 className="text-xl font-semibold text-indigo-900 mt-4 mb-4">
-                      Upload Dokumen Referensi
-                    </h2>
-                    <Upload
-                      accept=".pdf"
-                      multiple={false}
-                      uploadLimit={1}
-                      draggable={true}
-                    >
-                      <div className="flex flex-col items-center justify-center h-[200px] rounded-lg hover:bg-gray-100 transition-colors">
-                        <p className="text-gray-600 mb-2">
-                          Unggah File (PDF max 20mb)
-                        </p>
-                        <Button size="sm" className="w-32">
-                          Telusuri File
-                        </Button>
-                      </div>
-                    </Upload>
-                    <div className="flex gap-2 py-4">
-                      {documents.map((_, index) => (
-                        <div key={index} className="py-4">
-                          <h2 className="text-base font-semibold mb-4">
-                            Dokumen Referensi
-                          </h2>
-                          <div className="border border-gray-400 rounded-lg p-2 w-[320px] flex items-center gap-1">
-                            <RiFileLine size={18} />
-                            document-name.pdf
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Tabs.TabContent>
-              </FormContainer>
-            </Form>
-          </Formik>
+          <div className="space-y-6">
+            <Tabs.TabContent value={"0"}>
+              <FormDetailPermintaan
+                ref={formRefs["0"]}
+                onSubmit={(values) =>
+                  handleStepSubmit(values, "detailPermintaan")
+                }
+                isLoading={isLoading}
+              />
+            </Tabs.TabContent>
+            {/* LANGKAH 2 ///////////////////////////////*/}
+            <Tabs.TabContent value={"1"}>
+              <div className="mt-10">
+                <FormAddKompetitor />
+              </div>
+            </Tabs.TabContent>
+            {/* LANGKAH 3 //////////////////////////////*/}
+            <Tabs.TabContent value={"2"}>
+              <FormAddDetailProduk
+                ref={formRefs["2"]}
+                onSubmit={(values) => handleStepSubmit(values, "detailProduk")}
+                isLoading={isLoading}
+              />
+            </Tabs.TabContent>
+            {/* LANGKAH 4 //////////////////*/}
+            <Tabs.TabContent value={"3"}>
+              <FormDokumenReferensi
+                ref={formRefs["3"]}
+                onSubmit={(values) =>
+                  handleStepSubmit(values, "dokumenReferensi")
+                }
+                isLoading={isLoading}
+              />
+            </Tabs.TabContent>
+          </div>
         </Tabs>
         <div className="flex justify-end gap-2 py-4">
           <Button
             disabled={activeTab == 0}
-            onClick={() => setActiveTab(activeTab - 1)}
+            onClick={() => setActiveTab(String(Number(activeTab) - 1))}
           >
             Sebelumnya
           </Button>
           <Button
+            loading={isLoading}
             variant="solid"
-            onClick={activeTab == 3 ? null : () => setActiveTab(activeTab + 1)}
+            onClick={handleNextClick}
+            // onClick={handleSubmit}
           >
-            {activeTab == 3 ? "Konfirmasi" : "Selanjutnya"}
+            {activeTab == 3 ? "Ajukan" : "Selanjutnya"}
           </Button>
         </div>
       </div>
-      {/* <ModalUpload
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onConfirm={() => setIsOpen(false)}
-        title="Upload Bukti Pembayaran"
-      /> */}
+      <ConfirmationCustom
+        isOpen={isOpenModal}
+        onClose={() => setIsOpenModal(false)}
+        showCancelBtn
+        showSubmitBtn
+        onConfirm={handleConfirmSubmission}
+        confirmText="Konfirmasi"
+        title={`Anda yakin ingin membuat Permintaan RnD ${dataDetailRndRequest?.title}?`}
+        titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
+        text="Klik Konfirmasi untuk melanjutkan"
+        textClass="text-slate-500 text-base"
+        isLoading={isLoading}
+        disableCancel={false}
+        buttonType="button"
+        width={500}
+        contentClassName="p-5 rounded-2xl"
+      />
     </LayoutRightSpace>
   );
 };
