@@ -224,34 +224,32 @@ export const ROUTE_LIST = [
 
   {
     key: "researchAndDevelopment.qttp",
-    path: "/research-development/pra-formulasi/qttp",
-    component: React.lazy(() => import("views/R&D/PraFormulasi/Qttp")),
+    path: "/research-development/pra-formulasi/qttp/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/index")),
     authority: [],
   },
   {
     key: "researchAndDevelopment.cqa",
-    path: "/research-development/pra-formulasi/cqa",
-    component: React.lazy(() => import("views/R&D/PraFormulasi/CQA")),
+    path: "/research-development/pra-formulasi/cqa/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/index")),
     authority: [],
   },
   {
     key: "researchAndDevelopment.cma",
-    path: "/research-development/pra-formulasi/cma",
-    component: React.lazy(() => import("views/R&D/PraFormulasi/CMA")),
+    path: "/research-development/pra-formulasi/cma/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/index")),
     authority: [],
   },
   {
     key: "researchAndDevelopment.cpp",
-    path: "/research-development/pra-formulasi/cpp",
-    component: React.lazy(() => import("views/R&D/PraFormulasi/CPP")),
+    path: "/research-development/pra-formulasi/cpp/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/index")),
     authority: [],
   },
   {
     key: "researchAndDevelopment.technicalFeasibility",
-    path: "/research-development/pra-formulasi/technical-feasibility",
-    component: React.lazy(() =>
-      import("views/R&D/PraFormulasi/TechnicalFeasibility")
-    ),
+    path: "/research-development/pra-formulasi/technical-feasibility/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/PraFormulasi/index")),
     authority: [],
   },
 ];

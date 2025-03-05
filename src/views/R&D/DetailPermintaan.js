@@ -14,7 +14,7 @@ import { NoDataSvg } from "assets/svg";
 import ProcessDevelopment from "components/rmp/R&D/ProcessDevelopment";
 import { useLocation } from "react-router-dom";
 import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq";
-import { formatDate } from "utils/helpers";
+import { formatDate, shortenString } from "utils/helpers";
 import deepParseJson from "utils/deepParseJson";
 
 const DetailPermintaanRnd = () => {
@@ -24,6 +24,7 @@ const DetailPermintaanRnd = () => {
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [isLoadingCompetitor, setIsLoadingCompetitor] = useState(false);
   const [isLoadingSubstance, setIsLoadingSubstance] = useState(false);
+  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
 
   const {
     getDetailRndRequest,
@@ -35,6 +36,8 @@ const DetailPermintaanRnd = () => {
     filterCompetitorById,
     dataKompetitor,
     dataRndProductSubstances,
+    getRndDocReference,
+    dataRndDocReference,
   } = useCreateRndReq();
   const [activeTab, setActiveTab] = useState("0");
   const location = useLocation();
@@ -60,7 +63,6 @@ const DetailPermintaanRnd = () => {
       try {
         setIsLoadingProduct(true);
         const resp = await getRndProductDetails({ rnd_request_id: id });
-        console.log(resp);
         setIsLoadingProduct(false);
       } catch (error) {
         console.log(error);
@@ -75,7 +77,6 @@ const DetailPermintaanRnd = () => {
       try {
         setIsLoadingSubstance(true);
         const resp = await getRndProductSubstances({ rnd_request_id: id });
-        console.log(resp);
         setIsLoadingSubstance(false);
       } catch (error) {
         console.log(error);
@@ -99,9 +100,21 @@ const DetailPermintaanRnd = () => {
     if (id) fetchCompetitor();
   }, [id]);
 
-  const documents = Array(3).fill(null);
+  useEffect(() => {
+    const fetchDocument = async () => {
+      try {
+        setIsLoadingDocument(true);
+        await getRndDocReference(Number(id));
+        setIsLoadingDocument(false);
+      } catch (error) {
+        console.log(error);
+        setIsLoadingDocument(false);
+      }
+    };
+    if (id) fetchDocument();
+  }, [id]);
 
-  console.log(dataRndProductSubstances);
+  const documents = Array(3).fill(null);
 
   const columns = [
     {
@@ -333,15 +346,27 @@ const DetailPermintaanRnd = () => {
               />
             </div>
             <div className="flex gap-2 py-4">
-              {documents.map((_, index) => (
-                <div key={index} className="py-4">
-                  <h2 className="text-base font-semibold mb-4">
-                    Dokumen Referensi
+              {dataRndDocReference?.length === 0 && (
+                <div className="blockpy-6 ">
+                  <h2 className="text-xl font-semibold text-indigo-900 ">
+                    Dokumen
                   </h2>
-                  <div className="border border-gray-400 rounded-lg p-2 w-[320px] flex items-center gap-1">
+                  <p>Belum ada data dokumen</p>
+                </div>
+              )}
+
+              {dataRndDocReference?.map((item, index) => (
+                <div key={index} className="py-4">
+                  <h2 className="text-base font-semibold mb-4">{item?.name}</h2>
+                  <a
+                    href={`${process.env.REACT_APP_BASE_URL}/${item?.file_path}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-gray-400 rounded-lg p-2 w-[320px] flex items-center gap-1"
+                  >
                     <RiFileLine size={18} />
-                    document-name.pdf
-                  </div>
+                    {shortenString(item?.file_path, 30)}
+                  </a>
                 </div>
               ))}
             </div>
