@@ -31,7 +31,7 @@ export const beforeUploadFile = (files) => {
   let valid = true;
 
   const allowedFileType = ["image/jpeg", "image/png", "image/*"];
-  const maxFileSize = 15000000;
+  const maxFileSize = 20000000;
 
   if (files) {
     for (const f of files) {
@@ -40,7 +40,7 @@ export const beforeUploadFile = (files) => {
       }
 
       if (f.size >= maxFileSize) {
-        valid = "Upload image cannot more then 15mb!";
+        valid = "Upload image cannot more then 20mb!";
       }
     }
   }
@@ -484,6 +484,14 @@ export function getCapitalizeType(type) {
     return "-";
   }
 }
+
+export function shortenString(str, maxLength) {
+  if (str.length > maxLength) {
+    return str.slice(0, maxLength) + "...";
+  }
+  return str;
+}
+
 export function formatNumber(num) {
   // Handle null or undefined
   if (num == null) return "-";

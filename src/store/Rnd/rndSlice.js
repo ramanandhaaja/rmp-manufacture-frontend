@@ -5,6 +5,7 @@ const initialState = {
   dataRndRequest: [],
   dataDetailProduct: null,
   dataDetailRndRequest: [],
+  dataRndDocReference: [],
 };
 
 export const rndSlice = createSlice({
@@ -26,20 +27,20 @@ export const rndSlice = createSlice({
     resetDataDetailProduct: (state) => {
       state.dataDetailProduct = null;
     },
+    setDataRndDocReference: (state, action) => {
+      state.dataRndDocReference = action.payload;
+    },
     clearDataRndRequest: () => initialState,
   },
 });
 
 export const {
-  rndRequestId,
-  dataRndRequest,
-  dataDetailRndRequest,
-  dataDetailProduct,
   setIdRndRequest,
   setDataRndRequest,
   setDataDetailRndRequest,
   setDataDetailProduct,
   resetDataDetailProduct,
   clearDataRndRequest,
+  setDataRndDocReference,
 } = rndSlice.actions;
 export default rndSlice.reducer;

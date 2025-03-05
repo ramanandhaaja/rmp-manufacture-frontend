@@ -13,6 +13,7 @@ import {
   getRndCompetitorApi,
   postRndDetailProductApi,
   getDetailRndCompetitorApi,
+  getDetailRndReferenceDocApi,
   deleteRndDetailProductApi,
   deleteRndProductSubstancesApi,
   postRndReferenceDocApi,
@@ -23,14 +24,19 @@ import {
   setIdRndRequest,
   setDataDetailProduct,
   resetDataDetailProduct,
+  setDataRndDocReference,
 } from "store/Rnd/rndSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useCallback } from "react";
 
 function useCreateRndReq() {
   const dispatch = useDispatch();
-  const { dataRndRequest, dataDetailRndRequest, dataDetailProduct } =
-    useSelector((state) => state.rnd);
+  const {
+    dataRndRequest,
+    dataDetailRndRequest,
+    dataDetailProduct,
+    dataRndDocReference,
+  } = useSelector((state) => state.rnd);
   const [dataKompetitor, setDataKompetitor] = useState([]);
   const [dataRndProductDetailsById, setDataRndProductDetailsById] = useState(
     []
@@ -387,6 +393,26 @@ function useCreateRndReq() {
     }
   };
 
+  const getRndDocReference = async (id) => {
+    try {
+      const response = await getDetailRndReferenceDocApi(id);
+
+      if (response.data) {
+        dispatch(setDataRndDocReference(response.data));
+        return { status: "success", message: "" };
+      } else {
+        console.log(response);
+        return { status: "failed", message: "" };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: "failed",
+        message: error?.response?.data?.message || error.toString(),
+      };
+    }
+  };
+
   return {
     getRndRequest,
     getDetailRndRequest,
@@ -401,6 +427,7 @@ function useCreateRndReq() {
     dataRndProductDetailsById,
     dataDetailProduct,
     dataRndProductSubstances,
+    dataRndDocReference,
     deleteRndCompetitor,
     getRndCompetitorById,
     getRndProductDetailsById,
@@ -410,6 +437,7 @@ function useCreateRndReq() {
     deleteRndProductSubstances,
     getRndProductSubstances,
     createRndDocReference,
+    getRndDocReference,
   };
 }
 export default useCreateRndReq;

@@ -160,57 +160,45 @@ const DetailPermintaanRnd = () => {
           break;
 
         case "dokumenReferensi":
-          toast.push(
-            <Notification
-              type="success"
-              title="Permintaan R&D berhasil Diajukan"
-              width={700}
-            />,
-            { placement: "top-center" }
-          );
-          setTimeout(() => {
-            navigate("/purchase/product-r&d");
-          }, 2000);
-          // try {
-          //   const formData = new FormData();
+          try {
+            const formData = new FormData();
 
-          //   if (Array.isArray(values.documents)) {
-          //     values.documents.forEach((doc, index) => {
-          //       // For each document, append both the file and its name
-          //       formData.append(`rnd_request_id`, rndRequestId);
-          //       formData.append(`file_path[${index}]`, doc.file);
-          //       formData.append(`name[${index}]`, doc.documentName);
-          //     });
-          //   }
+            if (Array.isArray(values.documents)) {
+              values.documents.forEach((doc, index) => {
+                // For each document, append both the file and its name
+                formData.append(`rnd_request_id`, rndRequestId);
+                formData.append(`file`, doc.file);
+                formData.append(`name`, doc.documentName);
+              });
+            }
 
-          //   const response = await createRndDocReference(formData);
-          //   if (response.status === "success") {
-          //     toast.push(
-          //       <Notification
-          //         type="success"
-          //         title="Dokumen referensi berhasil disimpan"
-          //         width={700}
-          //       />,
-          //       { placement: "top-center" }
-          //     );
-
-          //     setTimeout(() => {
-          //       navigate("/purchase/product-r&d");
-          //     }, 2000);
-          //   } else {
-          //     toast.push(
-          //       <Notification
-          //         type="danger"
-          //         title="Maaf terjadi kesalahan, gagal menyimpan dokumen referensi"
-          //         width={700}
-          //       />,
-          //       { placement: "top-center" }
-          //     );
-          //   }
-          // } catch (error) {
-          //   console.error("Error in dokumenReferensi:", error);
-          //   throw error;
-          // }
+            const response = await createRndDocReference(formData);
+            if (response.status === "success") {
+              toast.push(
+                <Notification
+                  type="success"
+                  title="Permintaan R&D berhasil Diajukan"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+              setTimeout(() => {
+                navigate("/purchase/product-r&d");
+              }, 2000);
+            } else {
+              toast.push(
+                <Notification
+                  type="danger"
+                  title="Maaf terjadi kesalahan, gagal menyimpan dokumen referensi"
+                  width={700}
+                />,
+                { placement: "top-center" }
+              );
+            }
+          } catch (error) {
+            console.error("Error in dokumenReferensi:", error);
+            throw error;
+          }
           break;
       }
     } catch (error) {

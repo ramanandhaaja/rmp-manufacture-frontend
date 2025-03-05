@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { formatDate, getStatusClassName, getStatusName } from "utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { Pagination, Notification, toast } from "components/ui";
-import CreatePOModal from "components/custom/ModalCreatePo";
 import capitalize from "components/ui/utils/capitalize";
 import TableListDropdown from "components/template/TableListDropdown";
 import DataTable from "components/shared/DataTable";
@@ -14,10 +13,10 @@ import { useLocation } from "react-router-dom";
 import useCreateRndReq from "utils/hooks/Rnd/useCreateRndReq.js";
 import { useSelector, useDispatch } from "react-redux";
 import { clearDataRndRequest } from "store/Rnd/rndSlice";
+import ConfirmationCustom from "components/custom/ConfirmationCustom";
 
 const ListRequestRnd = () => {
   const dispatch = useDispatch();
-  const { rndRequestId } = useSelector((state) => state.rnd);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [localState, setLocalState] = useState({
@@ -29,11 +28,12 @@ const ListRequestRnd = () => {
     },
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [id, setId] = useState(null);
   const location = useLocation();
   const checkLocation = location.pathname.includes("product-r&d");
-  const { getRndRequest, dataRndRequest } = useCreateRndReq();
+  const { getRndRequest, dataRndRequest, deleteRndRequest } = useCreateRndReq();
   const columns = PageConfig.listFields
     .filter((field) => field.is_show)
     .map((field) => ({
@@ -93,6 +93,13 @@ const ListRequestRnd = () => {
                       : `/research-development/detail-permintaan/${row.original.id}`
                   ),
               },
+              {
+                label: "Delete",
+                onClick: () => {
+                  setId(row.original.id);
+                  setIsOpen(true);
+                },
+              },
             ]}
           />
         );
@@ -112,6 +119,18 @@ const ListRequestRnd = () => {
           per_page: data?.per_page,
         },
       }));
+      if (response.status === "failed") {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi gangguan jaringan, gagal memuat data"
+          />,
+          {
+            placement: "top-center",
+            width: 700,
+          }
+        );
+      }
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
@@ -119,7 +138,6 @@ const ListRequestRnd = () => {
     }
   };
 
-  console.log(rndRequestId);
   useEffect(() => {
     dispatch(clearDataRndRequest());
   }, [dispatch]);
@@ -143,13 +161,41 @@ const ListRequestRnd = () => {
     });
   };
 
-  //   const handleDelete = async (id) => {
-  //     try {
-  //       await fetchData();
-  //     } catch (error) {
-  //       console.error("Error deleting PO:", error);
-  //     }
-  //   };
+  const handleDelete = async (id) => {
+    try {
+      setIsLoadingDelete(true);
+      const resp = await deleteRndRequest(id);
+      if (resp.status === "success") {
+        toast.push(
+          <Notification
+            type="success"
+            title="Data Rnd Request berhasil dihapus"
+          />,
+          {
+            placement: "top-center",
+            width: 700,
+          }
+        );
+        await fetchData();
+      } else {
+        toast.push(
+          <Notification
+            type="danger"
+            title="Maaf terjadi gangguan jaringan, gagal menghapus data"
+          />,
+          {
+            placement: "top-center",
+            width: 700,
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting Rnd Request:", error);
+    } finally {
+      setIsLoadingDelete(false);
+      setIsOpen(false);
+    }
+  };
 
   //   const onSort = (sort, sortingColumn) => {
   //     fetchData({
@@ -165,8 +211,6 @@ const ListRequestRnd = () => {
         <Tools
           localState={localState}
           // getData={fetchData}
-          deleteIds={selectedIds}
-          setIds={setSelectedIds}
           pageConfig={PageConfig}
           setOpenModal={setIsModalOpen}
         />
@@ -191,12 +235,15 @@ const ListRequestRnd = () => {
         wrapClass="mb-4"
       />
 
-      {/* <CreatePOModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        isLoading={isLoading}
-        setSubmitted={setIsSubmitted}
-      /> */}
+      <ConfirmationCustom
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={() => handleDelete(id)}
+        title="Delete Confirmation"
+        text="Anda yakin akan menghapus data ini?"
+        confirmText="Hapus"
+        isLoading={isLoadingDelete}
+      />
     </div>
   );
 };
