@@ -76,17 +76,34 @@ const ProcessDevelopment = () => {
     fetchDataConfirmation();
   }, []);
 
-  const findMatchingProcessDetails = (dataArray, targetId) => {
+  const findMatchingProcessDetails = (
+    dataArray,
+    targetId,
+    confirmationType
+  ) => {
     return dataArray?.some(
       (item) =>
         item.rnd_process_detail_id === targetId &&
-        item.confirmation === "Alihkan"
+        item.confirmation === confirmationType
     );
   };
 
   const isAlihkan = findMatchingProcessDetails(
     dataProcessRndConfirmation,
-    idProcess
+    idProcess,
+    "Alihkan"
+  );
+
+  const isKonfirmasiProses = findMatchingProcessDetails(
+    dataProcessRndConfirmation,
+    idProcess,
+    "Konfirmasi Proses"
+  );
+
+  const isTolak = findMatchingProcessDetails(
+    dataProcessRndConfirmation,
+    idProcess,
+    "Tolak Permintaan Pengalihan"
   );
 
   const handleModalClose = () => {
@@ -159,9 +176,77 @@ const ProcessDevelopment = () => {
   const ConditionalButton = ({ item, id, dataProcessRndConfirmation }) => {
     const navigate = useNavigate();
 
-    const extractLastWord = (str) => {
-      const words = str.trim().split(/\s+/);
-      return (words[words.length - 1] || "").toLowerCase();
+    function extractLastWord(str) {
+      if (!str) {
+        return "Empty or invalid input";
+      }
+
+      if (!str.includes("-")) {
+        return str;
+      }
+
+      return str.split("-").pop();
+    }
+
+    const getProcessPath = (item, id) => {
+      // Base paths for each category
+      const basePaths = {
+        "pengembangan-produk": "/research-development/pra-formulasi",
+        "trial-formulasi": "/research-development/trial-formulasi",
+        "proses-persiapan-master-data": "/research-development/master-data",
+        "pilot-scale-batch": "/research-development/pilot-scale",
+        "proses-registrasi-dokumen": "/research-development/registration",
+      };
+
+      // Special cases handling
+      const specialCases = {
+        // Pengembangan Produk special case
+        5: `${basePaths["pengembangan-produk"]}/technical-feasibility/${id}/process/${item.id}`,
+
+        // Trial Formulasi special cases
+        6: `${basePaths["trial-formulasi"]}/riset-vendor/${id}/process/${item.id}`,
+        7: `${basePaths["trial-formulasi"]}/trial-kemas/${id}/process/${item.id}`,
+        9: `${basePaths["trial-formulasi"]}/trial-formula/${id}/process/${item.id}`,
+        10: `${basePaths["trial-formulasi"]}/formula-produk/${id}/process/${item.id}`,
+        11: `${basePaths["trial-formulasi"]}/trial-metode-analisis/${id}/process/${item.id}`,
+        12: `${basePaths["trial-formulasi"]}/metode-pemeriksaan/${id}/process/${item.id}`,
+
+        // Proses Persiapan Master Data special case
+        13: `${basePaths["proses-persiapan-master-data"]}/penentuan-nama/${id}/process/${item.id}`,
+        14: `${basePaths["proses-persiapan-master-data"]}/ceklist-design-kemas/${id}/process/${item.id}`,
+        15: `${basePaths["proses-persiapan-master-data"]}/prosedur-produksi/${id}/process/${item.id}`,
+        16: `${basePaths["proses-persiapan-master-data"]}/cogm/${id}/process/${item.id}`,
+
+        // Pilot Scale Batch special cases
+        17: `${basePaths["pilot-scale-batch"]}/pilot-scale-batch-produk/${id}/process/${item.id}`,
+        18: `${basePaths["pilot-scale-batch"]}/validasi-proses/${id}/process/${item.id}`,
+        // Registration special cases
+        19: `${basePaths["proses-registrasi-dokumen"]}/bpom/${id}/process/${item.id}`,
+        20: `${basePaths["proses-registrasi-dokumen"]}/bpjh/${id}/process/${item.id}`,
+        21: `${basePaths["proses-registrasi-dokumen"]}/permintaan-desain-kemas/${id}/process/${item.id}`,
+        22: `${basePaths["proses-registrasi-dokumen"]}/pengembangan-desain-kemas/${id}/process/${item.id}`,
+      };
+
+      // Check if this is a special case
+      if (specialCases[item.id]) {
+        return specialCases[item.id];
+      }
+
+      // Generate slug from item name
+      const processSlug = item.name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "") // Remove special characters
+        .replace(/\s+/g, "-"); // Replace spaces with hyphens
+
+      // Get the appropriate base path
+      const categorySlug = "pengembangan-produk";
+
+      const basePath = basePaths[categorySlug] || "/research-development";
+
+      // Return the standard format path
+      return `${basePath}/${extractLastWord(processSlug)}/${id}/process/${
+        item.id
+      }`;
     };
 
     const isDisabled = dataProcessRndConfirmation?.some(
@@ -171,14 +256,7 @@ const ProcessDevelopment = () => {
     );
 
     const handleClick = () => {
-      const basePath = "/research-development/pra-formulasi";
-      const processPath =
-        item.id === 5
-          ? `${basePath}/technical-feasibility/${id}/process/${item.id}`
-          : `${basePath}/${extractLastWord(item.name)}/${id}/process/${
-              item.id
-            }`;
-
+      const processPath = getProcessPath(item, id);
       navigate(processPath);
     };
 
@@ -240,15 +318,32 @@ const ProcessDevelopment = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-4">
-                      <div
-                        className={`${getRNDStatusClassName(
-                          "Butuh Konfirmasi"
-                        )} w-[140px] px-1 py-1.5 rounded text-sm font-bold text-center`}
-                      >
-                        Butuh Konfirmasi
+                      <div className="flex items-center gap-4">
+                        {dataProcessRndConfirmation.some(
+                          (itemProcess) =>
+                            itemProcess.rnd_process_detail_id === item.id &&
+                            itemProcess.confirmation === "Konfirmasi Proses"
+                        ) ? (
+                          <div
+                            className={`${getRNDStatusClassName(
+                              "Konfirmasi Proses"
+                            )} w-[140px] px-1 py-1.5 rounded text-sm font-bold text-center`}
+                          >
+                            Diproses
+                          </div>
+                        ) : (
+                          <div
+                            className={`${getRNDStatusClassName(
+                              "Butuh Konfirmasi"
+                            )} w-[140px] px-1 py-1.5 rounded text-sm font-bold text-center`}
+                          >
+                            Butuh Konfirmasi
+                          </div>
+                        )}
                       </div>
                       <ConditionalButton
                         key={item.id}
+                        // item={{ ...item, category: "pengembangan-produk" }}
                         item={item}
                         id={id}
                         dataProcessRndConfirmation={dataProcessRndConfirmation}
@@ -274,6 +369,7 @@ const ProcessDevelopment = () => {
                                       setConfirmation("Konfirmasi Proses");
                                     },
                                     border: true,
+                                    disabled: isKonfirmasiProses || isAlihkan,
                                   },
                                   {
                                     label: "Alihkan",
@@ -281,7 +377,7 @@ const ProcessDevelopment = () => {
                                       setIsOpenModalAlihkan(true);
                                       setConfirmation("Alihkan");
                                     },
-                                    disabled: isAlihkan,
+                                    disabled: isKonfirmasiProses || isAlihkan,
                                   },
                                   {
                                     label: "Tolak Pengalihan",
@@ -292,13 +388,14 @@ const ProcessDevelopment = () => {
                                       );
                                     },
                                     border: true,
-                                    disabled: true,
+                                    disabled: isKonfirmasiProses || isAlihkan,
                                   },
                                   {
                                     label: "Lihat Catatan",
                                     onClick: () => {
                                       setIsOpenModalCatatan(true);
                                     },
+                                    disabled: isKonfirmasiProses,
                                   },
                                 ]
                           }

@@ -6,6 +6,7 @@ const initialState = {
   dataDetailProduct: null,
   dataDetailRndRequest: [],
   dataRndDocReference: [],
+  isEdit: false,
 };
 
 export const rndSlice = createSlice({
@@ -30,6 +31,9 @@ export const rndSlice = createSlice({
     setDataRndDocReference: (state, action) => {
       state.dataRndDocReference = action.payload;
     },
+    setIsEdit: (state) => {
+      state.isEdit = true;
+    },
     clearDataRndRequest: () => initialState,
   },
 });
@@ -42,5 +46,6 @@ export const {
   resetDataDetailProduct,
   clearDataRndRequest,
   setDataRndDocReference,
+  setIsEdit,
 } = rndSlice.actions;
 export default rndSlice.reducer;

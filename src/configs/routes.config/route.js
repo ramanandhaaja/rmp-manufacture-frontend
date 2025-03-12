@@ -252,4 +252,47 @@ export const ROUTE_LIST = [
     component: React.lazy(() => import("views/R&D/PraFormulasi/index")),
     authority: [],
   },
+
+  {
+    key: "researchAndDevelopment.trialBahanKemas",
+    path: "/research-development/trial-formulasi/trial-kemas/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/TrialBahanKemas/index")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialBahanKemas.add",
+    path: "/research-development/trial-formulasi/trial-bahan-kemas/add",
+    component: React.lazy(() =>
+      import("views/R&D/TrialBahanKemas/AddBahanKemas")
+    ),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialBahanKemas.edit",
+    path: "/research-development/trial-formulasi/trial-bahan-kemas/edit/:id",
+    component: React.lazy(() =>
+      import("views/R&D/TrialBahanKemas/AddBahanKemas")
+    ),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialBahanKemas.detail",
+    path: "/research-development/trial-formulasi/trial-bahan-kemas/detail/:id",
+    component: React.lazy(() =>
+      import("views/R&D/TrialBahanKemas/DetailBahanKemas")
+    ),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialBahanKemas.addReport",
+    path: "/research-development/trial-formulasi/trial-bahan-kemas/add-laporan/:id",
+    component: React.lazy(() =>
+      import("views/R&D/TrialBahanKemas/AddLaporanBahanKemas")
+    ),
+    authority: [],
+  },
 ];
