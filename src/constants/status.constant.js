@@ -580,9 +580,9 @@ export const PAYMENT_STATUS_STYLES = {
 
 export const RND_STATUS_STYLES = {
   "Butuh Konfirmasi": "bg-gray-500 text-white",
-  // "Menunggu Persetujuan": "bg-yellow-500 text-white",
+  "Menunggu Persetujuan": "bg-yellow-500 text-white",
   Direvisi: "bg-orange-500 text-white",
   Disetujui: "bg-emerald-600 text-white",
   Selesai: "bg-emerald-600 text-white",
-  Proses: "bg-blue-600 text-white",
+  "Konfirmasi Proses": "bg-blue-600 text-white",
 };

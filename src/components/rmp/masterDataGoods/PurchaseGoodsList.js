@@ -16,6 +16,7 @@ const PurchaseGoodsList = () => {
   const [total, setTotal] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [id, setId] = useState(null);
   const { dataMasterGoods, getGoods, deleteGoods } = useMasterGoods();
   const columns = [
@@ -56,11 +57,6 @@ const PurchaseGoodsList = () => {
         <TableListDropdown
           dropdownItemList={[
             {
-              label: "Lihat Detail",
-              onClick: () =>
-                navigate(`/vendor-management/detail-vendor/${row.original.id}`),
-            },
-            {
               label: "Edit",
               onClick: () =>
                 navigate(`/vendor-management/edit-vendor/${row.original.id}`),
@@ -79,19 +75,21 @@ const PurchaseGoodsList = () => {
     },
   ];
 
-  useEffect(() => {
-    const fetchMasterGoods = async () => {
-      try {
-        const response = await getGoods();
-        const data = response.data;
-        setTotal(data.total);
-        setPageSize(data.per_page);
-      } catch (error) {
-        console.error("Error fetching purchase requests:", error);
-      } finally {
-      }
-    };
+  const fetchMasterGoods = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getGoods();
+      const data = response.data;
+      setTotal(data.total);
+      setPageSize(data.per_page);
+    } catch (error) {
+      console.error("Error fetching purchase requests:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchMasterGoods();
   }, []);
 
@@ -107,7 +105,7 @@ const PurchaseGoodsList = () => {
 
   const handleDelete = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingDelete(true);
       const response = await deleteGoods(id);
       const data = response.data;
       setTotal(data?.total);
@@ -120,24 +118,24 @@ const PurchaseGoodsList = () => {
           }
         );
         setTimeout(() => {
-          window.location.reload();
+          fetchMasterGoods;
         }, 1000);
       } else {
         toast.push(
-          <Notification type="danger" title={"Barang berhasil dihapus "} />,
+          <Notification
+            type="danger"
+            title={"Maaf terjadi kesalahan, Barang gagal dihapus "}
+          />,
           {
             placement: "top-center",
           }
         );
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
       }
     } catch (err) {
       console.log(err);
     } finally {
       setTimeout(() => {
-        setIsLoading(false);
+        setIsLoadingDelete(false);
         setIsOpen(false);
       }, 1000);
     }
@@ -151,7 +149,11 @@ const PurchaseGoodsList = () => {
         }
         addBtnTitle={"Tambah Barang"}
       />
-      <CustomTable data={getCurrentPageData()} columns={columns} />
+      <CustomTable
+        data={getCurrentPageData()}
+        columns={columns}
+        isLoading={isLoading}
+      />
       <div className="flex justify-end mt-2">
         <Pagination
           total={total}
@@ -168,7 +170,7 @@ const PurchaseGoodsList = () => {
         title="Delete Confirmation"
         text="Anda yakin akan menghapus data ini?"
         confirmText="Hapus"
-        isLoading={isLoading}
+        isLoading={isLoadingDelete}
       />
     </div>
   );

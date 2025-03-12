@@ -30,7 +30,7 @@ export const TableSearch = (props) => {
       defaultValue={props.query ? props.query : ""}
       className="text-blue-999 lg:w-[320px] lg:mb-0 mb-4 mr-2"
       size="md"
-      placeholder="Search..."
+      placeholder={props.placeholder}
       suffix={<HiOutlineSearch className="text-lg text-blue-999" />}
       onChange={onEdit}
     />
