@@ -8,7 +8,6 @@ import DataTable from "components/shared/DataTable";
 import { Tools } from "./Tools";
 import { PageConfig } from "./config";
 import { formatNumber } from "utils/helpers";
-import { dataTrial } from "./dummyData";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useDispatch } from "react-redux";
 import {
@@ -19,7 +18,7 @@ import {
 import { useParams } from "react-router-dom";
 import useProcessRnd from "utils/hooks/Rnd/useProcessRnd";
 
-const TrialBahanKemasList = () => {
+const RisetBahanDanVendorList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +32,7 @@ const TrialBahanKemasList = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
-  const { getRndTrialPackagingMaterials } = useProcessRnd();
+  const { getRndRawMaterials } = useProcessRnd();
   const [dataTable, setDataTable] = useState([]);
 
   const columns = PageConfig.listFields
@@ -44,18 +43,64 @@ const TrialBahanKemasList = () => {
       sortable: field.sortable,
       width: field.width,
       Cell: ({ row }) => {
-        const value = row.original[field.key];
+        // Handle nested data access
+        const getValue = (obj, path) => {
+          if (path.includes("rnd_raw_material_details")) {
+            const details = obj.rnd_raw_material_details;
+            if (Array.isArray(details) && details.length > 0) {
+              return details.map((detail) => {
+                if (path.includes("raw_material.raw_material_code")) {
+                  return detail.raw_material?.raw_material_code;
+                } else if (path.includes("raw_material.category")) {
+                  return detail.raw_material?.category;
+                } else if (path.includes("material_status")) {
+                  return detail.material_status;
+                } else if (path.includes("raw_material.stock")) {
+                  return detail.raw_material?.stock;
+                }
+                return "";
+              });
+            }
+            return [];
+          }
+          return obj[path];
+        };
+
+        const value = getValue(row.original, field.key);
+
         switch (field.key) {
-          case "status":
+          case "rnd_raw_material_details.material_status":
             return (
-              <span
-                className={`px-2 py-1 rounded text-xs font-semibold ${getRNDStatusClassName(
-                  value
-                )}`}
-              >
-                {value}
-              </span>
+              <div className="flex flex-wrap gap-1">
+                {Array.isArray(value) &&
+                  value.map((status, index) => (
+                    <span
+                      key={index}
+                      className={`px-2 py-1 rounded text-xs font-semibold ${getRNDStatusClassName(
+                        status
+                      )}`}
+                    >
+                      {status}
+                    </span>
+                  ))}
+              </div>
             );
+
+          case "rnd_raw_material_details.raw_material.raw_material_code":
+            return (
+              <div className="flex flex-col gap-1">
+                {Array.isArray(value) &&
+                  value.map((code, index) => (
+                    <span key={index} className="text-sm">
+                      {code || "-"}
+                    </span>
+                  ))}
+              </div>
+            );
+
+          case "raw_material_name":
+            return value || "-";
+
           default:
             return value;
         }
@@ -67,7 +112,7 @@ const TrialBahanKemasList = () => {
       return (
         <TableListDropdown
           placement={
-            dataTrial.length > 1 && row.index < 1 ? "bottom-end" : "top-end"
+            dataTable.length > 1 && row.index < 1 ? "bottom-end" : "top-end"
           }
           dropdownItemList={[
             {
@@ -128,21 +173,21 @@ const TrialBahanKemasList = () => {
     );
   };
 
-  if (PageConfig.enableActions) {
-    columns.push({
-      Header: "Action",
-      accessor: "action",
-      width: "100px",
-      Cell: ({ row }) => {
-        return renderDropdown(row);
-      },
-    });
-  }
+  //   if (PageConfig.enableActions) {
+  //     columns.push({
+  //       Header: "Action",
+  //       accessor: "action",
+  //       width: "100px",
+  //       Cell: ({ row }) => {
+  //         return renderDropdown(row);
+  //       },
+  //     });
+  //   }
 
   const fetchData = async (params = localState.params) => {
     setIsLoading(true);
     try {
-      const response = await getRndTrialPackagingMaterials({
+      const response = await getRndRawMaterials({
         rnd_request_id: id,
       });
       const data = response.data;
@@ -243,7 +288,7 @@ const TrialBahanKemasList = () => {
               icon={<PlusIcon />}
               onClick={() =>
                 navigate(
-                  "/research-development/trial-formulasi/trial-bahan-kemas/add"
+                  "/research-development/trial-formulasi/riset-bahan-dan-vendor/add"
                 )
               }
             >
@@ -292,4 +337,4 @@ const TrialBahanKemasList = () => {
   );
 };
 
-export default TrialBahanKemasList;
+export default RisetBahanDanVendorList;

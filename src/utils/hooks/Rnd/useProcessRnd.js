@@ -7,6 +7,12 @@ import {
   getRndTrialPackagingMaterialsApi,
   deleteRndTrialPackagingMaterialsApi,
   getRndTrialPackagingMaterialsApiById,
+  getRndRawMaterialsApi,
+  getRndRawMaterialsListApi,
+  postRndRawMaterialsApi,
+  postTrialFormulaApi,
+  getRndTrialFormulationsApi,
+  deleteRndTrialFormulationsApi,
 } from "services/RndService";
 import { useState } from "react";
 
@@ -159,6 +165,123 @@ function useProcessRnd() {
       };
     }
   };
+
+  const getMasterRawMaterials = async (params) => {
+    try {
+      const response = await getRndRawMaterialsApi(params);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const getRndRawMaterials = async (params) => {
+    try {
+      const response = await getRndRawMaterialsListApi(params);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const postRndRawMaterials = async (data) => {
+    try {
+      const response = await postRndRawMaterialsApi(data);
+      if (response.status === 201) {
+        return {
+          status: "success",
+          message: response.data.message,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const getRndTrialFormulations = async (params) => {
+    try {
+      const response = await getRndTrialFormulationsApi(params);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const postTrialFormula = async (data) => {
+    try {
+      const response = await postTrialFormulaApi(data);
+      if (response.status === 201) {
+        return {
+          status: "success",
+          message: response.data.message,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const deleteRndTrialFormulations = async (id) => {
+    try {
+      const response = await deleteRndTrialFormulationsApi(id);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
   return {
     dataProcessRnd,
     dataProcessRndConfirmation,
@@ -170,6 +293,12 @@ function useProcessRnd() {
     getRndTrialPackagingMaterials,
     deleteRndTrialPackagingMaterials,
     getRndTrialPackagingMaterialsById,
+    getRndRawMaterials,
+    postRndRawMaterials,
+    getMasterRawMaterials,
+    postTrialFormula,
+    getRndTrialFormulations,
+    deleteRndTrialFormulations,
   };
 }
 

@@ -63,3 +63,52 @@ export async function deleteRndTrialPackagingMaterialsApi(id) {
     method: "delete",
   });
 }
+
+export async function getRndRawMaterialsListApi(params) {
+  return ApiService.fetchData({
+    url: `rnd-raw-materials`,
+    method: "get",
+    params,
+  });
+}
+
+export async function getRndRawMaterialsApi(params) {
+  return ApiService.fetchData({
+    url: `raw-materials`,
+    method: "get",
+    params,
+  });
+}
+
+export async function postRndRawMaterialsApi(data) {
+  return ApiService.fetchData({
+    url: `rnd-raw-materials`,
+    method: "post",
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function postTrialFormulaApi(data) {
+  return ApiService.fetchData({
+    url: `rnd-trial-formulations`,
+    method: "post",
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function getRndTrialFormulationsApi(params) {
+  return ApiService.fetchData({
+    url: `rnd-trial-formulations`,
+    method: "get",
+    params,
+  });
+}
+
+export async function deleteRndTrialFormulationsApi(id) {
+  return ApiService.fetchData({
+    url: `rnd-trial-formulations/${id}`,
+    method: "delete",
+  });
+}
