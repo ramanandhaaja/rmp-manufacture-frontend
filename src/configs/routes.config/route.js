@@ -295,4 +295,36 @@ export const ROUTE_LIST = [
     ),
     authority: [],
   },
+
+  {
+    key: "researchAndDevelopment.risetBahan&Vendor",
+    path: "/research-development/trial-formulasi/riset-bahan-dan-vendor/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/RisetBahanDanVendor")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.risetBahan&Vendor.add",
+    path: "/research-development/trial-formulasi/riset-bahan-dan-vendor/add",
+    component: React.lazy(() =>
+      import("views/R&D/RisetBahanDanVendor/AddRisetBahanDanVendor")
+    ),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialFormula",
+    path: "/research-development/trial-formulasi/trial-formula/:id/process/:idProcess",
+    component: React.lazy(() => import("views/R&D/TrialFormula/")),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialFormula.add",
+    path: "/research-development/trial-formulasi/trial-formula/add",
+    component: React.lazy(() =>
+      import("views/R&D/TrialFormula/AddTrialFormula")
+    ),
+    authority: [],
+  },
 ];

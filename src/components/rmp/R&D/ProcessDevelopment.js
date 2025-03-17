@@ -204,7 +204,7 @@ const ProcessDevelopment = () => {
         5: `${basePaths["pengembangan-produk"]}/technical-feasibility/${id}/process/${item.id}`,
 
         // Trial Formulasi special cases
-        6: `${basePaths["trial-formulasi"]}/riset-vendor/${id}/process/${item.id}`,
+        6: `${basePaths["trial-formulasi"]}/riset-bahan-dan-vendor/${id}/process/${item.id}`,
         7: `${basePaths["trial-formulasi"]}/trial-kemas/${id}/process/${item.id}`,
         9: `${basePaths["trial-formulasi"]}/trial-formula/${id}/process/${item.id}`,
         10: `${basePaths["trial-formulasi"]}/formula-produk/${id}/process/${item.id}`,

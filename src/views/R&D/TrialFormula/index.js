@@ -7,8 +7,7 @@ import TableListDropdown from "components/template/TableListDropdown";
 import DataTable from "components/shared/DataTable";
 import { Tools } from "./Tools";
 import { PageConfig } from "./config";
-import { formatNumber } from "utils/helpers";
-import { dataTrial } from "./dummyData";
+import { formatDate } from "utils/helpers";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useDispatch } from "react-redux";
 import {
@@ -18,8 +17,9 @@ import {
 } from "store/Rnd/rndSlice";
 import { useParams } from "react-router-dom";
 import useProcessRnd from "utils/hooks/Rnd/useProcessRnd";
+import ConfirmationCustom from "components/custom/ConfirmationCustom";
 
-const TrialBahanKemasList = () => {
+const TrialFormulaList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,8 +33,11 @@ const TrialBahanKemasList = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
-  const { getRndTrialPackagingMaterials } = useProcessRnd();
+  const { getRndTrialFormulations, deleteRndTrialFormulations } =
+    useProcessRnd();
   const [dataTable, setDataTable] = useState([]);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  const [idTrial, setIdTrial] = useState(null);
 
   const columns = PageConfig.listFields
     .filter((field) => field.is_show)
@@ -56,6 +59,12 @@ const TrialBahanKemasList = () => {
                 {value}
               </span>
             );
+          case "version":
+            return "Versi 1";
+          case "procedure":
+            return "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed ";
+          case "updated_at":
+            return formatDate(value);
           default:
             return value;
         }
@@ -63,11 +72,11 @@ const TrialBahanKemasList = () => {
     }));
 
   const renderDropdown = (row) => {
-    if (row.original.status === "Selesai") {
+    if (row.original.status === "Review") {
       return (
         <TableListDropdown
           placement={
-            dataTrial.length > 1 && row.index < 1 ? "bottom-end" : "top-end"
+            dataTable.length > 1 && row.index < 1 ? "bottom-end" : "top-end"
           }
           dropdownItemList={[
             {
@@ -79,7 +88,7 @@ const TrialBahanKemasList = () => {
               // },
             },
             {
-              label: "Edit Laporan",
+              label: "Edit ",
               // onClick: () => {
               //   navigate(
               //     `/rnd/trial-bahan-kemas/view/${row.original.id}`
@@ -87,7 +96,7 @@ const TrialBahanKemasList = () => {
               // },
             },
             {
-              label: "Tetapkan Trial",
+              label: "Tentukan Formula",
               // onClick: () => {
               //   navigate(
               //     `/rnd/trial-bahan-kemas/view/${row.original.id}`
@@ -114,15 +123,13 @@ const TrialBahanKemasList = () => {
               );
             },
           },
-          //   {
-          //     label: "Edit",
-          //     onClick: () => {
-          //       dispatch(setIsEdit(true));
-          //       navigate(
-          //         `/research-development/trial-formulasi/trial-bahan-kemas/edit/${row.original.id}`
-          //       );
-          //     },
-          //   },
+          {
+            label: "Delete",
+            onClick: () => {
+              setIdTrial(row.original.id);
+              setIsModalOpen(true);
+            },
+          },
         ]}
       />
     );
@@ -142,7 +149,7 @@ const TrialBahanKemasList = () => {
   const fetchData = async (params = localState.params) => {
     setIsLoading(true);
     try {
-      const response = await getRndTrialPackagingMaterials({
+      const response = await getRndTrialFormulations({
         rnd_request_id: id,
       });
       const data = response.data;
@@ -186,10 +193,22 @@ const TrialBahanKemasList = () => {
   };
 
   const handleDelete = async (id) => {
+    setIsLoadingDelete(true);
     try {
-      await fetchData();
+      const response = await deleteRndTrialFormulations(id);
+      if (response.status === "success") {
+        fetchData();
+        toast.push(
+          <Notification type="success" title="Berhasil menghapus data" />
+        );
+      } else {
+        toast.push(<Notification type="danger" title="Gagal menghapus data" />);
+      }
     } catch (error) {
       console.error("Error deleting data:", error);
+      toast.push(<Notification type="danger" title="Gagal menghapus data" />);
+    } finally {
+      setIsLoadingDelete(false);
     }
   };
 
@@ -243,11 +262,11 @@ const TrialBahanKemasList = () => {
               icon={<PlusIcon />}
               onClick={() =>
                 navigate(
-                  "/research-development/trial-formulasi/trial-bahan-kemas/add"
+                  "/research-development/trial-formulasi/trial-formula/add"
                 )
               }
             >
-              Bahan Kemas
+              Trial Formula
             </Button>
           </div>
         </div>
@@ -288,8 +307,25 @@ const TrialBahanKemasList = () => {
         borderlessRow={false}
         wrapClass="mb-4"
       />
+      <ConfirmationCustom
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        showCancelBtn
+        showSubmitBtn
+        onConfirm={() => handleDelete(idTrial)}
+        confirmText="Konfirmasi"
+        title="Anda yakin ingin menghapus data ini?"
+        titleClass="mt-5 mb-3 text-main-100 text-xl font-bold"
+        text="Klik Konfirmasi untuk melanjutkan"
+        textClass="text-slate-500 text-base"
+        isLoading={isLoadingDelete}
+        disableCancel={false}
+        buttonType="button"
+        width={500}
+        contentClassName="p-5 rounded-2xl"
+      />
     </div>
   );
 };
 
-export default TrialBahanKemasList;
+export default TrialFormulaList;
