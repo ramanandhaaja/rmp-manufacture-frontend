@@ -13,6 +13,12 @@ import {
   postTrialFormulaApi,
   getRndTrialFormulationsApi,
   deleteRndTrialFormulationsApi,
+  getDetailTrialFormulationsApi,
+  postTrialFormulationReportsApi,
+  getDetailTrialFormulationReportApi,
+  getTrialAnalysisMethodsApi,
+  getDetailTrialAnalysisMethodApi,
+  postTrialAnalysisMethodApi,
 } from "services/RndService";
 import { useState } from "react";
 
@@ -245,6 +251,26 @@ function useProcessRnd() {
     }
   };
 
+  const getDetailTrialFormulations = async (id) => {
+    try {
+      const response = await getDetailTrialFormulationsApi(id);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
   const postTrialFormula = async (data) => {
     try {
       const response = await postTrialFormulaApi(data);
@@ -282,6 +308,104 @@ function useProcessRnd() {
       };
     }
   };
+
+  const postTrialFormulationReports = async (data) => {
+    try {
+      const response = await postTrialFormulationReportsApi(data);
+      if (response.status === 201) {
+        return {
+          status: "success",
+          message: response.data.message,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const getDetailTrialFormulationsReport = async (id) => {
+    try {
+      const response = await getDetailTrialFormulationReportApi(id);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const getTrialAnalysisMethod = async () => {
+    try {
+      const response = await getTrialAnalysisMethodsApi();
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const getDetailTrialAnalysisMethod = async (id) => {
+    try {
+      const response = await getDetailTrialAnalysisMethodApi(id);
+      if (response.status === 200) {
+        return {
+          status: "success",
+          message: response.data.message,
+          data: response.data,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
+
+  const postTrialAnalysisMethod = async (data) => {
+    try {
+      const response = await postTrialAnalysisMethodApi(data);
+      if (response.status === 201) {
+        return {
+          status: "success",
+          message: response.data.message,
+        };
+      } else {
+        return { status: "failed", message: response.data.message };
+      }
+    } catch (error) {
+      return {
+        status: "network error",
+        message: error?.message || error.toString(),
+      };
+    }
+  };
   return {
     dataProcessRnd,
     dataProcessRndConfirmation,
@@ -299,6 +423,12 @@ function useProcessRnd() {
     postTrialFormula,
     getRndTrialFormulations,
     deleteRndTrialFormulations,
+    getDetailTrialFormulations,
+    postTrialFormulationReports,
+    getDetailTrialFormulationsReport,
+    getTrialAnalysisMethod,
+    postTrialAnalysisMethod,
+    getDetailTrialAnalysisMethod,
   };
 }
 

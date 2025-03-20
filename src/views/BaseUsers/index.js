@@ -20,46 +20,6 @@ const dummy = {
       username: "user1",
       is_active: 0,
     },
-    {
-      id: 2,
-      created_at: "2021-04-06T05:22:47",
-      updated_at: "2020-02-21T08:39:12",
-      name: "Alice Doe",
-      email: "alice@example.com",
-      email_verified_at: "2020-09-22T06:13:26",
-      username: "user2",
-      is_active: 1,
-    },
-    {
-      id: 3,
-      created_at: "2021-09-24T16:11:58",
-      updated_at: "2022-10-05T08:26:59",
-      name: "Charlie Davis",
-      email: "charlie@example.com",
-      email_verified_at: "2022-11-09T17:36:42",
-      username: "user3",
-      is_active: 0,
-    },
-    {
-      id: 4,
-      created_at: "2022-08-16T17:23:46",
-      updated_at: "2020-01-19T07:43:56",
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      email_verified_at: "2022-01-24T07:51:28",
-      username: "user4",
-      is_active: 1,
-    },
-    {
-      id: 5,
-      created_at: "2020-11-18T04:12:16",
-      updated_at: "2022-09-17T14:33:04",
-      name: "John Doe",
-      email: "john@example.com",
-      email_verified_at: "2022-02-16T02:30:04",
-      username: "user5",
-      is_active: 0,
-    },
   ],
   meta: {
     current_page: 1,
@@ -122,15 +82,15 @@ const dummy = {
     to: 10,
     total: 79,
   },
-}
+};
 
 const Page = () => {
-  const firstLoad = useRef(true)
-  const firstReq = useRef(true)
-  const [openFilter, setOpenFilter] = useState(false)
-  const [openColumns, setOpenColumns] = useState(false)
-  const [ids, setIds] = useState([])
-  const [checkboxList, setCheckboxList] = useState([])
+  const firstLoad = useRef(true);
+  const firstReq = useRef(true);
+  const [openFilter, setOpenFilter] = useState(false);
+  const [openColumns, setOpenColumns] = useState(false);
+  const [ids, setIds] = useState([]);
+  const [checkboxList, setCheckboxList] = useState([]);
   const [localState, setLocalState] = useState({
     loading: false,
     data: dummy?.data,
@@ -145,7 +105,7 @@ const Page = () => {
       options: [],
       relations: [].join(),
     },
-  })
+  });
 
   const getData = useCallback(
     async (params) => {
@@ -153,17 +113,17 @@ const Page = () => {
         setLocalState({
           ...localState,
           loading: true,
-        })
+        });
 
-        const ress = await apiIndex(params)
+        const ress = await apiIndex(params);
 
         if (firstReq.current) {
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-          firstReq.current = false
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          firstReq.current = false;
         }
 
         if (ress.data?.meta?.current_page !== localState.meta?.current_page) {
-          setIds([])
+          setIds([]);
         }
 
         setLocalState({
@@ -172,7 +132,7 @@ const Page = () => {
           data: ress.data?.data || [],
           meta: ress.data?.meta || null,
           params: params,
-        })
+        });
       } catch (error) {
         toast.push(
           <Notification title={"Error"} type="danger">
@@ -183,30 +143,30 @@ const Page = () => {
           {
             placement: "top-center",
           }
-        )
+        );
       }
     },
     [localState]
-  )
+  );
 
   useEffect(() => {
     if (firstLoad.current) {
       // getData(localState.params)
-      firstLoad.current = false
+      firstLoad.current = false;
     }
-  }, [getData, localState])
+  }, [getData, localState]);
 
   useEffect(() => {
-    let x = []
+    let x = [];
 
     for (let index = 0; index < PageConfig.listFields.length; index++) {
-      const el = PageConfig.listFields[index]
+      const el = PageConfig.listFields[index];
       if (el.is_show) {
-        x.push(el.key)
+        x.push(el.key);
       }
     }
-    setCheckboxList(x)
-  }, [])
+    setCheckboxList(x);
+  }, []);
 
   return (
     <AdaptableCard className="h-full" bodyClass="h-full p-2">
@@ -223,12 +183,12 @@ const Page = () => {
             deleteIds={ids}
             setIds={setIds}
             openFilter={() => {
-              setOpenFilter(!openFilter)
-              setOpenColumns(false)
+              setOpenFilter(!openFilter);
+              setOpenColumns(false);
             }}
             openColumns={() => {
-              setOpenColumns(!openColumns)
-              setOpenFilter(false)
+              setOpenColumns(!openColumns);
+              setOpenFilter(false);
             }}
             checkboxList={checkboxList}
           />
@@ -261,7 +221,7 @@ const Page = () => {
         checkboxList={checkboxList}
       />
     </AdaptableCard>
-  )
-}
+  );
+};
 
 export default Page;

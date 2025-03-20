@@ -43,7 +43,7 @@
   }
 
   &.middle-end-bottom {
-    @apply right-full bottom-0 origin-bottom;
+    @apply right-full -bottom-9 origin-bottom;
   }
 }
 

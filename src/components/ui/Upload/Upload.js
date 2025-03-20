@@ -8,6 +8,7 @@ import Button from "../Buttons";
 import CloseButton from "../CloseButton";
 import Notification from "../Notification";
 import toast from "../toast";
+import { FiPlus } from "react-icons/fi";
 
 const filesToArray = (files) => Object.keys(files).map((key) => files[key]);
 
@@ -118,7 +119,11 @@ const Upload = React.forwardRef((props, ref) => {
   const renderChildren = () => {
     if (!draggable && !children) {
       return showUploadButton ? (
-        <Button disabled={disabled} onClick={(e) => e.preventDefault()}>
+        <Button
+          disabled={disabled}
+          onClick={(e) => e.preventDefault()}
+          icon={<FiPlus />}
+        >
           {buttonText}
         </Button>
       ) : null;

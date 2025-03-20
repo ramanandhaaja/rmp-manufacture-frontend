@@ -3,7 +3,7 @@ export const PageConfig = {
   pageTitle: "users",
   baseEnpoint: "/base/users",
   primaryKey: "id",
-  maxBottomIndexDropdown: 2,
+  maxBottomIndexDropdown: 1,
   enableSearchTools: true,
   enableExportTools: true,
   enableFilterTools: true,
@@ -166,4 +166,4 @@ export const PageConfig = {
       rules: ["required"],
     },
   ],
-}
+};

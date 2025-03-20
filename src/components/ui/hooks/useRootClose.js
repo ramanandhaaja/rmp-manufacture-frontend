@@ -1,12 +1,15 @@
-import { useEffect, useCallback } from "react";
-import { findDOMNode } from "react-dom";
+import { useCallback, useEffect } from "react";
 
+// Utility functions
 const domContains = (context, node) => {
+  if (!context || !node) return false;
+
   if (context.contains) {
     return context.contains(node);
   } else if (context.compareDocumentPosition) {
     return context === node || !!(context.compareDocumentPosition(node) & 16);
   }
+
   if (node) {
     do {
       if (node === context) {
@@ -22,14 +25,23 @@ const getRefTarget = (ref) => {
 };
 
 function getDOMNode(elementOrRef) {
-  const element =
-    elementOrRef?.root || elementOrRef?.child || getRefTarget(elementOrRef);
+  if (!elementOrRef) return null;
 
-  if (element?.nodeType && typeof element?.nodeName === "string") {
+  // Handle refs
+  const element = getRefTarget(elementOrRef);
+
+  if (!element) return null;
+
+  // Handle DOM nodes
+  if (element.nodeType && typeof element.nodeName === "string") {
     return element;
   }
 
-  return findDOMNode(element);
+  // Handle custom properties that might contain the DOM node
+  if (element.root) return element.root;
+  if (element.child) return element.child;
+
+  return null;
 }
 
 function isLeftClickEvent(e) {
@@ -50,7 +62,16 @@ function onEventListener(target, eventType, listener, options = false) {
   };
 }
 
-function useRootClose(onRootClose, { disabled, triggerTarget, overlayTarget }) {
+function useRootClose(
+  onRootClose,
+  {
+    disabled,
+    triggerTarget,
+    overlayTarget,
+    listenEscape = false,
+    isPortal = false,
+  }
+) {
   const handleDocumentMouseDown = useCallback(
     (event) => {
       const triggerElement = getDOMNode(triggerTarget);
@@ -73,6 +94,15 @@ function useRootClose(onRootClose, { disabled, triggerTarget, overlayTarget }) {
     [onRootClose, triggerTarget, overlayTarget]
   );
 
+  const handleEscapeKey = useCallback(
+    (event) => {
+      if (event.key === "Escape") {
+        onRootClose?.(event);
+      }
+    },
+    [onRootClose]
+  );
+
   useEffect(() => {
     const currentTarget = getDOMNode(triggerTarget);
 
@@ -80,6 +110,7 @@ function useRootClose(onRootClose, { disabled, triggerTarget, overlayTarget }) {
 
     const doc = () =>
       (currentTarget && currentTarget.ownerDocument) || document;
+
     const onDocumentMouseDownListener = onEventListener(
       doc(),
       "mousedown",
@@ -87,10 +118,28 @@ function useRootClose(onRootClose, { disabled, triggerTarget, overlayTarget }) {
       true
     );
 
+    let onDocumentKeyUpListener;
+    if (listenEscape) {
+      onDocumentKeyUpListener = onEventListener(
+        doc(),
+        "keyup",
+        handleEscapeKey,
+        true
+      );
+    }
+
     return () => {
       onDocumentMouseDownListener?.off();
+      onDocumentKeyUpListener?.off();
     };
-  }, [triggerTarget, disabled, onRootClose, handleDocumentMouseDown]);
+  }, [
+    triggerTarget,
+    disabled,
+    onRootClose,
+    handleDocumentMouseDown,
+    handleEscapeKey,
+    listenEscape,
+  ]);
 }
 
 export default useRootClose;

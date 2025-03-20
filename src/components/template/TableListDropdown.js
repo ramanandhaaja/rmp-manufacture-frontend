@@ -47,7 +47,7 @@ const TableListDropdown = ({ dropdownItemList, placement }) => {
               disabled={item.disabled}
               key={item.label}
               eventKey={item.label}
-              className={`mb-1 flex justify-between items-center w-full shadow-none ${
+              className={` flex justify-between items-center w-full shadow-none ${
                 item.border ? "border-b border-gray-400" : ""
               }`}
               onClick={item.onClick}

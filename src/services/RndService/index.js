@@ -106,9 +106,55 @@ export async function getRndTrialFormulationsApi(params) {
   });
 }
 
+export async function getDetailTrialFormulationsApi(id) {
+  return ApiService.fetchData({
+    url: `rnd-trial-formulations/${id}`,
+    method: "get",
+  });
+}
+
 export async function deleteRndTrialFormulationsApi(id) {
   return ApiService.fetchData({
     url: `rnd-trial-formulations/${id}`,
     method: "delete",
+  });
+}
+
+export async function postTrialFormulationReportsApi(data) {
+  return ApiService.fetchData({
+    url: `trial-formulation-reports`,
+    method: "post",
+    data,
+    withCredentials: true,
+  });
+}
+
+export async function getDetailTrialFormulationReportApi(id) {
+  return ApiService.fetchData({
+    url: `trial-formulation-reports/${id}`,
+    method: "get",
+  });
+}
+
+export async function getTrialAnalysisMethodsApi() {
+  return ApiService.fetchData({
+    url: `trial-analysis-methods`,
+    method: "get",
+  });
+}
+
+export async function getDetailTrialAnalysisMethodApi(id) {
+  return ApiService.fetchData({
+    url: `trial-analysis-methods/${id}`,
+    method: "get",
+  });
+}
+
+export async function postTrialAnalysisMethodApi(data) {
+  return ApiService.fetchData({
+    url: `trial-analysis-methods`,
+    method: "post",
+    data,
+    withCredentials: true,
   });
 }
