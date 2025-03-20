@@ -12,11 +12,11 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { FileIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { Details } from "./details";
-import { useNavigate } from "react-router-dom"
-import CardStatus from "components/custom/CardStatus"
-import { STATUSCOLORDIVISI } from "constants/status.constant"
+import { useNavigate } from "react-router-dom";
+import CardStatus from "components/custom/CardStatus";
+import { STATUSCOLORDIVISI } from "constants/status.constant";
 
-dayjs.extend(utc)
+dayjs.extend(utc);
 
 const ActionColumn = ({
   row,
@@ -27,24 +27,24 @@ const ActionColumn = ({
   index,
   length,
 }) => {
-  const { textTheme } = useThemeClass()
+  const { textTheme } = useThemeClass();
 
   const onEdit = () => {
-    setRow(row)
-    setDialogEditOpen(true)
-  }
+    setRow(row);
+    setDialogEditOpen(true);
+  };
 
   const onDetails = () => {
-    setRow(row)
-    setDialogDetailsOpen(true)
-  }
+    setRow(row);
+    setDialogDetailsOpen(true);
+  };
 
   const onDelete = () => {
-    setRow(row)
-    setDialogDeleteOpen(true)
-  }
+    setRow(row);
+    setDialogDeleteOpen(true);
+  };
 
-  const dropdownItems = []
+  const dropdownItems = [];
 
   if (PageConfig.enableDetails) {
     dropdownItems.push({
@@ -53,7 +53,7 @@ const ActionColumn = ({
       icon: <FileIcon />,
       className: "hover:" + textTheme,
       onClick: onDetails,
-    })
+    });
   }
 
   if (PageConfig.enableEdit) {
@@ -63,7 +63,7 @@ const ActionColumn = ({
       icon: <Pencil1Icon />,
       className: "hover:" + textTheme,
       onClick: onEdit,
-    })
+    });
   }
 
   if (PageConfig.enableEdit) {
@@ -73,7 +73,7 @@ const ActionColumn = ({
       icon: <TrashIcon />,
       className: "hover:text-red-500",
       onClick: onDelete,
-    })
+    });
   }
 
   const Btn = (
@@ -83,7 +83,7 @@ const ActionColumn = ({
       icon={<HiOutlineDotsHorizontal />}
       size="sm"
     />
-  )
+  );
 
   return (
     <div>
@@ -93,7 +93,7 @@ const ActionColumn = ({
           placement={
             index > 1 && index >= length - PageConfig.maxBottomIndexDropdown
               ? "top-end"
-              : "bottom-end"
+              : "middle-end-bottom"
           }
         >
           {dropdownItems.map((item) => (
@@ -111,24 +111,24 @@ const ActionColumn = ({
         </Dropdown>
       )}
     </div>
-  )
-}
+  );
+};
 
 export const PageTable = (props) => {
-  const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false)
-  const [dialogEditOpen, setDialogEditOpen] = useState(false)
-  const [dialogDetailsOpen, setDialogDetailsOpen] = useState(false)
+  const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
+  const [dialogEditOpen, setDialogEditOpen] = useState(false);
+  const [dialogDetailsOpen, setDialogDetailsOpen] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [row, setRow] = useState({})
-  const { getData, localState } = props
+  const [row, setRow] = useState({});
+  const { getData, localState } = props;
 
   const columns = useMemo(() => {
-    const cols = []
+    const cols = [];
 
     for (let index = 0; index < PageConfig.listFields.length; index++) {
-      const el = PageConfig.listFields[index]
+      const el = PageConfig.listFields[index];
       if (props.checkboxList.includes(el.key)) {
         if (
           ["created_at", "updated_at", "email_verified_at"].includes(el.key)
@@ -140,14 +140,14 @@ export const PageTable = (props) => {
             width: el.width,
             sticky: el.sticky,
             Cell: (props) => {
-              const row = props.row.original
+              const row = props.row.original;
               return (
                 <span>
                   {dayjs.utc(row[el.key]).local().format("YYYY-MM-DD H:mm")}{" "}
                 </span>
-              )
+              );
             },
-          })
+          });
         } else if (el.type === "id") {
           cols.push({
             Header: el.label,
@@ -156,19 +156,19 @@ export const PageTable = (props) => {
             width: el.width,
             sticky: el.sticky,
             Cell: (props) => {
-              const row = props.row.original
+              const row = props.row.original;
               return (
                 <span
                   className="text-sky-600 text-sm font-bold leading-[21px] cursor-pointer"
                   onClick={() => {
-                    navigate(`${PageConfig.url}/detail/${row["id"]}`)
+                    navigate(`${PageConfig.url}/detail/${row["id"]}`);
                   }}
                 >
                   {row[el.key]}
                 </span>
-              )
+              );
             },
-          })
+          });
         } else if (el.type === "status") {
           cols.push({
             Header: el.label,
@@ -177,7 +177,7 @@ export const PageTable = (props) => {
             width: el.width,
             sticky: el.sticky,
             Cell: (props) => {
-              const row = props.row.original
+              const row = props.row.original;
               return (
                 <div>
                   <CardStatus
@@ -187,9 +187,9 @@ export const PageTable = (props) => {
                     classMain="w-[152px]"
                   />
                 </div>
-              )
+              );
             },
-          })
+          });
         } else {
           cols.push({
             Header: el.label,
@@ -197,7 +197,7 @@ export const PageTable = (props) => {
             sortable: el.sortable,
             width: el.width,
             sticky: el.sticky,
-          })
+          });
         }
       }
     }
@@ -220,27 +220,27 @@ export const PageTable = (props) => {
               setDialogEditOpen={setDialogEditOpen}
               setDialogDetailsOpen={setDialogDetailsOpen}
             />
-          )
+          );
         },
-      })
+      });
     }
 
-    return cols
-  }, [props.checkboxList])
+    return cols;
+  }, [props.checkboxList]);
 
   const metaTable = {
     total: props.localState.meta?.total || 0,
     pageIndex: props.localState.meta?.current_page || 1,
     pageSize: props.localState.meta?.per_page || 10,
-  }
+  };
 
   const onPaginationChange = (page) => {
-    props.getData({ ...props.localState.params, page: page })
-  }
+    props.getData({ ...props.localState.params, page: page });
+  };
 
   const onSelectChange = (value) => {
-    props.getData({ ...props.localState.params, limit: value, page: 1 })
-  }
+    props.getData({ ...props.localState.params, limit: value, page: 1 });
+  };
 
   const onSort = (sort, sortingColumn) => {
     props.getData({
@@ -248,46 +248,46 @@ export const PageTable = (props) => {
       order_by: sort.key,
       sort_by: sort.order,
       page: 1,
-    })
-  }
+    });
+  };
 
   const onAllRowSelect = useCallback(
     (checked, rows) => {
       if (checked) {
-        const originalRows = rows.map((row) => row.original)
-        const selectedIds = []
+        const originalRows = rows.map((row) => row.original);
+        const selectedIds = [];
 
         for (let index = 0; index < originalRows.length; index++) {
-          const el = originalRows[index]
-          selectedIds.push(el[PageConfig.primaryKey])
+          const el = originalRows[index];
+          selectedIds.push(el[PageConfig.primaryKey]);
         }
 
-        props.setIds(selectedIds)
+        props.setIds(selectedIds);
       } else {
-        props.setIds([])
+        props.setIds([]);
       }
     },
     [props]
-  )
+  );
 
   const onCheckBoxChange = (checked, row) => {
     props.setIds((s) => {
-      let x = [...s]
+      let x = [...s];
       if (checked) {
-        x.push(row[PageConfig.primaryKey])
+        x.push(row[PageConfig.primaryKey]);
       } else {
         for (let index = 0; index < x.length; index++) {
-          const el = x[index]
+          const el = x[index];
 
           if (row[PageConfig.primaryKey] === el) {
-            x.splice(index, 1)
+            x.splice(index, 1);
           }
         }
       }
 
-      return x
-    })
-  }
+      return x;
+    });
+  };
 
   return (
     <>
@@ -311,21 +311,21 @@ export const PageTable = (props) => {
       <ConfirmDialog
         isOpen={dialogDeleteOpen}
         onClose={() => {
-          setDialogDeleteOpen(false)
+          setDialogDeleteOpen(false);
         }}
         onRequestClose={() => {
-          setDialogDeleteOpen(false)
+          setDialogDeleteOpen(false);
         }}
         type="danger"
         title="Delete data"
         onCancel={() => {
-          setDialogDeleteOpen(false)
+          setDialogDeleteOpen(false);
         }}
         onConfirm={async () => {
           try {
-            await apiDestroy(row[PageConfig.primaryKey])
-            getData({ ...localState.params, page: 1 })
-            setDialogDeleteOpen(false)
+            await apiDestroy(row[PageConfig.primaryKey]);
+            getData({ ...localState.params, page: 1 });
+            setDialogDeleteOpen(false);
 
             toast.push(
               <Notification
@@ -338,7 +338,7 @@ export const PageTable = (props) => {
               {
                 placement: "top-center",
               }
-            )
+            );
           } catch (error) {
             toast.push(
               <Notification title={"Error"} type="danger">
@@ -349,7 +349,7 @@ export const PageTable = (props) => {
               {
                 placement: "top-center",
               }
-            )
+            );
           }
         }}
         confirmButtonColor="red-600"
@@ -363,10 +363,10 @@ export const PageTable = (props) => {
       <Dialog
         isOpen={dialogDetailsOpen}
         onClose={() => {
-          setDialogDetailsOpen(false)
+          setDialogDetailsOpen(false);
         }}
         onRequestClose={() => {
-          setDialogDetailsOpen(false)
+          setDialogDetailsOpen(false);
         }}
         width={700}
         bodyOpenClassName="dialog-scroll"
@@ -375,7 +375,7 @@ export const PageTable = (props) => {
           <Details
             item={row}
             onDialogClose={() => {
-              setDialogDetailsOpen(false)
+              setDialogDetailsOpen(false);
             }}
           />
         </div>
@@ -384,10 +384,10 @@ export const PageTable = (props) => {
       <Dialog
         isOpen={dialogEditOpen}
         onClose={() => {
-          setDialogEditOpen(false)
+          setDialogEditOpen(false);
         }}
         onRequestClose={() => {
-          setDialogEditOpen(false)
+          setDialogEditOpen(false);
         }}
         width={700}
         bodyOpenClassName="dialog-scroll"
@@ -395,7 +395,7 @@ export const PageTable = (props) => {
         <div className="flex flex-col h-full justify-between">
           <FormData
             onDialogClose={() => {
-              setDialogEditOpen(false)
+              setDialogEditOpen(false);
             }}
             title="Edit Data"
             getData={props.getData}
@@ -405,5 +405,5 @@ export const PageTable = (props) => {
         </div>
       </Dialog>
     </>
-  )
-}
+  );
+};

@@ -327,4 +327,29 @@ export const ROUTE_LIST = [
     ),
     authority: [],
   },
+
+  {
+    key: "researchAndDevelopment.trialFormula.report.add",
+    path: "/research-development/trial-formulasi/trial-formula/add-report/:id",
+    component: React.lazy(() =>
+      import("views/R&D/TrialFormula/AddReportTrialFormula")
+    ),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialFormula.report.edit",
+    path: "/research-development/trial-formulasi/trial-formula/edit-report/:id",
+    component: React.lazy(() =>
+      import("views/R&D/TrialFormula/AddReportTrialFormula")
+    ),
+    authority: [],
+  },
+
+  {
+    key: "researchAndDevelopment.trialFormula.report.detail",
+    path: "/research-development/trial-formulasi/trial-formula/report-detail/:id",
+    component: React.lazy(() => import("views/R&D/TrialFormula/DetailReport")),
+    authority: [],
+  },
 ];

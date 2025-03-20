@@ -224,10 +224,11 @@ const DataTable = (props) => {
       >
         {showHeader && (
           <THead>
-            {headerGroups.map((headerGroup) => (
-              <Tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroups.map((headerGroup, headerGroupIndex) => (
+              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroupIndex}>
                 {headerGroup.headers.map((column, index) => (
                   <Th
+                    key={column.id || index}
                     {...column.getHeaderProps({
                       style: {
                         minWidth: column.minWidth,
@@ -298,11 +299,12 @@ const DataTable = (props) => {
                 </Td>
               </Tr>
             ) : (
-              page.map((row, i) => {
+              page.map((row) => {
                 prepareRow(row);
                 return (
                   <Tr
                     {...row.getRowProps()}
+                    key={row.id || row.original.id || row.index} // Added key prop
                     className={`${rowClassName?.(row.original) || ""}`}
                   >
                     {row.cells.map((cell, index) => {
@@ -313,6 +315,7 @@ const DataTable = (props) => {
                           : true;
                       return (
                         <Td
+                          key={cell.column.id || index} // Added key prop
                           {...cell.getCellProps({
                             style: {
                               ...getStickyStyle(

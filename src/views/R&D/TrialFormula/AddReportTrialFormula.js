@@ -2,17 +2,32 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LayoutRightSpace from "components/layout/LayoutRightSpace";
 import Accordion, { AccordionItem } from "components/ui/Accordion/index";
-import FormAddLaporan from "components/rmp/R&D/TrialBahanKemas/FormAddLaporan";
+import FormAddReportTrialFormula from "components/rmp/R&D/TrialFormula/FormAddReport";
+import { useParams, useLocation } from "react-router-dom";
+import useProcessRnd from "utils/hooks/Rnd/useProcessRnd";
 
-const DetailBahanKemas = () => {
+const ReportTrialFormula = () => {
+  const [dataTrialFormulation, setDataTrialFormulation] = useState([]);
+  const { getDetailTrialFormulations } = useProcessRnd();
+  const { id } = useParams();
   const dispatch = useDispatch();
-  const [imageFiles, setImageFiles] = useState([]);
+  const location = useLocation();
+  const isEdit = location.pathname.includes("edit");
+
+  useEffect(() => {
+    const fecthData = async () => {
+      const response = await getDetailTrialFormulations(id);
+      setDataTrialFormulation(response.data);
+      console.log(response);
+    };
+    fecthData();
+  }, []);
 
   return (
     <div className="p-6 ">
       <div className="flex items-center gap-2 mb-4 px-4 ">
         <h1 className="text-2xl font-semibold text-indigo-900">
-          Laporan Trial Bahan Kemas
+          Laporan Trial Formula
         </h1>
       </div>
 
@@ -22,10 +37,11 @@ const DetailBahanKemas = () => {
           <div className="w-1/4 p-4 ">
             <h2 className="text-lg font-medium mb-4">Informasi</h2>
             <div className="space-y-4">
-              <InfoRow label="Nama Trial" value="Trial 1" />
-              <InfoRow label="Tanggal Pelaksanaan" value="10/10/2024" />
-              <InfoRow label="Vendor" value="PT. Gunung Sindur" multiline />
-              <InfoRow label="Manufaktur" value="PT. Bromo" />
+              <InfoRow label="Nama Trial" value={dataTrialFormulation?.name} />
+              <InfoRow
+                label="Tanggal Pelaksanaan"
+                value={dataTrialFormulation?.trial_date}
+              />
             </div>
 
             <Accordion className="shadow-none mt-4">
@@ -41,28 +57,10 @@ const DetailBahanKemas = () => {
 
           {/* Right Section */}
           <div className="w-3/4 p-4 border-l">
-            <Accordion className="shadow-none mt-4">
-              <AccordionItem
-                title="Bahan Kemas 1"
-                titleClass="text-lg font-medium"
-                bodyClass="space-y-4"
-              >
-                <div className="py-2">
-                  <div className="grid grid-cols-2 gap-4">
-                    <p>Bahan Pengemas</p>
-                    <p className="text-indigo-900">Bahan Kemas 1</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <p>Supplier</p>
-                    <p className="text-indigo-900">Supplier 20</p>
-                  </div>
-                </div>
-                <div>
-                  <FormAddLaporan />
-                </div>
-              </AccordionItem>
-            </Accordion>
+            <FormAddReportTrialFormula
+              dataTrial={dataTrialFormulation}
+              isEdit={isEdit}
+            />
           </div>
         </div>
       </LayoutRightSpace>
@@ -80,4 +78,4 @@ const InfoRow = ({ label, value, multiline = false }) => {
     </div>
   );
 };
-export default DetailBahanKemas;
+export default ReportTrialFormula;

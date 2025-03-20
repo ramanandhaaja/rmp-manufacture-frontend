@@ -76,7 +76,9 @@ const TrialFormulaList = () => {
       return (
         <TableListDropdown
           placement={
-            dataTable.length > 1 && row.index < 1 ? "bottom-end" : "top-end"
+            dataTable.length > 1 && row.index < 1
+              ? "bottom-end"
+              : "middle-end-bottom"
           }
           dropdownItemList={[
             {
@@ -110,16 +112,24 @@ const TrialFormulaList = () => {
     return (
       <TableListDropdown
         placement={
-          dataTable.length > 1 && row.index < 1
-            ? "bottom-end"
-            : "middle-end-bottom"
+          dataTable.length >= 1 && row.index < 1
+            ? "middle-end-bottom"
+            : "top-end"
         }
         dropdownItemList={[
           {
             label: "Buat Laporan",
             onClick: () => {
               navigate(
-                `/research-development/trial-formulasi/trial-bahan-kemas/add-laporan/${row.original.id}`
+                `/research-development/trial-formulasi/trial-formula/add-report/${row.original.id}`
+              );
+            },
+          },
+          {
+            label: "Lihat Detail",
+            onClick: () => {
+              navigate(
+                `/research-development/trial-formulasi/trial-formula/report-detail/${row.original.id}`
               );
             },
           },
